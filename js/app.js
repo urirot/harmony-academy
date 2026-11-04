@@ -101,19 +101,7 @@ function renderTabs() {
   document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
-  // Phones show one pane at a time, so collapsing only applies to the two-pane layout.
-  $('#main').classList.toggle('collapsed', !!state.lessonCollapsed && !narrow.matches);
-  $('#railLabel').textContent = `Week ${l.week} · ${l.title}`;
 }
-
-function setLessonCollapsed(collapsed) {
-  state.lessonCollapsed = collapsed;
-  save();
-  renderTabs();
-}
-$('#collapseLesson').addEventListener('click', () => setLessonCollapsed(true));
-$('#expandLesson').addEventListener('click', () => setLessonCollapsed(false));
-$('#railLabel').addEventListener('click', () => setLessonCollapsed(false));
 // On phones the header shows where you are; tapping it goes back to the lesson.
 $('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 

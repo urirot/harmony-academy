@@ -184,14 +184,6 @@ main {
   padding: 0 var(--s6);
 }
 .tool-pane > .panel, .tabs { max-width: 880px; }
-/* Collapsed lesson: a slim rail that brings it back. */
-.rail { display: none; }
-.collapse-btn { margin-left: var(--s2); }
-main.collapsed { grid-template-columns: 36px minmax(0, 1fr); column-gap: var(--s6); }
-main.collapsed .lesson-pane > :not(.rail) { display: none; }
-main.collapsed .rail { display: flex; flex-direction: column; align-items: center; gap: var(--s3); }
-.rail-label { writing-mode: vertical-rl; transform: rotate(180deg); border: none; background: none; padding: var(--s2) 0; font: 400 var(--fs-sm)/1 var(--sans); color: var(--muted); cursor: pointer; white-space: nowrap; }
-.rail-label:hover { color: var(--text); }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
@@ -347,7 +339,6 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
   .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
   .tab-lesson { display: block; }
-  .collapse-btn { display: none; }
   .lesson-pane, .tool-pane { grid-column: 1; grid-row: 2; padding: var(--s5) 0 var(--s7); }
   main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
 }
@@ -390,13 +381,8 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
     </nav>
 
     <section class="pane lesson-pane" id="lessonPane">
-      <div class="rail">
-        <button class="icon-btn" id="expandLesson" title="Show the lessons" aria-label="Show the lessons">⇥</button>
-        <button class="rail-label" id="railLabel" title="Show the lessons"></button>
-      </div>
       <div class="side-head">
         <select class="week-select" id="weekSelect" aria-label="Week"></select>
-        <button class="icon-btn sm collapse-btn" id="collapseLesson" title="Hide the lessons to give the tools more room" aria-label="Hide the lessons">⇤</button>
       </div>
       <div class="pace">
         <span class="sm muted" id="paceLine"></span>
@@ -2066,19 +2052,7 @@ function renderTabs() {
   document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
-  // Phones show one pane at a time, so collapsing only applies to the two-pane layout.
-  $('#main').classList.toggle('collapsed', !!state.lessonCollapsed && !narrow.matches);
-  $('#railLabel').textContent = `Week ${l.week} · ${l.title}`;
 }
-
-function setLessonCollapsed(collapsed) {
-  state.lessonCollapsed = collapsed;
-  save();
-  renderTabs();
-}
-$('#collapseLesson').addEventListener('click', () => setLessonCollapsed(true));
-$('#expandLesson').addEventListener('click', () => setLessonCollapsed(false));
-$('#railLabel').addEventListener('click', () => setLessonCollapsed(false));
 // On phones the header shows where you are; tapping it goes back to the lesson.
 $('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
