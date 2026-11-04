@@ -23,8 +23,8 @@
     </div>
     <div class="top-actions">
       <button class="btn btn-sm" id="copyLogBtn" title="Copy a text summary of your progress">Progress log</button>
-      <button class="btn btn-sm" id="backupBtn" title="Download all progress as a JSON file">Back up</button>
-      <button class="btn btn-sm" id="restoreBtn" title="Restore progress from a backup">Restore</button>
+      <button class="btn btn-sm" id="backupBtn" title="Download a file with all your progress">Save progress</button>
+      <button class="btn btn-sm" id="restoreBtn" title="Load progress from a saved file">Load progress</button>
     </div>
   </header>
 
@@ -134,14 +134,14 @@
   </dialog>
 
   <dialog id="restoreDialog">
-    <h3>Restore progress</h3>
-    <p class="small muted">Choose a backup file, or paste its contents. This replaces everything stored on this device.</p>
+    <h3>Load progress</h3>
+    <p class="small muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
     <input type="file" id="restoreFile" accept="application/json,.json">
-    <textarea id="restoreText" class="mono" rows="8" placeholder="…or paste the backup JSON here"></textarea>
+    <textarea id="restoreText" class="mono" rows="8" placeholder="…or paste the file’s contents here"></textarea>
     <p class="small error" id="restoreError"></p>
     <div class="row end">
       <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="restoreApply">Restore</button>
+      <button class="btn btn-primary" id="restoreApply">Load</button>
     </div>
   </dialog>
 

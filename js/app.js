@@ -908,14 +908,20 @@ $('#copyLogBtn').addEventListener('click', async () => {
   openDialog('#logDialog');
 });
 
+// The saved file leads with the readable progress log, so it makes sense opened
+// in a text editor; the rest is the full state that "Load progress" reads back.
 $('#backupBtn').addEventListener('click', () => {
   save();
-  const blob = new Blob([JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const file = { summary: progressLog().split('\n'), savedAt: new Date().toISOString(), ...state };
+  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `harmony-academy-backup-${today()}.json`;
+  a.download = `harmony-academy-progress-${today()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  const btn = $('#backupBtn');
+  btn.textContent = 'Saved ✓';
+  setTimeout(() => { btn.textContent = 'Save progress'; }, 2000);
 });
 
 $('#restoreBtn').addEventListener('click', () => {
@@ -930,9 +936,9 @@ $('#restoreFile').addEventListener('change', async (e) => {
 });
 $('#restoreApply').addEventListener('click', () => {
   let data;
-  try { data = JSON.parse($('#restoreText').value); } catch { $('#restoreError').textContent = 'That is not valid JSON. Use a file from “Back up”.'; return; }
-  if (!data || data.version !== 1 || typeof data.lessons !== 'object') { $('#restoreError').textContent = 'This does not look like a Harmony Academy backup.'; return; }
-  delete data.exportedAt;
+  try { data = JSON.parse($('#restoreText').value); } catch { $('#restoreError').textContent = 'That is not valid JSON. Use a file from “Save progress”.'; return; }
+  if (!data || data.version !== 1 || typeof data.lessons !== 'object') { $('#restoreError').textContent = 'This does not look like a Harmony Academy progress file.'; return; }
+  ['summary', 'savedAt', 'exportedAt'].forEach((k) => delete data[k]);
   state = { ...freshState(), ...data };
   save();
   $('#restoreDialog').close();

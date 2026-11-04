@@ -17,10 +17,13 @@ Use Chrome or Edge. Both save progress and support a USB MIDI keyboard
 
 Progress (checklists, journal, ear-training scores, practice time) is stored in
 the browser, per address: the Pages link and the local file keep separate
-progress, and devices do not sync. To move it, use **Back up** on one and
-**Restore** on the other. Clearing site data or a private window loses it. On
-iPhone, add the page to the Home Screen, or Safari may clear it after a week
-unvisited.
+progress, and devices do not sync. Clearing site data or a private window
+loses it. On iPhone, add the page to the Home Screen, or Safari may clear it
+after a week unvisited.
+
+**Save progress** downloads `harmony-academy-progress-<date>.json`: a readable
+summary at the top, then everything needed to restore. **Load progress** reads
+that file back, in any browser or on any machine.
 
 ## What is in it
 
