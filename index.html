@@ -4,144 +4,186 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#1e3a8a">
-  <title>Harmony & Ear Academy</title>
+  <meta name="theme-color" content="#FBFAF8">
+  <title>Harmony Academy</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <h1>Harmony &amp; Ear Academy</h1>
-      <p>Phase 1 · Classical harmony &amp; voice leading · 3 sessions a week</p>
-    </div>
-    <div class="timer" id="timer">
-      <button class="btn btn-sm" id="timerToggle" title="Start or pause the practice timer">▶</button>
-      <span class="mono" id="timerSession">00:00</span>
-      <span class="muted" id="timerTotals"></span>
-    </div>
-    <div class="top-actions">
-      <button class="btn btn-sm" id="copyLogBtn" title="Copy a text summary of your progress">Progress log</button>
-      <button class="btn btn-sm" id="backupBtn" title="Download a file with all your progress">Save progress</button>
-      <button class="btn btn-sm" id="restoreBtn" title="Load progress from a saved file">Load progress</button>
+  <header class="top">
+    <div class="top-inner">
+      <button class="icon-btn" id="drawerBtn" aria-label="Course map" title="Course map">☰</button>
+      <button class="app-name" id="crumb" title="Course map">Harmony Academy</button>
+      <div class="spacer"></div>
+      <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
+      <div class="menu-wrap">
+        <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
+        <div class="popover menu" id="menu" hidden>
+          <p class="sm muted" id="timerTotals"></p>
+          <button class="menu-item" id="copyLogBtn">Progress log</button>
+          <button class="menu-item" id="backupBtn">Save progress</button>
+          <button class="menu-item" id="restoreBtn">Load progress</button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="layout">
-    <nav class="course" id="course" aria-label="Course map"></nav>
+  <main id="main" data-view="lesson">
+    <nav class="tabs" id="tabs" role="tablist">
+      <button class="tab tab-lesson" data-tab="lesson" role="tab">Lesson</button>
+      <button class="tab" data-tab="lab" role="tab">Lab</button>
+      <button class="tab" data-tab="workbench" role="tab">Workbench</button>
+      <button class="tab" data-tab="ear" role="tab">Ear</button>
+      <button class="tab" data-tab="explore" role="tab">Explore</button>
+    </nav>
 
-    <main id="main">
-      <section class="lesson-head" id="lessonHead"></section>
-
-      <div class="grid">
-        <div class="col">
-          <section class="card" id="checklistCard">
-            <div class="card-title"><h2>Session checklist</h2><span class="mono accent" id="checklistPct"></span></div>
-            <ul class="tasks" id="tasks"></ul>
-            <div id="lessonNav" class="lesson-nav"></div>
-          </section>
-
-          <section class="card" id="vlCard">
-            <div class="card-title"><h2>Voice-leading lab</h2><span class="muted small" id="vlKey"></span></div>
-            <div class="pills" id="vlPills"></div>
-            <p class="small muted" id="vlNote"></p>
-            <div id="vlView"></div>
-          </section>
-
-          <section class="card" id="workbenchCard">
-            <div class="card-title"><h2>Workbench</h2><span class="muted small">Check your own part-writing</span></div>
-            <p class="small muted">One chord per line: an optional Roman numeral, then soprano, alto, tenor and bass. Sharps are <span class="mono">#</span>, flats <span class="mono">b</span>.</p>
-            <div class="row">
-              <label class="small" for="wbKey">Key</label>
-              <select id="wbKey"></select>
-              <button class="btn btn-sm btn-primary" id="wbCheck">Check &amp; play</button>
-              <button class="btn btn-sm" id="wbExample">Example</button>
-            </div>
-            <textarea id="wbText" class="mono" rows="5" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
-            <div id="wbView"></div>
-          </section>
-        </div>
-
-        <div class="col">
-          <section class="card" id="earCard">
-            <div class="card-title"><h2>Ear lab</h2><span class="mono accent" id="earStats"></span></div>
-            <div class="pills" id="earTabs" role="tablist"></div>
-            <div class="pills pills-sub" id="earLevels"></div>
-            <div class="pills pills-sub" id="earDirections"></div>
-            <p class="small muted" id="earHint"></p>
-            <div class="row">
-              <button class="btn btn-primary" id="earNew">▶ New <kbd>Space</kbd></button>
-              <button class="btn" id="earReplay">↻ Replay <kbd>R</kbd></button>
-              <span class="small muted" id="earStatus">Press New, sing it back, then answer.</span>
-            </div>
-            <div class="answers" id="earAnswers"></div>
-            <div class="feedback" id="earFeedback" hidden></div>
-            <p class="small muted" id="earWeak"></p>
-          </section>
-
-          <section class="card" id="explorerCard">
-            <div class="card-title"><h2>Chord explorer</h2>
-              <select id="exKey" aria-label="Explorer key"></select>
-            </div>
-            <div class="pills" id="exChords"></div>
-            <div id="exView" class="explain mono small">Pick a chord to hear it and see how it is built.</div>
-          </section>
-
-          <section class="card" id="droneCard">
-            <div class="card-title"><h2>Drone &amp; scale degrees</h2>
-              <div class="row">
-                <select id="droneKey" aria-label="Drone key"></select>
-                <button class="btn btn-sm" id="droneToggle">▶ Drone</button>
-              </div>
-            </div>
-            <p class="small muted">Start the drone, sing a degree, then tap it to check your pitch.</p>
-            <div class="pills" id="degreeButtons"></div>
-          </section>
-
-          <section class="card" id="journalCard">
-            <div class="card-title"><h2>Journal</h2><span class="muted small" id="journalSaved">Saved on this device</span></div>
-            <textarea id="journal" rows="5" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
-          </section>
-
-          <section class="card" id="sourcesCard">
-            <div class="card-title"><h2>Sources</h2></div>
-            <ul class="sources" id="sources"></ul>
-          </section>
-        </div>
+    <section class="pane lesson-pane" id="lessonPane">
+      <div class="eyebrow-row">
+        <span class="eyebrow" id="eyebrow"></span>
+        <span class="stepper">
+          <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson">‹</button>
+          <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson">›</button>
+        </span>
       </div>
-    </main>
-  </div>
+      <h1 class="lesson-title" id="lessonTitle"></h1>
+      <p class="goal" id="lessonGoal"></p>
+
+      <h2 class="section-title">Key ideas</h2>
+      <ul class="ideas" id="ideas"></ul>
+
+      <div class="section-head">
+        <h2 class="section-title">Session</h2>
+        <span class="sm muted" id="checklistPct"></span>
+      </div>
+      <div class="progress"><span id="progressFill"></span></div>
+      <ul class="tasks" id="tasks"></ul>
+      <div id="nextUp"></div>
+
+      <h2 class="section-title">Notes</h2>
+      <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+      <p class="xs muted" id="journalSaved">Saved in this browser</p>
+    </section>
+
+    <section class="pane tool-pane" id="toolPane">
+      <div class="panel" id="panel-lab" data-panel="lab">
+        <div class="lab-head">
+          <span class="stepper">
+            <button class="icon-btn sm" id="vlPrev" aria-label="Previous example">‹</button>
+            <span class="sm muted" id="vlCount"></span>
+            <button class="icon-btn sm" id="vlNext" aria-label="Next example">›</button>
+          </span>
+          <span class="sm muted" id="vlKey"></span>
+        </div>
+        <h2 class="panel-title" id="vlTitle"></h2>
+        <p class="muted" id="vlNote"></p>
+        <div id="vlView"></div>
+      </div>
+
+      <div class="panel" id="panel-workbench" data-panel="workbench">
+        <h2 class="panel-title">Check your own part-writing</h2>
+        <p class="muted">One chord per line: a Roman numeral, then soprano, alto, tenor and bass. Write sharps as <span class="mono">#</span> and flats as <span class="mono">b</span>.</p>
+        <div class="row">
+          <select id="wbKey" aria-label="Key"></select>
+          <button class="btn primary" id="wbCheck">Check &amp; play</button>
+          <button class="btn quiet" id="wbExample">Example</button>
+        </div>
+        <textarea id="wbText" class="mono" rows="6" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
+        <div id="wbView"></div>
+      </div>
+
+      <div class="panel" id="panel-ear" data-panel="ear">
+        <div class="ear-head">
+          <div class="row">
+            <select id="earEx" aria-label="Drill"></select>
+            <select id="earLevel" aria-label="Level"></select>
+            <select id="earDir" aria-label="Direction"></select>
+          </div>
+          <span class="sm muted" id="earStats"></span>
+        </div>
+        <p class="muted" id="earHint"></p>
+        <div class="row">
+          <button class="btn primary" id="earNew">▶ New</button>
+          <button class="btn" id="earReplay">↻ Replay</button>
+          <span class="xs muted key-hint">Space · R · 1–9</span>
+        </div>
+        <p class="feedback" id="earFeedback">Press New, sing it back, then answer.</p>
+        <div class="tiles answers" id="earAnswers"></div>
+        <p class="sm muted" id="earWeak"></p>
+      </div>
+
+      <div class="panel" id="panel-explore" data-panel="explore">
+        <div class="section-head">
+          <h2 class="panel-title">Chords</h2>
+          <select id="exKey" aria-label="Chord key"></select>
+        </div>
+        <div class="tiles chords" id="exChords"></div>
+        <p class="readout" id="exView">Pick a chord to hear it and see how it is built.</p>
+
+        <div class="section-head drone-head">
+          <h2 class="panel-title">Drone &amp; scale degrees</h2>
+          <div class="row">
+            <select id="droneKey" aria-label="Drone key"></select>
+            <button class="btn" id="droneToggle">▶ Drone</button>
+          </div>
+        </div>
+        <p class="muted">Start the drone, sing a degree, then tap it to check your pitch.</p>
+        <div class="tiles degrees" id="degreeButtons"></div>
+      </div>
+    </section>
+  </main>
 
   <footer class="dock" id="dock">
     <div class="dock-bar">
-      <button class="btn btn-sm" id="dockToggle" aria-expanded="true">▾ Keyboard</button>
-      <span class="small muted" id="dockStatus">Click, or type A–K on your computer keyboard (Z/X shift octave)</span>
-      <span class="dock-right">
-        <span class="legend"><i class="sw sw-bass"></i>bass <i class="sw sw-upper"></i>upper <i class="sw sw-sel"></i>your notes</span>
-        <button class="btn btn-sm" id="midiBtn" hidden>Connect MIDI</button>
-        <button class="btn btn-sm" id="stopBtn" title="Stop all sound">■ Stop</button>
-      </span>
+      <button class="btn quiet sm" id="dockToggle" aria-expanded="true">Keyboard ▾</button>
+      <span class="sm muted" id="dockStatus"></span>
+      <div class="spacer"></div>
+      <div class="menu-wrap">
+        <button class="icon-btn sm" id="helpBtn" aria-label="Keyboard help" aria-expanded="false">?</button>
+        <div class="popover help up" id="help" hidden>
+          <p>Click a key, or type on your computer: <span class="mono">A S D F G H J K</span> are the white keys from C, <span class="mono">W E T Y U</span> the black keys. <span class="mono">Z</span>/<span class="mono">X</span> shift the octave.</p>
+          <p class="legend"><i class="sw sw-bass"></i>bass <i class="sw sw-upper"></i>upper voices <i class="sw sw-sel"></i>your notes</p>
+        </div>
+      </div>
+      <button class="btn quiet sm" id="midiBtn" hidden>MIDI</button>
+      <button class="btn quiet sm" id="stopBtn" title="Stop all sound">■ Stop</button>
     </div>
     <div class="piano-wrap"><div class="piano" id="piano"></div></div>
   </footer>
 
-  <dialog id="logDialog">
-    <h3>Progress log</h3>
-    <p class="small muted" id="logNote">Copied to the clipboard.</p>
-    <textarea id="logText" class="mono" rows="16" readonly></textarea>
-    <div class="row end"><button class="btn btn-primary" data-close>Done</button></div>
+  <dialog class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div>
+        <h2 class="panel-title">Phase 1 · Classical harmony</h2>
+        <p class="sm muted" id="courseCount"></p>
+      </div>
+      <button class="icon-btn" data-close aria-label="Close">✕</button>
+    </div>
+    <nav id="course" aria-label="Lessons"></nav>
+    <h3 class="section-title">Sources</h3>
+    <ul class="sources" id="sources"></ul>
   </dialog>
 
-  <dialog id="restoreDialog">
-    <h3>Load progress</h3>
-    <p class="small muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
-    <input type="file" id="restoreFile" accept="application/json,.json">
-    <textarea id="restoreText" class="mono" rows="8" placeholder="…or paste the file’s contents here"></textarea>
-    <p class="small error" id="restoreError"></p>
+  <dialog class="modal" id="logDialog">
+    <h2 class="dialog-title">Progress log</h2>
+    <p class="sm muted" id="logNote">Copied to the clipboard.</p>
+    <textarea id="logText" class="mono" rows="14" readonly></textarea>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog class="modal" id="restoreDialog">
+    <h2 class="dialog-title">Load progress</h2>
+    <p class="muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
+    <div class="row">
+      <button class="btn" id="restoreChoose">Choose file…</button>
+      <span class="sm muted" id="restoreFileName"></span>
+      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    </div>
+    <textarea id="restoreText" class="mono" rows="6" placeholder="…or paste the file’s contents here"></textarea>
+    <p class="sm bad" id="restoreError"></p>
     <div class="row end">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="restoreApply">Load</button>
+      <button class="btn quiet" data-close>Cancel</button>
+      <button class="btn primary" id="restoreApply">Load</button>
     </div>
   </dialog>
 

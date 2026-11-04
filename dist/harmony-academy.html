@@ -4,59 +4,75 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#1e3a8a">
-  <title>Harmony & Ear Academy</title>
+  <meta name="theme-color" content="#FBFAF8">
+  <title>Harmony Academy</title>
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxZTNhOGEiLz4KICA8ZyBmaWxsPSIjZmJmYWY3Ij4KICAgIDxyZWN0IHg9IjEwIiB5PSIxNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjM2IiByeD0iMiIvPgogICAgPHJlY3QgeD0iMjIiIHk9IjE0IiB3aWR0aD0iMTAiIGhlaWdodD0iMzYiIHJ4PSIyIi8+CiAgICA8cmVjdCB4PSIzNCIgeT0iMTQiIHdpZHRoPSIxMCIgaGVpZ2h0PSIzNiIgcng9IjIiLz4KICAgIDxyZWN0IHg9IjQ2IiB5PSIxNCIgd2lkdGg9IjgiIGhlaWdodD0iMzYiIHJ4PSIyIi8+CiAgPC9nPgogIDxnIGZpbGw9IiNmNTllMGIiPgogICAgPHJlY3QgeD0iMTciIHk9IjE0IiB3aWR0aD0iNyIgaGVpZ2h0PSIyMSIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iNDEiIHk9IjE0IiB3aWR0aD0iNyIgaGVpZ2h0PSIyMSIgcng9IjEuNSIvPgogIDwvZz4KPC9zdmc+Cg==">
   <style>
-/* Palette kept from the original app: warm paper, navy accent, amber highlight. */
+/* Calm two-pane study desk: lesson on the left, one tool on the right.
+   No cards; hairlines only under the header and tabs, between tasks, under the
+   table head and above the dock. One accent. Six type sizes. */
+
 :root {
-  --bg: #f8f7f4;
-  --surface: #ffffff;
-  --subtle: #f1efe9;
-  --border: #e2ded4;
-  --border-strong: #cbc5b8;
-  --text: #17191e;
-  --muted: #5d6573;
-  --accent: #1e3a8a;
-  --accent-soft: #eff4ff;
-  --accent-border: #bfd0fe;
-  --amber: #a14a07;
-  --amber-soft: #fef3c7;
-  --green: #15803d;
-  --green-soft: #dcfce7;
-  --red: #b91c1c;
-  --red-soft: #fee2e2;
-  --key-white: #fbfaf7;
-  --key-black: #1b1c20;
-  --lit-bass: #3b82f6;
-  --lit-upper: #f59e0b;
-  --lit-sel: #10b981;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --dock-h: 190px;
+  --bg: #FBFAF8;
+  --surface: #FFFFFF;
+  --subtle: #F3F1ED;
+  --line: #E7E3DC;
+  --line-strong: #D3CEC4;
+  --text: #1C1D21;
+  --muted: #6B6F78;
+  --accent: #3451B2;
+  --accent-soft: #EEF1FB;
+  --on-accent: #FFFFFF;
+  --ok: #2F7D4F;
+  --ok-soft: #E9F5EE;
+  --bad: #B4382F;
+  --bad-soft: #FBECEA;
+  --warn: #A35A00;
+  --lit-bass: #3451B2;
+  --lit-upper: #E0A33A;
+  --lit-sel: #2F9E6A;
+  --key-white: #FFFFFF;
+  --key-black: #22242A;
+  --key-edge: #C9C4BA;
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+  --fs-xs: 12px; --lh-xs: 16px;
+  --fs-sm: 13px; --lh-sm: 20px;
+  --fs-base: 15px; --lh-base: 24px;
+  --fs-md: 17px; --lh-md: 26px;
+  --fs-lg: 20px; --lh-lg: 28px;
+  --fs-xl: 28px; --lh-xl: 36px;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --r: 8px;
+  --r-lg: 12px;
+  --shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  --header-h: 56px;
+  --tabs-h: 44px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14161b;
-    --surface: #1c1f26;
-    --subtle: #23262e;
-    --border: #2f333d;
-    --border-strong: #454a56;
-    --text: #e8e6e1;
-    --muted: #9aa1ad;
-    --accent: #93b4ff;
-    --accent-soft: #1d2740;
-    --accent-border: #33467a;
-    --amber: #fbbf24;
-    --amber-soft: #3a2e12;
-    --green: #4ade80;
-    --green-soft: #12301f;
-    --red: #f87171;
-    --red-soft: #3a1717;
-    --key-white: #e9e7e2;
-    --key-black: #0c0d0f;
+    --bg: #15171B;
+    --surface: #1C1F24;
+    --subtle: #23262C;
+    --line: #2C3037;
+    --line-strong: #3A3F48;
+    --text: #E7E5E0;
+    --muted: #9BA0A8;
+    --accent: #8EA6F0;
+    --accent-soft: #232B45;
+    --on-accent: #15171B;
+    --ok: #6CC596;
+    --ok-soft: #17291F;
+    --bad: #F08B80;
+    --bad-soft: #321C1A;
+    --warn: #E3A54A;
+    --lit-bass: #8EA6F0;
+    --key-white: #E4E1DA;
+    --key-black: #0E0F12;
+    --key-edge: #3A3F48;
     color-scheme: dark;
   }
 }
@@ -64,325 +80,438 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: var(--header-h) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  font: 400 var(--fs-base)/var(--lh-base) var(--sans);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
-  padding-bottom: calc(var(--dock-h) + 16px);
 }
-body.dock-closed { padding-bottom: 64px; }
-.mono, kbd, code { font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace; }
+h1, h2, h3 { font-weight: 600; }
+a { color: var(--accent); text-underline-offset: 2px; }
+.mono { font-family: var(--mono); }
 .muted { color: var(--muted); }
-.small { font-size: 0.8rem; }
-.accent { color: var(--accent); }
-.error { color: var(--red); }
-h2 { font-size: 0.98rem; font-weight: 700; }
-a { color: var(--accent); }
-kbd { font-size: 0.68rem; border: 1px solid var(--border-strong); border-radius: 4px; padding: 0 4px; margin-left: 4px; opacity: 0.75; }
+.bad { color: var(--bad); }
+.xs { font-size: var(--fs-xs); line-height: var(--lh-xs); }
+.sm { font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.spacer { flex: 1; }
 [hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: none) { .key-hint { display: none; } }
 
-/* ---------------------------------------------------------------- buttons */
+/* ---------------------------------------------------------------- controls */
 .btn {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  padding: 0.45rem 0.85rem; font: inherit; font-size: 0.85rem; font-weight: 600;
-  border-radius: var(--radius-sm); border: 1px solid var(--border);
-  background: var(--surface); color: var(--text); cursor: pointer;
-  touch-action: manipulation;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  height: 36px; padding: 0 var(--s4); border-radius: var(--r);
+  font: 600 var(--fs-sm)/1 var(--sans); color: var(--text);
+  background: var(--surface); border: 1px solid var(--line-strong);
+  cursor: pointer; touch-action: manipulation; white-space: nowrap;
 }
-.btn:hover { border-color: var(--border-strong); background: var(--subtle); }
-.btn-sm { padding: 0.28rem 0.6rem; font-size: 0.78rem; }
-.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
-.btn-primary:hover { background: var(--accent); filter: brightness(1.1); }
-.btn-amber, .btn.on { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
-.row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.btn:hover { background: var(--subtle); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.quiet { background: none; border-color: transparent; color: var(--accent); padding: 0 var(--s2); }
+.btn.quiet:hover { background: var(--accent-soft); }
+.btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn.sm { height: 28px; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: var(--r); border: none; background: none;
+  font: 400 var(--fs-lg)/1 var(--sans); color: var(--text); cursor: pointer;
+}
+.icon-btn:hover { background: var(--subtle); }
+.icon-btn.sm { width: 28px; height: 28px; font-size: var(--fs-md); color: var(--muted); }
+.icon-btn:disabled { opacity: 0.3; cursor: default; background: none; }
+.row { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
 .row.end { justify-content: flex-end; }
-select, textarea, input[type="file"] {
-  font: inherit; font-size: 0.85rem; color: var(--text); background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.35rem 0.5rem;
+select, textarea {
+  font: 400 var(--fs-sm)/var(--lh-sm) var(--sans); color: var(--text);
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r);
 }
-textarea { width: 100%; resize: vertical; line-height: 1.45; }
+select { height: 36px; padding: 0 var(--s6) 0 var(--s3); appearance: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 16px, calc(100% - 11px) 16px; background-size: 5px 5px; background-repeat: no-repeat; }
+textarea { width: 100%; padding: var(--s3); resize: vertical; font-size: var(--fs-base); line-height: var(--lh-base); }
+textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 
-.pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.pill {
-  font: inherit; font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.7rem;
-  border-radius: 999px; border: 1px solid var(--border); background: var(--surface);
-  color: var(--text); cursor: pointer; touch-action: manipulation;
+.tiles { display: grid; gap: var(--s2); }
+.tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 56px; padding: var(--s2); border-radius: var(--r);
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--text);
+  font: 600 var(--fs-base)/var(--lh-sm) var(--sans); cursor: pointer; touch-action: manipulation; position: relative;
 }
-.pill:hover { border-color: var(--accent-border); }
-.pill.active { background: var(--accent); border-color: var(--accent); color: var(--surface); }
-.pill.err::before { content: '⚑ '; color: var(--red); }
-.pill.active.err::before { color: inherit; }
-.pills-sub .pill { font-size: 0.74rem; padding: 0.2rem 0.6rem; }
+.tile:hover { border-color: var(--accent); }
+.tile .sub { font-size: var(--fs-xs); line-height: var(--lh-xs); font-weight: 400; color: var(--muted); }
+.tile .k { position: absolute; top: 6px; left: 8px; font-size: var(--fs-xs); font-weight: 400; color: var(--muted); }
+.tile.right { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.tile.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.tile.active { background: var(--accent-soft); border-color: var(--accent); }
+.answers { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.answers .tile { min-height: 64px; }
+.chords { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+.chords .tile { font: 600 var(--fs-lg)/1 var(--serif); }
+.degrees { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-/* ---------------------------------------------------------------- top bar */
-.topbar {
-  display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: center; justify-content: space-between;
-  padding: 0.9rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--border);
-}
-.brand h1 { font-size: 1.15rem; color: var(--accent); }
-.brand p { font-size: 0.78rem; color: var(--muted); }
-.timer { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
-.timer .mono { font-weight: 600; min-width: 4.5ch; }
-.top-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-
-/* ---------------------------------------------------------------- layout */
-.layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1.25rem; max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
-.course { position: sticky; top: 1rem; align-self: start; max-height: calc(100vh - var(--dock-h) - 2rem); overflow-y: auto; }
-.week { margin-bottom: 0.9rem; }
-.week h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.3rem; }
-.lesson-link {
-  display: flex; gap: 0.5rem; align-items: flex-start; width: 100%; text-align: left;
-  font: inherit; font-size: 0.82rem; padding: 0.4rem 0.5rem; border-radius: var(--radius-sm);
-  border: 1px solid transparent; background: transparent; color: var(--text); cursor: pointer;
-}
-.lesson-link:hover { background: var(--subtle); }
-.lesson-link.active { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow); color: var(--accent); font-weight: 600; }
-.status { flex: none; width: 1.1rem; text-align: center; color: var(--muted); }
-.status.done { color: var(--green); }
-.status.partial { color: var(--amber); }
-.course-select { display: none; width: 100%; }
-
-.lesson-head { margin-bottom: 1.25rem; }
-.lesson-head .eyebrow { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.lesson-head h2 { font-size: 1.35rem; margin: 0.15rem 0 0.35rem; }
-.lesson-head .goal { font-size: 0.92rem; }
-.ideas { margin: 0.75rem 0 0; padding: 0.75rem 1rem 0.75rem 2rem; background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: var(--radius); font-size: 0.85rem; }
-.ideas li { margin: 0.2rem 0; }
-
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
-.col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 0.8rem; min-width: 0; }
-.card-title { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 0.55rem; }
-
-/* ---------------------------------------------------------------- checklist */
-.tasks { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
-.task { display: flex; gap: 0.65rem; padding: 0.6rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--subtle); }
-.task.done { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
-.task input { margin-top: 0.2rem; width: 1rem; height: 1rem; flex: none; accent-color: var(--green); }
-.task-body { flex: 1; min-width: 0; }
-.task-title { font-size: 0.86rem; font-weight: 600; }
-.task-meta { display: inline-block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-right: 0.35rem; }
-.task-detail { font-size: 0.79rem; color: var(--muted); margin-top: 0.15rem; }
-.task-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; margin-top: 0.35rem; font-size: 0.78rem; }
-.task-links .note { color: var(--muted); }
-.task .btn { margin-top: 0.4rem; }
-.lesson-nav { display: flex; justify-content: space-between; gap: 0.5rem; }
-
-/* ---------------------------------------------------------------- voice-leading table */
-.vl-scroll { overflow-x: auto; }
-.vl { border-collapse: collapse; font-size: 0.8rem; width: 100%; }
-.vl th, .vl td { padding: 0.35rem 0.4rem; text-align: center; white-space: nowrap; }
-.vl th.voice { text-align: left; color: var(--muted); font-weight: 600; }
-.vl .chord-head { cursor: pointer; border-radius: var(--radius-sm); }
-.vl .chord-head:hover { background: var(--subtle); }
-.vl .rn { font-family: 'Times New Roman', Georgia, serif; font-size: 1.05rem; font-weight: 600; }
-.vl .fn { display: block; font-size: 0.66rem; color: var(--muted); font-weight: 600; }
-.vl td.note { font-family: ui-monospace, Menlo, monospace; font-weight: 600; border-bottom: 1px solid var(--border); }
-.vl td.motion { color: var(--muted); font-size: 0.7rem; border-bottom: 1px solid var(--border); }
-.vl td.motion.held { color: var(--accent); font-weight: 700; }
-.vl td.motion.leap { color: var(--amber); }
-.vl tr.outer td { font-size: 0.68rem; color: var(--muted); border-bottom: none; }
-.vl .playing { background: var(--amber-soft); }
-.vl td.hidden-note { color: transparent; text-shadow: none; background: repeating-linear-gradient(45deg, var(--subtle), var(--subtle) 4px, transparent 4px, transparent 8px); }
-.vl td.drill-ok { color: var(--green); }
-.fig { display: inline-flex; flex-direction: column; font-size: 0.62rem; line-height: 0.95; vertical-align: middle; margin-left: 1px; }
-.issues { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.8rem; }
-.issues li { padding: 0.35rem 0.55rem; border-radius: var(--radius-sm); background: var(--red-soft); color: var(--red); }
-.issues li.ok { background: var(--green-soft); color: var(--green); }
-.issues .where { font-weight: 700; margin-right: 0.4rem; }
-.vl-controls { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
-.vl-controls label { font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem; }
-.drill-box { padding: 0.6rem 0.75rem; border: 1px dashed var(--accent-border); border-radius: var(--radius-sm); background: var(--accent-soft); font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.45rem; }
-
-/* ---------------------------------------------------------------- ear lab */
-.answers { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 0.45rem; }
-.answer { font: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.55rem 0.4rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; touch-action: manipulation; }
-.answer:hover { border-color: var(--accent); background: var(--accent-soft); }
-.answer .k { font-size: 0.65rem; color: var(--muted); margin-right: 0.3rem; }
-.answer.right { background: var(--green-soft); border-color: var(--green); color: var(--green); }
-.answer.wrong { background: var(--red-soft); border-color: var(--red); color: var(--red); }
-.feedback { padding: 0.55rem 0.7rem; border-radius: var(--radius-sm); font-size: 0.83rem; }
-.feedback.right { background: var(--green-soft); color: var(--green); }
-.feedback.wrong { background: var(--red-soft); color: var(--red); }
-
-.explain { background: var(--subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.7rem 0.8rem; line-height: 1.6; }
-.sources { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem; }
-
-/* ---------------------------------------------------------------- keyboard dock */
-.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.07); padding: 0.45rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom)); }
-.dock-bar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; max-width: 1400px; margin: 0 auto 0.45rem; }
-.dock-right { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
-.legend { font-size: 0.72rem; color: var(--muted); display: inline-flex; gap: 0.35rem; align-items: center; }
-.sw { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-left: 0.3rem; }
+/* ---------------------------------------------------------------- header */
+.top { border-bottom: 1px solid var(--line); background: var(--bg); }
+.top-inner { height: 100%; max-width: 1280px; margin: 0 auto; padding: 0 var(--s4); display: flex; align-items: center; gap: var(--s2); }
+.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); cursor: pointer; padding: var(--s2); border-radius: var(--r); }
+.app-name:hover { background: var(--subtle); }
+.timer { gap: var(--s2); padding: 0 var(--s3); }
+.timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.menu-wrap { position: relative; }
+.popover { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 220px; padding: var(--s2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); }
+.popover.up { top: auto; bottom: calc(100% + 6px); }
+.popover p { padding: var(--s2); }
+.menu-item { display: block; width: 100%; text-align: left; padding: var(--s2); border: none; background: none; border-radius: var(--r); font: 400 var(--fs-base)/var(--lh-base) var(--sans); color: var(--text); cursor: pointer; }
+.menu-item:hover { background: var(--subtle); }
+.help { width: 300px; font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.legend { display: flex; align-items: center; gap: var(--s2); color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
 .sw-bass { background: var(--lit-bass); }
 .sw-upper { background: var(--lit-upper); }
 .sw-sel { background: var(--lit-sel); }
-.dock.closed .piano-wrap { display: none; }
-.dock.closed .dock-bar { margin-bottom: 0; }
-.piano-wrap { max-width: 1400px; margin: 0 auto; overflow-x: auto; }
-.piano { position: relative; height: 128px; min-width: 760px; user-select: none; -webkit-user-select: none; touch-action: none; }
-.key { position: absolute; top: 0; border-radius: 0 0 5px 5px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
-.key.white { height: 100%; background: var(--key-white); border: 1px solid #2a2a2a; color: #737373; font-size: 0.62rem; padding-bottom: 5px; z-index: 1; }
-.key.black { height: 62%; background: var(--key-black); border: 1px solid #000; z-index: 2; }
-.key.middle-c { box-shadow: inset 0 -4px 0 #9ca3af; }
-.key.lit-bass { background: var(--lit-bass) !important; color: #fff; }
-.key.lit-upper { background: var(--lit-upper) !important; color: #111; }
-.key.lit-user { background: #a5b4fc !important; }
-.key.sel { background: var(--lit-sel) !important; color: #fff; }
-.key.miss { box-shadow: inset 0 0 0 3px var(--red); }
 
-dialog { margin: auto; max-width: 620px; width: calc(100% - 2rem); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; background: var(--surface); color: var(--text); }
-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
-dialog > * + * { margin-top: 0.75rem; }
-
-/* ---------------------------------------------------------------- narrow screens */
-@media (max-width: 1100px) {
-  .grid { grid-template-columns: minmax(0, 1fr); }
+/* ---------------------------------------------------------------- panes */
+main {
+  width: min(1280px, 100%); margin: 0 auto; min-height: 0;
+  display: grid; column-gap: var(--s8);
+  grid-template-columns: clamp(340px, 30vw, 400px) minmax(0, 760px);
+  grid-template-rows: var(--tabs-h) minmax(0, 1fr);
+  padding: 0 var(--s6);
 }
-@media (max-width: 820px) {
-  :root { --dock-h: 170px; }
-  .layout { grid-template-columns: minmax(0, 1fr); padding: 1rem; gap: 1rem; }
-  .course { position: static; max-height: none; }
-  .course .week { display: none; }
-  .course-select { display: block; }
-  .topbar { padding: 0.75rem 1rem; }
-  .piano { height: 112px; }
-  .dock #dockStatus, .legend { display: none; }
+.pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
+.tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
+.tabs { grid-column: 2; grid-row: 1; display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
+.tab { position: relative; border: none; background: none; padding: 0 2px; font: 600 var(--fs-base)/1 var(--sans); color: var(--muted); cursor: pointer; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); }
+.tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
+.tab-lesson { display: none; }
+.panel { display: none; flex-direction: column; gap: var(--s4); }
+.panel.active { display: flex; }
+
+/* ---------------------------------------------------------------- lesson pane */
+.eyebrow-row { display: flex; justify-content: space-between; align-items: center; }
+.eyebrow { font-size: var(--fs-sm); color: var(--muted); }
+.stepper { display: inline-flex; align-items: center; gap: var(--s1); }
+.lesson-title { font: 600 var(--fs-xl)/var(--lh-xl) var(--serif); margin: var(--s2) 0 var(--s3); }
+.goal { color: var(--muted); max-width: 64ch; }
+.section-title { font-size: var(--fs-md); line-height: var(--lh-md); margin: var(--s6) 0 var(--s3); }
+.section-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.section-head .section-title { margin-bottom: var(--s3); }
+.ideas { padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--s2); max-width: 64ch; }
+.ideas li::marker { color: var(--muted); }
+.progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
+.progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
+
+.tasks { list-style: none; }
+.task { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.check { position: relative; width: 20px; height: 20px; margin-top: 2px; cursor: pointer; }
+.check input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.check .ring { position: absolute; inset: 0; pointer-events: none; border-radius: 50%; border: 1.5px solid var(--line-strong); background: var(--surface); }
+.check input:checked + .ring { background: var(--accent); border-color: var(--accent); }
+.check input:checked + .ring::after { content: ''; position: absolute; left: 6px; top: 2.5px; width: 5px; height: 10px; border: solid var(--on-accent); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.check input:focus-visible + .ring { outline: 2px solid var(--accent); outline-offset: 2px; }
+.task-head { display: flex; justify-content: space-between; gap: var(--s3); width: 100%; text-align: left; border: none; background: none; color: inherit; font: inherit; cursor: pointer; }
+.task-title { display: block; font-weight: 600; }
+.task-meta { display: block; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.chev { flex: none; align-self: center; width: 20px; text-align: center; font-size: var(--fs-lg); line-height: 1; color: var(--muted); transition: transform 0.15s; }
+.task.open .chev { transform: rotate(90deg); }
+.task.done .task-title { color: var(--muted); font-weight: 400; }
+.task-body { grid-column: 2; display: none; flex-direction: column; gap: var(--s2); padding-top: var(--s2); color: var(--muted); }
+.task.open .task-body { display: flex; }
+.task-links { list-style: none; display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.task-links .note { color: var(--muted); }
+.task-body .btn { align-self: flex-start; margin-left: calc(-1 * var(--s2)); }
+#nextUp:not(:empty) { margin-top: var(--s5); }
+#journalSaved { margin-top: var(--s1); }
+
+/* ---------------------------------------------------------------- tool pane */
+.panel-title { font-size: var(--fs-md); line-height: var(--lh-md); }
+.panel > .muted { max-width: 64ch; }
+.lab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: calc(-1 * var(--s2)); }
+.flag { display: inline-block; margin-right: var(--s2); font-size: var(--fs-sm); font-weight: 600; color: var(--bad); }
+.ear-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.feedback { min-height: var(--lh-base); color: var(--muted); }
+.feedback.right { color: var(--ok); }
+.feedback.wrong { color: var(--bad); }
+.readout { color: var(--muted); line-height: 1.8; }
+.readout strong { color: var(--text); }
+.drone-head { margin-top: var(--s6); }
+.drone-head .panel-title { margin: 0; }
+
+/* SATB table */
+.vl-scroll { overflow-x: auto; margin: var(--s2) 0; }
+.vl { border-collapse: collapse; font-size: var(--fs-sm); }
+.vl th, .vl td { height: 36px; padding: 0 var(--s2); text-align: center; white-space: nowrap; }
+.vl thead th { border-bottom: 1px solid var(--line); padding-bottom: var(--s2); vertical-align: bottom; }
+.vl th.voice { text-align: left; font-weight: 400; color: var(--muted); padding-left: 0; padding-right: var(--s4); }
+.vl .voice .short { display: none; }
+.vl .chord-head { cursor: pointer; border-radius: var(--r) var(--r) 0 0; min-width: 56px; }
+.vl .chord-head:hover { background: var(--subtle); }
+.vl .rn { font: 600 var(--fs-lg)/1 var(--serif); }
+.vl .fn { display: block; margin-top: var(--s1); font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
+.vl .lbl { display: block; font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
+.vl td.note { font: 600 var(--fs-base)/1 var(--mono); font-variant-numeric: tabular-nums; }
+.vl td.motion { font-size: var(--fs-xs); color: var(--muted); }
+.vl td.motion.held { color: var(--accent); font-weight: 600; }
+.vl td.motion.leap { color: var(--warn); }
+.vl tr.outer td, .vl tr.outer th { font-size: var(--fs-xs); color: var(--muted); }
+.vl .playing { background: var(--subtle); }
+.vl td.hidden-note { color: var(--line-strong); }
+.vl td.drill-ok { color: var(--ok); }
+.fig { display: inline-flex; flex-direction: column; font-size: 0.6em; line-height: 0.95; vertical-align: middle; margin-left: 1px; }
+.vl-controls { display: flex; flex-direction: column; gap: var(--s2); }
+.vl-controls label { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--fs-sm); color: var(--muted); }
+.vl-controls input[type="range"] { width: 96px; accent-color: var(--accent); }
+.vl-controls input[type="checkbox"] { accent-color: var(--accent); }
+
+.callout { padding: var(--s3) var(--s4); border-radius: var(--r); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.callout.bad { background: var(--bad-soft); color: var(--bad); }
+.callout.bad strong { display: block; margin-bottom: var(--s1); }
+.callout.bad ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.callout .where { font-weight: 600; margin-right: var(--s2); }
+.callout.ok { background: var(--ok-soft); color: var(--ok); }
+.callout.ok summary { cursor: pointer; list-style: none; }
+.callout.ok summary::-webkit-details-marker { display: none; }
+.callout.ok summary::after { content: ' ⓘ'; opacity: 0.7; }
+.callout.ok p { margin-top: var(--s2); color: var(--text); opacity: 0.8; }
+.callout.drill { background: var(--accent-soft); color: var(--text); display: flex; flex-direction: column; gap: var(--s2); }
+.callout.info { background: var(--subtle); color: var(--muted); }
+
+/* ---------------------------------------------------------------- dock */
+.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s4) env(safe-area-inset-bottom); }
+.dock-bar { max-width: 1280px; margin: 0 auto; height: 36px; display: flex; align-items: center; gap: var(--s2); }
+.dock.closed .piano-wrap { display: none; }
+.piano-wrap { max-width: 1280px; margin: 0 auto var(--s2); overflow-x: auto; }
+.piano { position: relative; height: 104px; min-width: 760px; user-select: none; -webkit-user-select: none; touch-action: none; }
+.key { position: absolute; top: 0; border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
+.key.white { height: 100%; background: var(--key-white); border: 1px solid var(--key-edge); color: var(--muted); font-size: 10px; padding-bottom: 4px; z-index: 1; }
+.key.black { height: 60%; background: var(--key-black); border: 1px solid var(--key-black); z-index: 2; }
+.key.lit-bass { background: var(--lit-bass) !important; color: var(--on-accent); }
+.key.lit-upper { background: var(--lit-upper) !important; color: #1C1D21; }
+.key.lit-user { background: var(--accent-soft) !important; }
+.key.sel { background: var(--lit-sel) !important; color: #fff; }
+.key.miss { box-shadow: inset 0 0 0 3px var(--bad); }
+
+/* ---------------------------------------------------------------- dialogs */
+dialog { color: var(--text); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+dialog::backdrop { background: rgb(0 0 0 / 0.35); }
+.modal { margin: auto; width: min(560px, calc(100% - 2 * var(--s4))); padding: var(--s5); border-radius: var(--r-lg); }
+.modal > * + * { margin-top: var(--s4); }
+.dialog-title { font-size: var(--fs-lg); line-height: var(--lh-lg); }
+.drawer { margin: 0 auto 0 0; height: 100%; max-height: 100%; width: 360px; max-width: 100%; padding: var(--s5); border: none; border-right: 1px solid var(--line); border-radius: 0; overflow-y: auto; }
+.drawer-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--s5); }
+.week + .week { margin-top: var(--s5); }
+.week h3 { font-size: var(--fs-sm); line-height: var(--lh-sm); font-weight: 400; color: var(--muted); margin-bottom: var(--s1); }
+.lesson-link { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; padding: var(--s2); margin: 0 calc(-1 * var(--s2)); border: none; border-radius: var(--r); background: none; color: var(--text); font: 400 var(--fs-base)/var(--lh-base) var(--sans); cursor: pointer; }
+.lesson-link:hover { background: var(--subtle); }
+.lesson-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
+.status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
+.status.done { border-color: var(--accent); background: var(--accent); }
+.drawer .section-title { margin-top: var(--s6); }
+.sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+
+/* ---------------------------------------------------------------- one pane below 1024px */
+@media (max-width: 1023px) {
+  main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
+  .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
+  .tab-lesson { display: block; }
+  .lesson-pane, .tool-pane { grid-column: 1; grid-row: 2; padding: var(--s5) 0 var(--s7); }
+  main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
+}
+@media (max-width: 640px) {
+  .app-name { font-weight: 400; }
+  .lesson-title { font-size: 24px; line-height: 32px; }
+  .vl .voice .long { display: none; }
+  .vl .voice .short { display: inline; }
+  .vl th, .vl td { padding: 0 6px; }
+  .piano { height: 96px; }
+  .drawer { width: 100%; }
 }
 </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <h1>Harmony &amp; Ear Academy</h1>
-      <p>Phase 1 · Classical harmony &amp; voice leading · 3 sessions a week</p>
-    </div>
-    <div class="timer" id="timer">
-      <button class="btn btn-sm" id="timerToggle" title="Start or pause the practice timer">▶</button>
-      <span class="mono" id="timerSession">00:00</span>
-      <span class="muted" id="timerTotals"></span>
-    </div>
-    <div class="top-actions">
-      <button class="btn btn-sm" id="copyLogBtn" title="Copy a text summary of your progress">Progress log</button>
-      <button class="btn btn-sm" id="backupBtn" title="Download a file with all your progress">Save progress</button>
-      <button class="btn btn-sm" id="restoreBtn" title="Load progress from a saved file">Load progress</button>
+  <header class="top">
+    <div class="top-inner">
+      <button class="icon-btn" id="drawerBtn" aria-label="Course map" title="Course map">☰</button>
+      <button class="app-name" id="crumb" title="Course map">Harmony Academy</button>
+      <div class="spacer"></div>
+      <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
+      <div class="menu-wrap">
+        <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
+        <div class="popover menu" id="menu" hidden>
+          <p class="sm muted" id="timerTotals"></p>
+          <button class="menu-item" id="copyLogBtn">Progress log</button>
+          <button class="menu-item" id="backupBtn">Save progress</button>
+          <button class="menu-item" id="restoreBtn">Load progress</button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="layout">
-    <nav class="course" id="course" aria-label="Course map"></nav>
+  <main id="main" data-view="lesson">
+    <nav class="tabs" id="tabs" role="tablist">
+      <button class="tab tab-lesson" data-tab="lesson" role="tab">Lesson</button>
+      <button class="tab" data-tab="lab" role="tab">Lab</button>
+      <button class="tab" data-tab="workbench" role="tab">Workbench</button>
+      <button class="tab" data-tab="ear" role="tab">Ear</button>
+      <button class="tab" data-tab="explore" role="tab">Explore</button>
+    </nav>
 
-    <main id="main">
-      <section class="lesson-head" id="lessonHead"></section>
-
-      <div class="grid">
-        <div class="col">
-          <section class="card" id="checklistCard">
-            <div class="card-title"><h2>Session checklist</h2><span class="mono accent" id="checklistPct"></span></div>
-            <ul class="tasks" id="tasks"></ul>
-            <div id="lessonNav" class="lesson-nav"></div>
-          </section>
-
-          <section class="card" id="vlCard">
-            <div class="card-title"><h2>Voice-leading lab</h2><span class="muted small" id="vlKey"></span></div>
-            <div class="pills" id="vlPills"></div>
-            <p class="small muted" id="vlNote"></p>
-            <div id="vlView"></div>
-          </section>
-
-          <section class="card" id="workbenchCard">
-            <div class="card-title"><h2>Workbench</h2><span class="muted small">Check your own part-writing</span></div>
-            <p class="small muted">One chord per line: an optional Roman numeral, then soprano, alto, tenor and bass. Sharps are <span class="mono">#</span>, flats <span class="mono">b</span>.</p>
-            <div class="row">
-              <label class="small" for="wbKey">Key</label>
-              <select id="wbKey"></select>
-              <button class="btn btn-sm btn-primary" id="wbCheck">Check &amp; play</button>
-              <button class="btn btn-sm" id="wbExample">Example</button>
-            </div>
-            <textarea id="wbText" class="mono" rows="5" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
-            <div id="wbView"></div>
-          </section>
-        </div>
-
-        <div class="col">
-          <section class="card" id="earCard">
-            <div class="card-title"><h2>Ear lab</h2><span class="mono accent" id="earStats"></span></div>
-            <div class="pills" id="earTabs" role="tablist"></div>
-            <div class="pills pills-sub" id="earLevels"></div>
-            <div class="pills pills-sub" id="earDirections"></div>
-            <p class="small muted" id="earHint"></p>
-            <div class="row">
-              <button class="btn btn-primary" id="earNew">▶ New <kbd>Space</kbd></button>
-              <button class="btn" id="earReplay">↻ Replay <kbd>R</kbd></button>
-              <span class="small muted" id="earStatus">Press New, sing it back, then answer.</span>
-            </div>
-            <div class="answers" id="earAnswers"></div>
-            <div class="feedback" id="earFeedback" hidden></div>
-            <p class="small muted" id="earWeak"></p>
-          </section>
-
-          <section class="card" id="explorerCard">
-            <div class="card-title"><h2>Chord explorer</h2>
-              <select id="exKey" aria-label="Explorer key"></select>
-            </div>
-            <div class="pills" id="exChords"></div>
-            <div id="exView" class="explain mono small">Pick a chord to hear it and see how it is built.</div>
-          </section>
-
-          <section class="card" id="droneCard">
-            <div class="card-title"><h2>Drone &amp; scale degrees</h2>
-              <div class="row">
-                <select id="droneKey" aria-label="Drone key"></select>
-                <button class="btn btn-sm" id="droneToggle">▶ Drone</button>
-              </div>
-            </div>
-            <p class="small muted">Start the drone, sing a degree, then tap it to check your pitch.</p>
-            <div class="pills" id="degreeButtons"></div>
-          </section>
-
-          <section class="card" id="journalCard">
-            <div class="card-title"><h2>Journal</h2><span class="muted small" id="journalSaved">Saved on this device</span></div>
-            <textarea id="journal" rows="5" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
-          </section>
-
-          <section class="card" id="sourcesCard">
-            <div class="card-title"><h2>Sources</h2></div>
-            <ul class="sources" id="sources"></ul>
-          </section>
-        </div>
+    <section class="pane lesson-pane" id="lessonPane">
+      <div class="eyebrow-row">
+        <span class="eyebrow" id="eyebrow"></span>
+        <span class="stepper">
+          <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson">‹</button>
+          <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson">›</button>
+        </span>
       </div>
-    </main>
-  </div>
+      <h1 class="lesson-title" id="lessonTitle"></h1>
+      <p class="goal" id="lessonGoal"></p>
+
+      <h2 class="section-title">Key ideas</h2>
+      <ul class="ideas" id="ideas"></ul>
+
+      <div class="section-head">
+        <h2 class="section-title">Session</h2>
+        <span class="sm muted" id="checklistPct"></span>
+      </div>
+      <div class="progress"><span id="progressFill"></span></div>
+      <ul class="tasks" id="tasks"></ul>
+      <div id="nextUp"></div>
+
+      <h2 class="section-title">Notes</h2>
+      <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+      <p class="xs muted" id="journalSaved">Saved in this browser</p>
+    </section>
+
+    <section class="pane tool-pane" id="toolPane">
+      <div class="panel" id="panel-lab" data-panel="lab">
+        <div class="lab-head">
+          <span class="stepper">
+            <button class="icon-btn sm" id="vlPrev" aria-label="Previous example">‹</button>
+            <span class="sm muted" id="vlCount"></span>
+            <button class="icon-btn sm" id="vlNext" aria-label="Next example">›</button>
+          </span>
+          <span class="sm muted" id="vlKey"></span>
+        </div>
+        <h2 class="panel-title" id="vlTitle"></h2>
+        <p class="muted" id="vlNote"></p>
+        <div id="vlView"></div>
+      </div>
+
+      <div class="panel" id="panel-workbench" data-panel="workbench">
+        <h2 class="panel-title">Check your own part-writing</h2>
+        <p class="muted">One chord per line: a Roman numeral, then soprano, alto, tenor and bass. Write sharps as <span class="mono">#</span> and flats as <span class="mono">b</span>.</p>
+        <div class="row">
+          <select id="wbKey" aria-label="Key"></select>
+          <button class="btn primary" id="wbCheck">Check &amp; play</button>
+          <button class="btn quiet" id="wbExample">Example</button>
+        </div>
+        <textarea id="wbText" class="mono" rows="6" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
+        <div id="wbView"></div>
+      </div>
+
+      <div class="panel" id="panel-ear" data-panel="ear">
+        <div class="ear-head">
+          <div class="row">
+            <select id="earEx" aria-label="Drill"></select>
+            <select id="earLevel" aria-label="Level"></select>
+            <select id="earDir" aria-label="Direction"></select>
+          </div>
+          <span class="sm muted" id="earStats"></span>
+        </div>
+        <p class="muted" id="earHint"></p>
+        <div class="row">
+          <button class="btn primary" id="earNew">▶ New</button>
+          <button class="btn" id="earReplay">↻ Replay</button>
+          <span class="xs muted key-hint">Space · R · 1–9</span>
+        </div>
+        <p class="feedback" id="earFeedback">Press New, sing it back, then answer.</p>
+        <div class="tiles answers" id="earAnswers"></div>
+        <p class="sm muted" id="earWeak"></p>
+      </div>
+
+      <div class="panel" id="panel-explore" data-panel="explore">
+        <div class="section-head">
+          <h2 class="panel-title">Chords</h2>
+          <select id="exKey" aria-label="Chord key"></select>
+        </div>
+        <div class="tiles chords" id="exChords"></div>
+        <p class="readout" id="exView">Pick a chord to hear it and see how it is built.</p>
+
+        <div class="section-head drone-head">
+          <h2 class="panel-title">Drone &amp; scale degrees</h2>
+          <div class="row">
+            <select id="droneKey" aria-label="Drone key"></select>
+            <button class="btn" id="droneToggle">▶ Drone</button>
+          </div>
+        </div>
+        <p class="muted">Start the drone, sing a degree, then tap it to check your pitch.</p>
+        <div class="tiles degrees" id="degreeButtons"></div>
+      </div>
+    </section>
+  </main>
 
   <footer class="dock" id="dock">
     <div class="dock-bar">
-      <button class="btn btn-sm" id="dockToggle" aria-expanded="true">▾ Keyboard</button>
-      <span class="small muted" id="dockStatus">Click, or type A–K on your computer keyboard (Z/X shift octave)</span>
-      <span class="dock-right">
-        <span class="legend"><i class="sw sw-bass"></i>bass <i class="sw sw-upper"></i>upper <i class="sw sw-sel"></i>your notes</span>
-        <button class="btn btn-sm" id="midiBtn" hidden>Connect MIDI</button>
-        <button class="btn btn-sm" id="stopBtn" title="Stop all sound">■ Stop</button>
-      </span>
+      <button class="btn quiet sm" id="dockToggle" aria-expanded="true">Keyboard ▾</button>
+      <span class="sm muted" id="dockStatus"></span>
+      <div class="spacer"></div>
+      <div class="menu-wrap">
+        <button class="icon-btn sm" id="helpBtn" aria-label="Keyboard help" aria-expanded="false">?</button>
+        <div class="popover help up" id="help" hidden>
+          <p>Click a key, or type on your computer: <span class="mono">A S D F G H J K</span> are the white keys from C, <span class="mono">W E T Y U</span> the black keys. <span class="mono">Z</span>/<span class="mono">X</span> shift the octave.</p>
+          <p class="legend"><i class="sw sw-bass"></i>bass <i class="sw sw-upper"></i>upper voices <i class="sw sw-sel"></i>your notes</p>
+        </div>
+      </div>
+      <button class="btn quiet sm" id="midiBtn" hidden>MIDI</button>
+      <button class="btn quiet sm" id="stopBtn" title="Stop all sound">■ Stop</button>
     </div>
     <div class="piano-wrap"><div class="piano" id="piano"></div></div>
   </footer>
 
-  <dialog id="logDialog">
-    <h3>Progress log</h3>
-    <p class="small muted" id="logNote">Copied to the clipboard.</p>
-    <textarea id="logText" class="mono" rows="16" readonly></textarea>
-    <div class="row end"><button class="btn btn-primary" data-close>Done</button></div>
+  <dialog class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div>
+        <h2 class="panel-title">Phase 1 · Classical harmony</h2>
+        <p class="sm muted" id="courseCount"></p>
+      </div>
+      <button class="icon-btn" data-close aria-label="Close">✕</button>
+    </div>
+    <nav id="course" aria-label="Lessons"></nav>
+    <h3 class="section-title">Sources</h3>
+    <ul class="sources" id="sources"></ul>
   </dialog>
 
-  <dialog id="restoreDialog">
-    <h3>Load progress</h3>
-    <p class="small muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
-    <input type="file" id="restoreFile" accept="application/json,.json">
-    <textarea id="restoreText" class="mono" rows="8" placeholder="…or paste the file’s contents here"></textarea>
-    <p class="small error" id="restoreError"></p>
+  <dialog class="modal" id="logDialog">
+    <h2 class="dialog-title">Progress log</h2>
+    <p class="sm muted" id="logNote">Copied to the clipboard.</p>
+    <textarea id="logText" class="mono" rows="14" readonly></textarea>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog class="modal" id="restoreDialog">
+    <h2 class="dialog-title">Load progress</h2>
+    <p class="muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
+    <div class="row">
+      <button class="btn" id="restoreChoose">Choose file…</button>
+      <span class="sm muted" id="restoreFileName"></span>
+      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    </div>
+    <textarea id="restoreText" class="mono" rows="6" placeholder="…or paste the file’s contents here"></textarea>
+    <p class="sm bad" id="restoreError"></p>
     <div class="row end">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="restoreApply">Load</button>
+      <button class="btn quiet" data-close>Cancel</button>
+      <button class="btn primary" id="restoreApply">Load</button>
     </div>
   </dialog>
 
@@ -1495,9 +1624,10 @@ const emit = (midi, on, kind) => listeners.forEach((fn) => fn(midi, on, kind));
 
 /**
  * Play one note. `at` is seconds from now; `kind` ('bass' | 'upper' | 'user')
- * only affects which colour the keyboard lights.
+ * only affects which colour the keyboard lights, and `light: false` keeps the
+ * keys dark (ear-training questions would otherwise show their answer).
  */
-function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper' } = {}) {
+function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper', light = true } = {}) {
   const c = ensure();
   const t0 = c.currentTime + 0.03 + at;
   const f = midiToFreq(midi);
@@ -1529,10 +1659,10 @@ function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper' } = {}) {
   sounding.add(voice);
   oscs[0].onended = () => sounding.delete(voice);
   const onDelay = Math.max(0, (t0 - c.currentTime) * 1000);
-  voice.timers = [
+  voice.timers = light ? [
     setTimeout(() => emit(midi, true, kind), onDelay),
     setTimeout(() => emit(midi, false, kind), onDelay + Math.min(dur, 1.5) * 1000),
-  ];
+  ] : [];
   return voice;
 }
 
@@ -1548,7 +1678,7 @@ function stopAll() {
   const now = ctx.currentTime;
   sounding.forEach((v) => {
     v.timers.forEach(clearTimeout);
-    emit(v.midi, false);
+    if (v.timers.length) emit(v.midi, false);
     v.g.gain.cancelScheduledValues(now);
     v.g.gain.setTargetAtTime(0.0001, now, 0.02);
     v.oscs.forEach((o) => { try { o.stop(now + 0.15); } catch { /* already stopped */ } });
@@ -1817,11 +1947,12 @@ const { EXERCISES, makeQuestion } = __m.ear;
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const scrollTo = (el) => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+const narrow = window.matchMedia('(max-width: 1023px)');
 
 // ================================================================ state
 
 const STORE = 'harmony-academy:v1';
+const TOOLS = ['lab', 'workbench', 'ear', 'explore'];
 
 function freshState() {
   return {
@@ -1833,7 +1964,7 @@ function freshState() {
     earSettings: {},
     practice: {},
     workbench: { key: 'C-major', text: '' },
-    dockOpen: true,
+    tab: 'lab',
   };
 }
 
@@ -1868,7 +1999,7 @@ function fillKeySelect(sel, value) {
 
 // ================================================================ roman numeral display
 
-/** "V6/5 (passing)" → numeral, symbol, stacked figure, trailing text. */
+/** "V6/5 (passing)" → serif numeral with stacked figure, plus a small label. */
 function rnHtml(text) {
   if (!text) return '';
   const m = /^(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°oø+M]?)([0-9/–]*)(.*)$/.exec(text);
@@ -1877,8 +2008,73 @@ function rnHtml(text) {
   let figHtml = '';
   if (fig.includes('/')) figHtml = `<span class="fig">${fig.split('/').map((f) => `<span>${esc(f)}</span>`).join('')}</span>`;
   else if (fig) figHtml = `<sup>${esc(fig)}</sup>`;
-  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${rest ? `<span class="small muted">${esc(rest)}</span>` : ''}`;
+  const label = rest.trim().replace(/^\((.*)\)$/, '$1');
+  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${label ? `<span class="lbl">${esc(label)}</span>` : ''}`;
 }
+
+// ================================================================ tabs and layout
+
+let phoneView = 'lesson'; // on narrow screens: the lesson, or the current tool
+
+function showTab(tab) {
+  if (tab === 'lesson') {
+    phoneView = 'lesson';
+  } else {
+    state.tab = tab;
+    phoneView = 'tool';
+    save();
+  }
+  renderTabs();
+  if (tab !== 'lesson') $('#toolPane').scrollTop = 0;
+}
+
+function renderTabs() {
+  if (!TOOLS.includes(state.tab)) state.tab = 'lab';
+  const lessonView = narrow.matches && phoneView === 'lesson';
+  $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
+  document.querySelectorAll('#tabs .tab').forEach((b) => {
+    const on = b.dataset.tab === 'lesson' ? lessonView : !lessonView && b.dataset.tab === state.tab;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', String(on));
+  });
+  document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
+  const l = current();
+  $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
+}
+
+$('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+narrow.addEventListener('change', renderTabs);
+
+// ================================================================ popovers and dialogs
+
+function togglePopover(btn, pop) {
+  const open = pop.hidden;
+  document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+  document.querySelectorAll('[aria-expanded][aria-haspopup], #helpBtn').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+  pop.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+}
+$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
+$('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePopover($('#helpBtn'), $('#help')); });
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.popover')) document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+});
+
+function openDialog(id) {
+  const d = $(id);
+  document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+  d.showModal();
+  d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
+}
+// Clicking the backdrop closes a dialog.
+document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => {
+  if (e.target !== d) return;
+  const r = d.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+}));
 
 // ================================================================ keyboard (piano dock)
 
@@ -1903,7 +2099,7 @@ function buildPiano() {
       el.style.width = `${w * 0.6}%`;
     } else {
       const i = whites.indexOf(m);
-      el.className = `key white${m === 60 ? ' middle-c' : ''}`;
+      el.className = 'key white';
       el.style.left = `${i * w}%`;
       el.style.width = `${w}%`;
       if (m % 12 === 0) el.textContent = `C${m / 12 - 1}`;
@@ -1917,7 +2113,11 @@ function buildPiano() {
     e.preventDefault();
     userNote(Number(el.dataset.midi));
   });
-  // Show C3–C5 in the middle on narrow screens.
+  centerPiano();
+}
+
+// Show the middle of the keyboard when it is wider than the screen.
+function centerPiano() {
   const wrap = $('.piano-wrap');
   requestAnimationFrame(() => { wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2; });
 }
@@ -1925,10 +2125,9 @@ function buildPiano() {
 audio.onNote((midi, on, kind) => {
   const el = keyEls.get(midi);
   if (!el) return;
-  const cls = `lit-${kind || 'upper'}`;
   if (on) {
     lit.set(midi, (lit.get(midi) || 0) + 1);
-    el.classList.add(cls);
+    el.classList.add(`lit-${kind || 'upper'}`);
   } else {
     const n = (lit.get(midi) || 1) - 1;
     lit.set(midi, n);
@@ -1950,15 +2149,21 @@ const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) 
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
 let kbOctave = 4;
 const typing = (e) => /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+const earVisible = () => state.tab === 'ear' && !(narrow.matches && phoneView === 'lesson');
 
 document.addEventListener('keydown', (e) => {
-  if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat || document.querySelector('dialog[open]')) return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { e.preventDefault(); earNew(); return; }
-  if (k === 'r') { earReplay(); return; }
-  if (/^[1-9]$/.test(k)) { const b = $('#earAnswers').children[Number(k) - 1]; if (b) b.click(); return; }
-  if (k === 'z') { kbOctave = Math.max(2, kbOctave - 1); $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`; return; }
-  if (k === 'x') { kbOctave = Math.min(5, kbOctave + 1); $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`; return; }
+  if (earVisible()) {
+    if (k === ' ') { e.preventDefault(); earNew(); return; }
+    if (k === 'r') { earReplay(); return; }
+    if (/^[1-9]$/.test(k)) { $('#earAnswers').children[Number(k) - 1]?.click(); return; }
+  }
+  if (k === 'z' || k === 'x') {
+    kbOctave = k === 'z' ? Math.max(2, kbOctave - 1) : Math.min(5, kbOctave + 1);
+    $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`;
+    return;
+  }
   if (k in KEYMAP) userNote(12 * (kbOctave + 1) + KEYMAP[k]);
 });
 
@@ -1974,8 +2179,8 @@ function setupMidi() {
       const bind = () => {
         let n = 0;
         access.inputs.forEach((input) => { n += 1; input.onmidimessage = onMidi; });
-        btn.textContent = n ? `MIDI: ${n} input${n > 1 ? 's' : ''}` : 'No MIDI input';
-        btn.classList.toggle('on', n > 0);
+        btn.textContent = n ? 'MIDI ✓' : 'No MIDI';
+        btn.title = n ? `${n} MIDI input${n > 1 ? 's' : ''} connected` : 'No MIDI keyboard found';
       };
       bind();
       access.onstatechange = bind;
@@ -1989,11 +2194,22 @@ function onMidi({ data: [status, midi, vel] }) {
   if (cmd === 0x90 && vel > 0) {
     held.add(midi);
     audio.note(midi, { dur: 1.2, vel: 0.08 + (vel / 127) * 0.25, kind: 'user' });
+    $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
     if (drill) drillFromMidi();
   } else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) {
     held.delete(midi);
   }
 }
+
+function setDock(open) {
+  state.dockOpen = open;
+  $('#dock').classList.toggle('closed', !open);
+  $('#dockToggle').textContent = open ? 'Keyboard ▾' : 'Keyboard ▴';
+  $('#dockToggle').setAttribute('aria-expanded', String(open));
+  if (open) centerPiano();
+}
+$('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
+$('#stopBtn').addEventListener('click', () => stopAll());
 
 // ================================================================ playback helpers
 
@@ -2005,109 +2221,138 @@ function stopAll() {
   document.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
 }
 
-function playEvents(events) {
+function playEvents(events, { light = true } = {}) {
   stopAll();
   events.forEach((ev) => ev.notes.forEach((m, i) => audio.note(m, {
-    at: ev.at, dur: ev.dur, kind: ev.notes.length > 1 && i === 0 ? 'bass' : 'upper',
+    at: ev.at, dur: ev.dur, light, kind: ev.notes.length > 1 && i === 0 ? 'bass' : 'upper',
   })));
 }
 
-// ================================================================ course map + lesson
+// ================================================================ course drawer
 
 function renderCourse() {
-  const nav = $('#course');
   const status = (l) => {
     const done = lessonDone(l);
-    if (done === l.tasks.length) return '<span class="status done" title="Complete">✓</span>';
-    if (done > 0) return `<span class="status partial" title="${done}/${l.tasks.length} done">◐</span>`;
-    return '<span class="status">○</span>';
+    if (done === l.tasks.length) return '<span class="status done" aria-label="Complete"></span>';
+    if (done > 0) return `<span class="status partial" aria-label="${done} of ${l.tasks.length} done"></span>`;
+    return '<span class="status" aria-label="Not started"></span>';
   };
-  nav.innerHTML = `
-    <select class="course-select" id="courseSelect" aria-label="Lesson">
-      ${LESSONS.map((l) => `<option value="${l.id}">W${l.week} L${l.n} · ${esc(l.title)}${lessonDone(l) === l.tasks.length ? ' ✓' : ''}</option>`).join('')}
-    </select>
-    ${WEEKS.map((w) => `
-      <div class="week">
-        <h3>Week ${w.n} · ${esc(w.title)}</h3>
-        ${LESSONS.filter((l) => l.week === w.n).map((l) => `
-          <button class="lesson-link${l.id === state.current ? ' active' : ''}" data-lesson="${l.id}">
-            ${status(l)}<span>${l.n}. ${esc(l.title)}</span>
-          </button>`).join('')}
-      </div>`).join('')}`;
-  $('#courseSelect').value = state.current;
+  $('#course').innerHTML = WEEKS.map((w) => `
+    <div class="week">
+      <h3>Week ${w.n} · ${esc(w.title)}</h3>
+      ${LESSONS.filter((l) => l.week === w.n).map((l) => `
+        <button class="lesson-link${l.id === state.current ? ' active' : ''}" data-lesson="${l.id}">
+          ${status(l)}<span>${esc(l.title)}</span>
+        </button>`).join('')}
+    </div>`).join('');
+  const complete = LESSONS.filter((l) => lessonDone(l) === l.tasks.length).length;
+  $('#courseCount').textContent = `${complete} of ${LESSONS.length} lessons complete`;
 }
 
+function openDrawer() {
+  renderCourse();
+  openDialog('#drawer');
+  $('#course .lesson-link.active')?.focus();
+}
+$('#drawerBtn').addEventListener('click', openDrawer);
+$('#crumb').addEventListener('click', openDrawer);
 $('#course').addEventListener('click', (e) => {
   const b = e.target.closest('[data-lesson]');
-  if (b) openLesson(b.dataset.lesson);
+  if (!b) return;
+  $('#drawer').close();
+  openLesson(b.dataset.lesson);
 });
-$('#course').addEventListener('change', (e) => { if (e.target.id === 'courseSelect') openLesson(e.target.value); });
 
-function openLesson(id, { scroll = true } = {}) {
+// ================================================================ lesson pane
+
+let openTasks = new Set();
+
+function openLesson(id) {
   state.current = id;
   save();
   drillExit();
   const l = current();
-  vlSelected = (l.progressions || [])[0]?.id || null;
+  vlIndex = 0;
   if (l.ear) {
     earExercise = l.ear.exercise;
     earSettings(earExercise).level = l.ear.level;
     if (l.ear.direction) earSettings(earExercise).direction = l.ear.direction;
   }
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
+  const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
+  openTasks = new Set(firstOpen ? [firstOpen.id] : []);
+  phoneView = 'lesson';
   renderAll();
-  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+  $('#lessonPane').scrollTop = 0;
 }
 
-function renderLessonHead() {
+function renderLesson() {
   const l = current();
-  $('#lessonHead').innerHTML = `
-    <div class="eyebrow">Week ${l.week} · Lesson ${l.n} of 3</div>
-    <h2>${esc(l.title)}</h2>
-    <p class="goal">${esc(l.goal)}</p>
-    <ul class="ideas">${l.ideas.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+  const i = LESSONS.indexOf(l);
+  $('#eyebrow').textContent = `Week ${l.week} · Lesson ${l.n} of 3`;
+  $('#prevLesson').disabled = i === 0;
+  $('#nextLesson').disabled = i === LESSONS.length - 1;
+  $('#lessonTitle').textContent = l.title;
+  $('#lessonGoal').textContent = l.goal;
+  $('#ideas').innerHTML = l.ideas.map((x) => `<li>${esc(x)}</li>`).join('');
+  $('#journal').value = lessonRec(l.id).journal || '';
+  renderTasks();
 }
 
 const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard', ear: 'Ear', spot: 'Analyze' };
+const ACTION_LABEL = (a) => (a.ear ? 'Open in Ear →' : a.progression ? 'Open in Lab →' : a.explorer ? 'Open in Explore →' : 'Open the Workbench →');
 
 function renderTasks() {
   const l = current();
   const rec = lessonRec(l.id);
   $('#tasks').innerHTML = l.tasks.map((t) => {
     const done = !!rec.tasks[t.id];
-    const links = (t.links || []).map((k) => `<a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.label)}</a>${k.note ? ` <span class="note">${esc(k.note)}</span>` : ''}`).join('');
-    const action = t.action ? `<button class="btn btn-sm" data-action='${esc(JSON.stringify(t.action))}'>Open in the app →</button>` : '';
+    const open = openTasks.has(t.id);
+    const links = (t.links || []).map((k) => `<li><a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.label)} ↗</a>${k.note ? ` <span class="note">${esc(k.note)}</span>` : ''}</li>`).join('');
     return `
-      <li class="task${done ? ' done' : ''}">
-        <input type="checkbox" data-task="${t.id}" ${done ? 'checked' : ''} aria-label="Done: ${esc(t.title)}">
+      <li class="task${done ? ' done' : ''}${open ? ' open' : ''}">
+        <label class="check"><input type="checkbox" data-task="${t.id}" ${done ? 'checked' : ''} aria-label="Done: ${esc(t.title)}"><span class="ring"></span></label>
+        <button class="task-head" data-toggle="${t.id}" aria-expanded="${open}">
+          <span><span class="task-title">${esc(t.title)}</span><span class="task-meta">${KIND_LABEL[t.kind] || t.kind} · ${t.minutes} min</span></span>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
         <div class="task-body">
-          <div class="task-title"><span class="task-meta">${KIND_LABEL[t.kind] || t.kind} · ${t.minutes}′</span>${esc(t.title)}</div>
-          ${t.detail ? `<div class="task-detail">${esc(t.detail)}</div>` : ''}
-          ${links ? `<div class="task-links">${links}</div>` : ''}
-          ${action}
+          ${t.detail ? `<p>${esc(t.detail)}</p>` : ''}
+          ${links ? `<ul class="task-links">${links}</ul>` : ''}
+          ${t.action ? `<button class="btn quiet" data-action='${esc(JSON.stringify(t.action))}'>${ACTION_LABEL(t.action)}</button>` : ''}
         </div>
       </li>`;
   }).join('');
   const done = lessonDone(l);
   const minutes = l.tasks.reduce((a, t) => a + t.minutes, 0);
-  $('#checklistPct').textContent = `${done}/${l.tasks.length} · ~${minutes} min`;
-  const i = LESSONS.indexOf(l);
-  const prev = LESSONS[i - 1];
-  const next = LESSONS[i + 1];
-  $('#lessonNav').innerHTML = `
-    ${prev ? `<button class="btn btn-sm" data-lesson="${prev.id}">← ${esc(prev.title)}</button>` : '<span></span>'}
-    ${next ? `<button class="btn btn-sm${done === l.tasks.length ? ' btn-primary' : ''}" data-lesson="${next.id}">${esc(next.title)} →</button>` : ''}`;
+  $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
+  $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
+  const next = LESSONS[LESSONS.indexOf(l) + 1];
+  $('#nextUp').innerHTML = done === l.tasks.length && next
+    ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {
   const id = e.target.dataset.task;
   if (!id) return;
   lessonRec(state.current).tasks[id] = e.target.checked;
+  if (e.target.checked) {
+    // Close the finished task and open the next unfinished one.
+    openTasks.delete(id);
+    const nextTask = current().tasks.find((t) => !lessonRec(state.current).tasks[t.id]);
+    if (nextTask) openTasks.add(nextTask.id);
+  }
   save();
   renderTasks();
-  renderCourse();
 });
 $('#tasks').addEventListener('click', (e) => {
+  const toggle = e.target.closest('[data-toggle]');
+  if (toggle) {
+    const id = toggle.dataset.toggle;
+    if (openTasks.has(id)) openTasks.delete(id); else openTasks.add(id);
+    renderTasks();
+    return;
+  }
   const b = e.target.closest('[data-action]');
   if (!b) return;
   const a = JSON.parse(b.dataset.action);
@@ -2117,30 +2362,44 @@ $('#tasks').addEventListener('click', (e) => {
     if (a.direction) earSettings(a.ear).direction = a.direction;
     save();
     renderEar();
-    scrollTo($('#earCard'));
+    showTab('ear');
   } else if (a.progression) {
-    vlSelected = a.progression;
+    const progs = current().progressions || [];
+    vlIndex = Math.max(0, progs.findIndex((p) => p.id === a.progression));
+    drillExit();
     renderVl();
-    scrollTo($('#vlCard'));
+    showTab('lab');
   } else if (a.explorer) {
-    scrollTo($('#explorerCard'));
+    showTab('explore');
   } else if (a.workbench) {
-    scrollTo($('#workbenchCard'));
+    showTab('workbench');
   }
 });
-$('#lessonNav').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-lesson]');
-  if (b) openLesson(b.dataset.lesson);
+$('#nextUp').addEventListener('click', (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); });
+$('#prevLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i > 0) openLesson(LESSONS[i - 1].id); });
+$('#nextLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i < LESSONS.length - 1) openLesson(LESSONS[i + 1].id); });
+
+let journalTimer = null;
+$('#journal').addEventListener('input', () => {
+  clearTimeout(journalTimer);
+  $('#journalSaved').textContent = 'Saving…';
+  journalTimer = setTimeout(() => {
+    lessonRec(state.current).journal = $('#journal').value;
+    save();
+    $('#journalSaved').textContent = 'Saved in this browser';
+  }, 400);
 });
 
 // ================================================================ progression view (lab + workbench)
 
 let tempo = 1.1; // seconds per chord
 let outerOnly = false;
+const CHECKED = 'Ranges, spacing, voice crossing, doubling, parallel and direct 5ths and octaves, overlaps, augmented and diminished leaps, and the leading tone and chordal 7th.';
 
 /**
- * Render a progression with its analysis into `root`. opts.reveal shows issues
- * of a "find the error" progression; opts.drill hides the chords still to play.
+ * Render a progression with its analysis into `root`. A "find the error"
+ * progression keeps its issues hidden until revealed; in drill mode the chords
+ * still to play are hidden and the drill panel replaces the controls.
  */
 function renderProgression(root, prog, { reveal = !prog.faulty, drillState = null } = {}) {
   const key = prog.keyObj || makeKey(prog.key.tonic, prog.key.mode);
@@ -2155,44 +2414,47 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
   const head = cols.map((c) => (c.type === 'chord'
     ? `<th class="chord-head" data-col="${c.k}" title="Play this chord">${rnHtml(steps[c.k].label || steps[c.k].rn || '—')}${steps[c.k].fn ? `<span class="fn">${steps[c.k].fn}</span>` : ''}</th>`
     : '<th></th>')).join('');
-  const rows = VOICES.map((v, i) => `<tr><th class="voice">${v}</th>${cols.map((c) => {
+  const rows = VOICES.map((v, i) => `<tr><th class="voice"><span class="long">${v}</span><span class="short">${v[0]}</span></th>${cols.map((c) => {
     if (c.type === 'chord') {
-      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k <= drillState.idx && c.k > 0 ? 'note drill-ok' : 'note';
+      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k > 0 ? 'note drill-ok' : 'note';
       return `<td class="${cls}" data-col="${c.k}">${hidden(c.k) ? '?' : prettyPitch(steps[c.k].voices[i])}</td>`;
     }
-    const mo = r.transitions[c.k - 1].motions[i];
     if (hidden(c.k)) return '<td class="motion"></td>';
+    const mo = r.transitions[c.k - 1].motions[i];
     return `<td class="motion${mo.dir === 0 ? ' held' : mo.leap ? ' leap' : ''}">${esc(mo.label)}</td>`;
   }).join('')}</tr>`).join('');
-  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice small">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
+  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
 
   const issues = [
     ...steps.flatMap((c, k) => c.issues.map((x) => ({ where: `Chord ${k + 1}`, ...x }))),
     ...r.transitions.flatMap((t, k) => t.issues.map((x) => ({ where: `${k + 1} → ${k + 2}`, ...x }))),
   ];
-  let issuesHtml;
-  if (drillState) issuesHtml = '';
-  else if (!reveal) issuesHtml = `<button class="btn btn-sm btn-amber" data-reveal>Reveal the errors (${issues.length})</button>`;
-  else if (issues.length) issuesHtml = `<ul class="issues">${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul>`;
-  else issuesHtml = '<ul class="issues"><li class="ok">No problems found: ranges, spacing, crossing, doubling, parallel and direct 5ths/8ves, overlaps, melodic intervals and tendency tones all check out.</li></ul>';
+  let result;
+  if (!reveal) result = '<button class="btn" data-reveal>Reveal the errors</button>';
+  else if (issues.length) result = `<div class="callout bad"><strong>${issues.length} problem${issues.length > 1 ? 's' : ''}</strong><ul>${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul></div>`;
+  else result = `<details class="callout ok"><summary>✓ No voice-leading problems</summary><p>Checked: ${CHECKED}</p></details>`;
+
+  const isLab = root.id === 'vlView';
+  const controls = drillState ? '<div class="callout drill" id="drillBox"></div>' : `
+    <div class="vl-controls">
+      <div class="row">
+        <button class="btn primary" data-play>▶ Play</button>
+        <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices</label>
+        <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
+      </div>
+      ${isLab ? '<div class="row"><button class="btn quiet" data-drill>Drill at the keyboard</button><button class="btn quiet" data-edit>Edit in Workbench</button></div>' : ''}
+    </div>`;
 
   root.innerHTML = `
     <div class="vl-scroll"><table class="vl"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}${outer}</tbody></table></div>
-    <div class="vl-controls">
-      <button class="btn btn-sm btn-primary" data-play>▶ Play</button>
-      <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices only</label>
-      <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
-      ${root.id === 'vlView' && !drillState ? '<button class="btn btn-sm" data-drill title="Play each chord yourself, checked note by note">Drill at the keyboard</button>' : ''}
-      ${root.id === 'vlView' ? '<button class="btn btn-sm" data-edit title="Copy into the workbench to change it">Edit in workbench</button>' : ''}
-    </div>
-    ${issuesHtml}`;
+    ${controls}
+    ${drillState ? '' : result}`;
 
   const midisOf = (k) => steps[k].voices.map((p) => p.midi);
   root.onclick = (e) => {
     if (e.target.closest('[data-play]')) {
       stopAll();
       steps.forEach((_, k) => {
-        if (hidden(k)) return;
         const m = midisOf(k);
         const notes = (outerOnly ? [m[0], m[3]] : m).sort((a, b) => a - b);
         notes.forEach((n, i) => audio.note(n, { at: k * tempo, dur: tempo * 0.95, kind: i === 0 ? 'bass' : 'upper' }));
@@ -2200,10 +2462,10 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
       });
       playTimers.push(setTimeout(() => markCol(root, -1), steps.length * tempo * 1000 + 100));
     }
-    const head2 = e.target.closest('.chord-head');
-    if (head2 && !hidden(Number(head2.dataset.col))) {
+    const headCell = e.target.closest('.chord-head');
+    if (headCell && !hidden(Number(headCell.dataset.col))) {
       stopAll();
-      const k = Number(head2.dataset.col);
+      const k = Number(headCell.dataset.col);
       audio.chord(midisOf(k).sort((a, b) => a - b), { dur: 1.4 });
       markCol(root, k);
       playTimers.push(setTimeout(() => markCol(root, -1), 1400));
@@ -2213,10 +2475,8 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
     if (e.target.closest('[data-edit]')) {
       $('#wbKey').value = keyValue(key);
       $('#wbText').value = progressionToText(prog);
-      state.workbench = { key: $('#wbKey').value, text: $('#wbText').value };
-      save();
       wbCheck();
-      scrollTo($('#workbenchCard'));
+      showTab('workbench');
     }
   };
   root.oninput = (e) => {
@@ -2230,48 +2490,49 @@ function markCol(root, k) {
   if (k >= 0) root.querySelectorAll(`[data-col="${k}"]`).forEach((el) => el.classList.add('playing'));
 }
 
-const progressionToText = (prog) => prog.steps.map((s) => `${(s.rn || '').padEnd(6)}${s.rn ? '' : '      '}`.replace(/^(\S+)/, '$1:') + s.voices.join(' ')).join('\n');
+const progressionToText = (prog) => prog.steps.map((s) => `${s.rn ? `${s.rn}:` : ''}`.padEnd(7) + s.voices.join(' ')).join('\n');
 
-// ================================================================ voice-leading lab
+// ================================================================ lab
 
-let vlSelected = null;
+let vlIndex = 0;
 
 function renderVl() {
-  const l = current();
-  const progs = l.progressions || [];
-  const card = $('#vlCard');
-  if (!progs.length) {
-    $('#vlPills').innerHTML = '';
+  const progs = current().progressions || [];
+  const has = progs.length > 0;
+  $('#vlPrev').parentElement.hidden = !has;
+  if (!has) {
     $('#vlKey').textContent = '';
-    $('#vlNote').textContent = 'No worked progressions in this lesson. Use the workbench to check your own, or open another lesson’s examples:';
-    $('#vlView').innerHTML = `<div class="pills">${LESSONS.filter((x) => x.progressions).map((x) => `<button class="pill" data-lesson="${x.id}">W${x.week} L${x.n}</button>`).join('')}</div>`;
-    $('#vlView').onclick = (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); };
-    card.hidden = false;
+    $('#vlTitle').textContent = 'No worked examples in this lesson';
+    $('#vlNote').textContent = 'Write your own progression in the Workbench and it gets the same checks.';
+    $('#vlView').innerHTML = '<button class="btn" data-go-wb>Open the Workbench</button>';
+    $('#vlView').onclick = (e) => { if (e.target.closest('[data-go-wb]')) showTab('workbench'); };
     return;
   }
-  if (!progs.some((p) => p.id === vlSelected)) vlSelected = progs[0].id;
-  const prog = progressionById(vlSelected);
-  $('#vlPills').innerHTML = progs.map((p) => `<button class="pill${p.id === vlSelected ? ' active' : ''}${p.faulty ? ' err' : ''}" data-prog="${p.id}">${esc(p.title)}</button>`).join('');
+  vlIndex = Math.min(Math.max(vlIndex, 0), progs.length - 1);
+  const prog = progs[vlIndex];
+  $('#vlCount').textContent = `${vlIndex + 1} / ${progs.length}`;
+  $('#vlPrev').disabled = vlIndex === 0;
+  $('#vlNext').disabled = vlIndex === progs.length - 1;
   $('#vlKey').textContent = makeKey(prog.key.tonic, prog.key.mode).name;
+  const m = /^Find the errors?:\s*(.*)$/.exec(prog.title);
+  $('#vlTitle').innerHTML = m
+    ? `<span class="flag">Find the error${prog.faulty.length > 1 || /errors/.test(prog.title) ? 's' : ''}</span>${esc(m[1][0].toUpperCase() + m[1].slice(1))}`
+    : esc(prog.title);
   $('#vlNote').textContent = prog.note || '';
   renderProgression($('#vlView'), prog, drill && drill.prog.id === prog.id ? { drillState: drill } : {});
   if (drill) renderDrillBox();
 }
 
-$('#vlPills').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-prog]');
-  if (!b) return;
-  drillExit();
-  vlSelected = b.dataset.prog;
-  renderVl();
-});
+$('#vlPrev').addEventListener('click', () => { drillExit(); vlIndex -= 1; renderVl(); });
+$('#vlNext').addEventListener('click', () => { drillExit(); vlIndex += 1; renderVl(); });
 
 // ---------------------------------------------------------------- drill
 
-let drill = null; // { prog, idx (last solved chord), selected:Set, misses }
+let drill = null; // { prog, idx (last chord shown), selected:Set, misses }
 
 function drillStart(prog) {
   drill = { prog, idx: 0, selected: new Set(), misses: 0 };
+  setDock(true);
   renderVl();
   const first = prog.steps[0].voices.map((n) => parsePitch(n).midi);
   audio.chord(first.sort((a, b) => a - b), { dur: 1.4 });
@@ -2281,7 +2542,6 @@ function drillExit() {
   if (!drill) return;
   drill = null;
   document.querySelectorAll('.key.sel, .key.miss').forEach((el) => el.classList.remove('sel', 'miss'));
-  $('#vlView').querySelector('.drill-box')?.remove();
 }
 
 function drillTarget() {
@@ -2290,23 +2550,22 @@ function drillTarget() {
 }
 
 function renderDrillBox() {
-  const view = $('#vlView');
-  view.querySelector('.drill-box')?.remove();
-  const box = document.createElement('div');
-  box.className = 'drill-box';
+  const box = $('#drillBox');
+  if (!box) return;
   const target = drillTarget();
   const step = drill.prog.steps[drill.idx + 1];
   if (!target) {
-    box.innerHTML = `<strong>Done.</strong> <span>${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</span>
-      <div class="row"><button class="btn btn-sm btn-primary" data-drill-again>Again</button><button class="btn btn-sm" data-drill-exit>Exit drill</button></div>`;
+    box.innerHTML = `<strong>Done. ${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</strong>
+      <div class="row"><button class="btn primary" data-drill-again>Again</button><button class="btn quiet" data-drill-exit>Exit drill</button></div>`;
   } else {
-    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length} (${rnHtml(step.label || step.rn || '')}): pick the four notes on the keyboard (click toggles), or hold them on a MIDI keyboard.</span>
-      <span class="small muted" data-drill-msg>Selected: ${[...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ') || 'nothing yet'}</span>
+    const sel = [...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ');
+    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length}, <strong>${esc(step.label || step.rn || '')}</strong>. Tap its four notes on the keyboard, or hold them on a MIDI keyboard.</span>
+      <span class="sm muted" data-drill-msg>${sel ? `Selected: ${sel}` : 'Nothing selected yet.'}</span>
       <div class="row">
-        <button class="btn btn-sm btn-primary" data-drill-check>Check</button>
-        <button class="btn btn-sm" data-drill-clear>Clear</button>
-        <button class="btn btn-sm" data-drill-show>Show answer</button>
-        <button class="btn btn-sm" data-drill-exit>Exit drill</button>
+        <button class="btn primary" data-drill-check>Check</button>
+        <button class="btn" data-drill-clear>Clear</button>
+        <button class="btn quiet" data-drill-show>Show answer</button>
+        <button class="btn quiet" data-drill-exit>Exit</button>
       </div>`;
   }
   box.onclick = (e) => {
@@ -2316,7 +2575,6 @@ function renderDrillBox() {
     if (e.target.closest('[data-drill-exit]')) { drillExit(); renderVl(); }
     if (e.target.closest('[data-drill-again]')) drillStart(drill.prog);
   };
-  view.prepend(box);
 }
 
 function syncSelection() {
@@ -2354,8 +2612,8 @@ function drillCheck() {
   }
   drill.misses += 1;
   wrong.forEach((m) => keyEls.get(m)?.classList.add('miss'));
-  const msg = $('#vlView [data-drill-msg]');
-  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? `; red keys are not in the chord` : ''}. Shortest path from the last chord.`;
+  const msg = $('#drillBox [data-drill-msg]');
+  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? '; the outlined keys are not in the chord' : ''}. Move each voice the shortest way from the last chord.`;
 }
 
 function drillAdvance() {
@@ -2411,11 +2669,11 @@ function wbCheck() {
   if (!text.trim()) { view.innerHTML = ''; return; }
   const { steps, errors, notes } = parseWorkbench(text, key);
   if (errors.length) {
-    view.innerHTML = `<ul class="issues">${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>`;
+    view.innerHTML = `<div class="callout bad"><strong>Can’t read this yet</strong><ul>${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`;
     return;
   }
   renderProgression(view, { keyObj: key, steps, title: 'Workbench' });
-  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="small muted">${notes.map(esc).join('<br>')}</p>`);
+  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="callout info">${notes.map(esc).join('<br>')}</p>`);
 }
 
 $('#wbCheck').addEventListener('click', () => { wbCheck(); $('#wbView [data-play]')?.click(); });
@@ -2439,47 +2697,60 @@ function renderEar() {
   const ex = EXERCISES[earExercise];
   const s = earSettings(earExercise);
   if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
-  $('#earTabs').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<button class="pill${id === earExercise ? ' active' : ''}" data-ex="${id}" role="tab">${e.title}</button>`).join('');
-  $('#earLevels').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<button class="pill${id === s.level ? ' active' : ''}" data-level="${id}">${esc(lv.label)}</button>`).join('');
-  $('#earDirections').innerHTML = ex.directions ? Object.entries(ex.directions).map(([id, label]) => `<button class="pill${id === s.direction ? ' active' : ''}" data-dir="${id}">${label}</button>`).join('') : '';
+  $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
+  $('#earEx').value = earExercise;
+  $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
+  $('#earLevel').value = s.level;
+  $('#earDir').hidden = !ex.directions;
+  if (ex.directions) {
+    $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
+    $('#earDir').value = s.direction;
+  }
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
   const items = ex.levels[s.level].items.map(String);
-  $('#earAnswers').innerHTML = items.map((id, i) => `<button class="answer" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
-  $('#earFeedback').hidden = true;
-  $('#earStatus').textContent = 'Press New, sing it back, then answer.';
+  $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
+  setFeedback('', 'Press New, sing it back, then answer.');
   renderEarStats();
+}
+
+function setFeedback(cls, text) {
+  const fb = $('#earFeedback');
+  fb.className = `feedback ${cls}`;
+  fb.textContent = text;
 }
 
 function renderEarStats() {
   const st = earStat(earExercise);
   const pct = st.attempts ? Math.round((100 * st.correct) / st.attempts) : 0;
-  const recent = st.recent || [];
-  const recentPct = recent.length ? Math.round((100 * recent.filter(Boolean).length) / recent.length) : null;
-  $('#earStats').textContent = `${pct}% (${st.correct}/${st.attempts})${recentPct !== null ? ` · last ${recent.length}: ${recentPct}%` : ''}`;
+  $('#earStats').textContent = st.attempts ? `${pct}% · ${st.correct} of ${st.attempts}` : 'No answers yet';
   const ex = EXERCISES[earExercise];
+  const recent = st.recent || [];
   const weak = Object.entries(st.items || {})
     .filter(([, [att]]) => att >= 3)
-    .map(([id, [att, cor]]) => ({ id, acc: cor / att, att }))
+    .map(([id, [att, cor]]) => ({ id, acc: cor / att }))
     .sort((a, b) => a.acc - b.acc)
     .slice(0, 3);
-  $('#earWeak').textContent = weak.length ? `Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(' · ')}. These come up more often.` : '';
+  const parts = [];
+  if (recent.length) parts.push(`Last ${recent.length}: ${Math.round((100 * recent.filter(Boolean).length) / recent.length)}%`);
+  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
+  $('#earWeak').textContent = parts.join(' · ');
 }
 
 function earNew() {
   const s = earSettings(earExercise);
   question = makeQuestion(earExercise, s.level, { direction: s.direction, stats: earStat(earExercise) });
   answered = false;
-  $('#earFeedback').hidden = true;
-  document.querySelectorAll('#earAnswers .answer').forEach((b) => b.classList.remove('right', 'wrong'));
-  $('#earStatus').textContent = 'Listen, sing it back, then answer.';
-  playEvents(question.events);
+  document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
+  setFeedback('', 'Listen, sing it back, then answer.');
+  // Keys stay dark while a question plays, or the keyboard would give the answer away.
+  playEvents(question.events, { light: false });
 }
 
 function earReplay() {
   if (!question) { earNew(); return; }
-  playEvents(question.events);
+  playEvents(question.events, { light: answered });
 }
 
 function earAnswer(id) {
@@ -2497,26 +2768,18 @@ function earAnswer(id) {
   save();
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
-  const fb = $('#earFeedback');
-  fb.hidden = false;
-  fb.className = `feedback ${ok ? 'right' : 'wrong'}`;
-  fb.textContent = `${ok ? 'Right.' : 'Not quite.'} ${question.reveal}`;
-  $('#earStatus').textContent = 'Space for the next one, R to hear it again.';
+  setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
   renderEarStats();
 }
 
-$('#earCard').addEventListener('click', (e) => {
-  const t = e.target.closest('button');
-  if (!t) return;
-  if (t.dataset.ex) { earExercise = t.dataset.ex; renderEar(); }
-  if (t.dataset.level) { earSettings(earExercise).level = t.dataset.level; save(); renderEar(); }
-  if (t.dataset.dir) { earSettings(earExercise).direction = t.dataset.dir; save(); renderEar(); }
-  if (t.dataset.answer) earAnswer(t.dataset.answer);
-  if (t.id === 'earNew') earNew();
-  if (t.id === 'earReplay') earReplay();
-});
+$('#earEx').addEventListener('change', (e) => { earExercise = e.target.value; renderEar(); });
+$('#earLevel').addEventListener('change', (e) => { earSettings(earExercise).level = e.target.value; save(); renderEar(); });
+$('#earDir').addEventListener('change', (e) => { earSettings(earExercise).direction = e.target.value; save(); renderEar(); });
+$('#earAnswers').addEventListener('click', (e) => { const b = e.target.closest('[data-answer]'); if (b) earAnswer(b.dataset.answer); });
+$('#earNew').addEventListener('click', earNew);
+$('#earReplay').addEventListener('click', earReplay);
 
-// ================================================================ chord explorer
+// ================================================================ explore: chords
 
 let exKey = 'C-major';
 const DIATONIC = { major: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'], minor: ['i', 'ii°', 'III', 'iv', 'V', 'VI', 'vii°'] };
@@ -2534,47 +2797,55 @@ function renderExplorer() {
   $('#exChords').innerHTML = explorerChords(key).map((rn) => {
     const ch = parseRoman(rn, key);
     const label = romanLabel(key, ch.degree, { seventh: ch.seventh, inversion: ch.inversion }).text;
-    return `<button class="pill" data-rn="${esc(rn)}">${rnHtml(label)}</button>`;
+    return `<button class="tile" data-rn="${esc(rn)}">${rnHtml(label)}</button>`;
   }).join('');
+  $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
 }
 
-function showChord(rn) {
+function showChord(rn, btn) {
   const key = keyFromValue(exKey);
   const { chord, voices } = voiceChord(key, rn);
   const lab = romanLabel(key, chord.degree, { seventh: chord.seventh, inversion: chord.inversion });
   const [s, a, t, b] = voices;
-  const root = makePitchFromPc(chord.members[0]);
+  const stacked = stackThirds(chord.members);
+  const root = stacked[0];
   let quality;
   if (chord.seventh) {
     const sym = lab.symbol || (lab.numeral === lab.numeral.toLowerCase() ? 'm' : '');
     quality = QUALITY_7[sym];
   } else {
-    const [r, th, f] = chord.members.map((pc, i) => makePitchFromPc(pc, i));
-    quality = `${triadQuality(r, th, f)} triad`;
+    quality = `${triadQuality(...stacked)} triad`;
   }
   const memberName = ['root', '3rd', '5th', '7th'][chord.inversion];
-  const above = [...new Set([t, a, s].map((p) => interval(b, p).simpleName))]
-    .sort((x, y) => Number(y.slice(1)) - Number(x.slice(1)) || 0);
+  // Simple intervals above the bass, with a doubled bass shown as an octave.
+  const above = [...new Set([t, a, s].map((p) => {
+    const iv = interval(b, p);
+    return iv.simpleName === 'P1' && iv.gen > 0 ? 'P8' : iv.simpleName;
+  }))].sort((x, y) => Number(y.slice(1)) - Number(x.slice(1)));
   $('#exView').innerHTML = `
-    <strong>${rnHtml(lab.text)} in ${esc(key.name)}</strong> · ${esc(pcName(root.letter, root.acc))} ${esc(quality)}<br>
-    Bass ${prettyPitch(b)} is the ${memberName}${chord.inversion ? '' : ' (root position)'}.<br>
-    Above the bass: ${above.map(esc).join(', ')}.<br>
-    S ${prettyPitch(s)} · A ${prettyPitch(a)} · T ${prettyPitch(t)} · B ${prettyPitch(b)}`;
+    <strong>${esc(lab.text)} in ${esc(key.name)}: ${esc(pcName(root.letter, root.acc))} ${esc(quality)}</strong><br>
+    The bass, ${prettyPitch(b)}, is the ${memberName}${chord.inversion ? '' : ' (root position)'}.
+    Above it: ${above.map(esc).join(', ')}.<br>
+    Soprano ${prettyPitch(s)}, alto ${prettyPitch(a)}, tenor ${prettyPitch(t)}, bass ${prettyPitch(b)}.`;
+  document.querySelectorAll('#exChords .tile').forEach((el) => el.classList.toggle('active', el === btn));
   stopAll();
   audio.chord(voices.map((p) => p.midi).sort((x, y) => x - y), { dur: 1.6 });
 }
 
-// Spelled pitch for display, octave 4 upward so stacked thirds stay ascending.
-function makePitchFromPc(pc, i = 0) {
-  return parsePitch(`${['C', 'D', 'E', 'F', 'G', 'A', 'B'][pc.letter]}${{ '-2': 'bb', '-1': 'b', 0: '', 1: '#', 2: '##' }[pc.acc]}${4 + Math.floor(i / 4)}`);
+// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
+function stackThirds(members) {
+  const out = [];
+  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
+  return out;
 }
 
-$('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn); });
+$('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn, b); });
 $('#exKey').addEventListener('change', (e) => { exKey = e.target.value; renderExplorer(); });
 
-// ================================================================ drone & degrees
+// ================================================================ explore: drone and degrees
 
 const SOLFEGE = { major: ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'], minor: ['do', 're', 'me', 'fa', 'sol', 'le', 'ti'] };
+const droneTonicPc = () => parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12;
 
 function renderDegrees() {
   const key = keyFromValue($('#droneKey').value);
@@ -2582,13 +2853,13 @@ function renderDegrees() {
   $('#degreeButtons').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8].map((d) => {
     const pc = degreePc(key, d === 8 ? 1 : d, { raised: d === 7 });
     const p = pitchAtOrAbove(pc, d === 8 ? tonic.midi + 12 : tonic.midi);
-    return `<button class="pill mono" data-midi="${p.midi}">^${d === 8 ? 1 : d} ${SOLFEGE[key.mode][(d - 1) % 7]} · ${prettyPitch(p)}</button>`;
+    return `<button class="tile" data-midi="${p.midi}">^${d === 8 ? 1 : d} ${SOLFEGE[key.mode][(d - 1) % 7]}<span class="sub">${prettyPitch(p)}</span></button>`;
   }).join('');
 }
 
 $('#droneKey').addEventListener('change', () => {
   renderDegrees();
-  if (audio.droneOn()) audio.startDrone(parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12);
+  if (audio.droneOn()) audio.startDrone(droneTonicPc());
 });
 $('#droneToggle').addEventListener('click', () => {
   const btn = $('#droneToggle');
@@ -2597,7 +2868,7 @@ $('#droneToggle').addEventListener('click', () => {
     btn.textContent = '▶ Drone';
     btn.classList.remove('on');
   } else {
-    audio.startDrone(parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12);
+    audio.startDrone(droneTonicPc());
     btn.textContent = '■ Drone';
     btn.classList.add('on');
   }
@@ -2605,19 +2876,6 @@ $('#droneToggle').addEventListener('click', () => {
 $('#degreeButtons').addEventListener('click', (e) => {
   const b = e.target.closest('[data-midi]');
   if (b) audio.note(Number(b.dataset.midi), { dur: 1.6, kind: 'upper' });
-});
-
-// ================================================================ journal
-
-let journalTimer = null;
-$('#journal').addEventListener('input', () => {
-  clearTimeout(journalTimer);
-  $('#journalSaved').textContent = 'Saving…';
-  journalTimer = setTimeout(() => {
-    lessonRec(state.current).journal = $('#journal').value;
-    save();
-    $('#journalSaved').textContent = 'Saved on this device';
-  }, 400);
 });
 
 // ================================================================ practice timer
@@ -2646,7 +2904,7 @@ function practiceTotals() {
 function renderTimer() {
   $('#timerSession').textContent = fmt(sessionSecs);
   const t = practiceTotals();
-  $('#timerTotals').textContent = `today ${hm(t.today)} · 7 days ${hm(t.week)}`;
+  $('#timerTotals').textContent = `Practice today ${hm(t.today)} · last 7 days ${hm(t.week)}`;
 }
 
 $('#timerToggle').addEventListener('click', () => {
@@ -2654,7 +2912,8 @@ $('#timerToggle').addEventListener('click', () => {
   if (ticking) {
     clearInterval(ticking);
     ticking = null;
-    btn.textContent = '▶';
+    $('#timerIcon').textContent = '▶';
+    btn.classList.remove('on');
     save();
   } else {
     ticking = setInterval(() => {
@@ -2663,12 +2922,13 @@ $('#timerToggle').addEventListener('click', () => {
       if (sessionSecs % 15 === 0) save();
       renderTimer();
     }, 1000);
-    btn.textContent = '❚❚';
+    $('#timerIcon').textContent = '❚❚';
+    btn.classList.add('on');
   }
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-// ================================================================ backup, restore, log
+// ================================================================ progress log, save, load
 
 function progressLog() {
   const l = current();
@@ -2693,16 +2953,10 @@ function progressLog() {
       return `${ex.title}: ${Math.round((100 * st.correct) / st.attempts)}% (${st.correct}/${st.attempts})${weak.length ? `; weakest ${weak.join(', ')}` : ''}`;
     }),
     '',
-    `JOURNAL (W${l.week} L${l.n})`,
+    `NOTES (W${l.week} L${l.n})`,
     lessonRec(l.id).journal || 'No notes yet.',
   ];
   return lines.join('\n');
-}
-
-function openDialog(id) {
-  const d = $(id);
-  d.showModal();
-  d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
 }
 
 $('#copyLogBtn').addEventListener('click', async () => {
@@ -2728,20 +2982,22 @@ $('#backupBtn').addEventListener('click', () => {
   a.download = `harmony-academy-progress-${today()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  const btn = $('#backupBtn');
-  btn.textContent = 'Saved ✓';
-  setTimeout(() => { btn.textContent = 'Save progress'; }, 2000);
+  $('#menu').hidden = true;
 });
 
 $('#restoreBtn').addEventListener('click', () => {
   $('#restoreError').textContent = '';
   $('#restoreText').value = '';
   $('#restoreFile').value = '';
+  $('#restoreFileName').textContent = '';
   openDialog('#restoreDialog');
 });
+$('#restoreChoose').addEventListener('click', () => $('#restoreFile').click());
 $('#restoreFile').addEventListener('change', async (e) => {
   const f = e.target.files[0];
-  if (f) $('#restoreText').value = await f.text();
+  if (!f) return;
+  $('#restoreFileName').textContent = f.name;
+  $('#restoreText').value = await f.text();
 });
 $('#restoreApply').addEventListener('click', () => {
   let data;
@@ -2751,35 +3007,22 @@ $('#restoreApply').addEventListener('click', () => {
   state = { ...freshState(), ...data };
   save();
   $('#restoreDialog').close();
-  openLesson(state.current, { scroll: false });
+  openLesson(state.current);
   renderTimer();
 });
 
-// ================================================================ dock, sources, boot
-
-function setDock(open) {
-  state.dockOpen = open;
-  $('#dock').classList.toggle('closed', !open);
-  document.body.classList.toggle('dock-closed', !open);
-  $('#dockToggle').textContent = open ? '▾ Keyboard' : '▴ Keyboard';
-  $('#dockToggle').setAttribute('aria-expanded', String(open));
-}
-$('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
-$('#stopBtn').addEventListener('click', () => { stopAll(); });
+// ================================================================ boot
 
 function renderSources() {
-  $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
+  $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
 }
 
 function renderAll() {
-  renderCourse();
-  renderLessonHead();
-  renderTasks();
+  renderLesson();
+  renderTabs();
   renderVl();
   renderEar();
   renderExplorer();
-  $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
-  $('#journal').value = lessonRec(state.current).journal || '';
 }
 
 function boot() {
@@ -2792,8 +3035,9 @@ function boot() {
   fillKeySelect($('#droneKey'), 'C-major');
   renderDegrees();
   renderSources();
-  setDock(state.dockOpen !== false);
-  openLesson(state.current, { scroll: false });
+  // Keyboard open by default on desktop, folded away on phones.
+  setDock(state.dockOpen ?? !narrow.matches);
+  openLesson(state.current);
   if (state.workbench.text) wbCheck();
   renderTimer();
 }

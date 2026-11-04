@@ -8,11 +8,12 @@ import { EXERCISES, makeQuestion } from './ear.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const scrollTo = (el) => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+const narrow = window.matchMedia('(max-width: 1023px)');
 
 // ================================================================ state
 
 const STORE = 'harmony-academy:v1';
+const TOOLS = ['lab', 'workbench', 'ear', 'explore'];
 
 function freshState() {
   return {
@@ -24,7 +25,7 @@ function freshState() {
     earSettings: {},
     practice: {},
     workbench: { key: 'C-major', text: '' },
-    dockOpen: true,
+    tab: 'lab',
   };
 }
 
@@ -59,7 +60,7 @@ function fillKeySelect(sel, value) {
 
 // ================================================================ roman numeral display
 
-/** "V6/5 (passing)" → numeral, symbol, stacked figure, trailing text. */
+/** "V6/5 (passing)" → serif numeral with stacked figure, plus a small label. */
 function rnHtml(text) {
   if (!text) return '';
   const m = /^(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°oø+M]?)([0-9/–]*)(.*)$/.exec(text);
@@ -68,8 +69,73 @@ function rnHtml(text) {
   let figHtml = '';
   if (fig.includes('/')) figHtml = `<span class="fig">${fig.split('/').map((f) => `<span>${esc(f)}</span>`).join('')}</span>`;
   else if (fig) figHtml = `<sup>${esc(fig)}</sup>`;
-  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${rest ? `<span class="small muted">${esc(rest)}</span>` : ''}`;
+  const label = rest.trim().replace(/^\((.*)\)$/, '$1');
+  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${label ? `<span class="lbl">${esc(label)}</span>` : ''}`;
 }
+
+// ================================================================ tabs and layout
+
+let phoneView = 'lesson'; // on narrow screens: the lesson, or the current tool
+
+function showTab(tab) {
+  if (tab === 'lesson') {
+    phoneView = 'lesson';
+  } else {
+    state.tab = tab;
+    phoneView = 'tool';
+    save();
+  }
+  renderTabs();
+  if (tab !== 'lesson') $('#toolPane').scrollTop = 0;
+}
+
+function renderTabs() {
+  if (!TOOLS.includes(state.tab)) state.tab = 'lab';
+  const lessonView = narrow.matches && phoneView === 'lesson';
+  $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
+  document.querySelectorAll('#tabs .tab').forEach((b) => {
+    const on = b.dataset.tab === 'lesson' ? lessonView : !lessonView && b.dataset.tab === state.tab;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', String(on));
+  });
+  document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
+  const l = current();
+  $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
+}
+
+$('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+narrow.addEventListener('change', renderTabs);
+
+// ================================================================ popovers and dialogs
+
+function togglePopover(btn, pop) {
+  const open = pop.hidden;
+  document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+  document.querySelectorAll('[aria-expanded][aria-haspopup], #helpBtn').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+  pop.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+}
+$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
+$('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePopover($('#helpBtn'), $('#help')); });
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.popover')) document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+});
+
+function openDialog(id) {
+  const d = $(id);
+  document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
+  d.showModal();
+  d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
+}
+// Clicking the backdrop closes a dialog.
+document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => {
+  if (e.target !== d) return;
+  const r = d.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+}));
 
 // ================================================================ keyboard (piano dock)
 
@@ -94,7 +160,7 @@ function buildPiano() {
       el.style.width = `${w * 0.6}%`;
     } else {
       const i = whites.indexOf(m);
-      el.className = `key white${m === 60 ? ' middle-c' : ''}`;
+      el.className = 'key white';
       el.style.left = `${i * w}%`;
       el.style.width = `${w}%`;
       if (m % 12 === 0) el.textContent = `C${m / 12 - 1}`;
@@ -108,7 +174,11 @@ function buildPiano() {
     e.preventDefault();
     userNote(Number(el.dataset.midi));
   });
-  // Show C3–C5 in the middle on narrow screens.
+  centerPiano();
+}
+
+// Show the middle of the keyboard when it is wider than the screen.
+function centerPiano() {
   const wrap = $('.piano-wrap');
   requestAnimationFrame(() => { wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2; });
 }
@@ -116,10 +186,9 @@ function buildPiano() {
 audio.onNote((midi, on, kind) => {
   const el = keyEls.get(midi);
   if (!el) return;
-  const cls = `lit-${kind || 'upper'}`;
   if (on) {
     lit.set(midi, (lit.get(midi) || 0) + 1);
-    el.classList.add(cls);
+    el.classList.add(`lit-${kind || 'upper'}`);
   } else {
     const n = (lit.get(midi) || 1) - 1;
     lit.set(midi, n);
@@ -141,15 +210,21 @@ const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) 
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
 let kbOctave = 4;
 const typing = (e) => /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+const earVisible = () => state.tab === 'ear' && !(narrow.matches && phoneView === 'lesson');
 
 document.addEventListener('keydown', (e) => {
-  if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat || document.querySelector('dialog[open]')) return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { e.preventDefault(); earNew(); return; }
-  if (k === 'r') { earReplay(); return; }
-  if (/^[1-9]$/.test(k)) { const b = $('#earAnswers').children[Number(k) - 1]; if (b) b.click(); return; }
-  if (k === 'z') { kbOctave = Math.max(2, kbOctave - 1); $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`; return; }
-  if (k === 'x') { kbOctave = Math.min(5, kbOctave + 1); $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`; return; }
+  if (earVisible()) {
+    if (k === ' ') { e.preventDefault(); earNew(); return; }
+    if (k === 'r') { earReplay(); return; }
+    if (/^[1-9]$/.test(k)) { $('#earAnswers').children[Number(k) - 1]?.click(); return; }
+  }
+  if (k === 'z' || k === 'x') {
+    kbOctave = k === 'z' ? Math.max(2, kbOctave - 1) : Math.min(5, kbOctave + 1);
+    $('#dockStatus').textContent = `Computer keys start at C${kbOctave}`;
+    return;
+  }
   if (k in KEYMAP) userNote(12 * (kbOctave + 1) + KEYMAP[k]);
 });
 
@@ -165,8 +240,8 @@ function setupMidi() {
       const bind = () => {
         let n = 0;
         access.inputs.forEach((input) => { n += 1; input.onmidimessage = onMidi; });
-        btn.textContent = n ? `MIDI: ${n} input${n > 1 ? 's' : ''}` : 'No MIDI input';
-        btn.classList.toggle('on', n > 0);
+        btn.textContent = n ? 'MIDI ✓' : 'No MIDI';
+        btn.title = n ? `${n} MIDI input${n > 1 ? 's' : ''} connected` : 'No MIDI keyboard found';
       };
       bind();
       access.onstatechange = bind;
@@ -180,11 +255,22 @@ function onMidi({ data: [status, midi, vel] }) {
   if (cmd === 0x90 && vel > 0) {
     held.add(midi);
     audio.note(midi, { dur: 1.2, vel: 0.08 + (vel / 127) * 0.25, kind: 'user' });
+    $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
     if (drill) drillFromMidi();
   } else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) {
     held.delete(midi);
   }
 }
+
+function setDock(open) {
+  state.dockOpen = open;
+  $('#dock').classList.toggle('closed', !open);
+  $('#dockToggle').textContent = open ? 'Keyboard ▾' : 'Keyboard ▴';
+  $('#dockToggle').setAttribute('aria-expanded', String(open));
+  if (open) centerPiano();
+}
+$('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
+$('#stopBtn').addEventListener('click', () => stopAll());
 
 // ================================================================ playback helpers
 
@@ -196,109 +282,138 @@ function stopAll() {
   document.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
 }
 
-function playEvents(events) {
+function playEvents(events, { light = true } = {}) {
   stopAll();
   events.forEach((ev) => ev.notes.forEach((m, i) => audio.note(m, {
-    at: ev.at, dur: ev.dur, kind: ev.notes.length > 1 && i === 0 ? 'bass' : 'upper',
+    at: ev.at, dur: ev.dur, light, kind: ev.notes.length > 1 && i === 0 ? 'bass' : 'upper',
   })));
 }
 
-// ================================================================ course map + lesson
+// ================================================================ course drawer
 
 function renderCourse() {
-  const nav = $('#course');
   const status = (l) => {
     const done = lessonDone(l);
-    if (done === l.tasks.length) return '<span class="status done" title="Complete">✓</span>';
-    if (done > 0) return `<span class="status partial" title="${done}/${l.tasks.length} done">◐</span>`;
-    return '<span class="status">○</span>';
+    if (done === l.tasks.length) return '<span class="status done" aria-label="Complete"></span>';
+    if (done > 0) return `<span class="status partial" aria-label="${done} of ${l.tasks.length} done"></span>`;
+    return '<span class="status" aria-label="Not started"></span>';
   };
-  nav.innerHTML = `
-    <select class="course-select" id="courseSelect" aria-label="Lesson">
-      ${LESSONS.map((l) => `<option value="${l.id}">W${l.week} L${l.n} · ${esc(l.title)}${lessonDone(l) === l.tasks.length ? ' ✓' : ''}</option>`).join('')}
-    </select>
-    ${WEEKS.map((w) => `
-      <div class="week">
-        <h3>Week ${w.n} · ${esc(w.title)}</h3>
-        ${LESSONS.filter((l) => l.week === w.n).map((l) => `
-          <button class="lesson-link${l.id === state.current ? ' active' : ''}" data-lesson="${l.id}">
-            ${status(l)}<span>${l.n}. ${esc(l.title)}</span>
-          </button>`).join('')}
-      </div>`).join('')}`;
-  $('#courseSelect').value = state.current;
+  $('#course').innerHTML = WEEKS.map((w) => `
+    <div class="week">
+      <h3>Week ${w.n} · ${esc(w.title)}</h3>
+      ${LESSONS.filter((l) => l.week === w.n).map((l) => `
+        <button class="lesson-link${l.id === state.current ? ' active' : ''}" data-lesson="${l.id}">
+          ${status(l)}<span>${esc(l.title)}</span>
+        </button>`).join('')}
+    </div>`).join('');
+  const complete = LESSONS.filter((l) => lessonDone(l) === l.tasks.length).length;
+  $('#courseCount').textContent = `${complete} of ${LESSONS.length} lessons complete`;
 }
 
+function openDrawer() {
+  renderCourse();
+  openDialog('#drawer');
+  $('#course .lesson-link.active')?.focus();
+}
+$('#drawerBtn').addEventListener('click', openDrawer);
+$('#crumb').addEventListener('click', openDrawer);
 $('#course').addEventListener('click', (e) => {
   const b = e.target.closest('[data-lesson]');
-  if (b) openLesson(b.dataset.lesson);
+  if (!b) return;
+  $('#drawer').close();
+  openLesson(b.dataset.lesson);
 });
-$('#course').addEventListener('change', (e) => { if (e.target.id === 'courseSelect') openLesson(e.target.value); });
 
-function openLesson(id, { scroll = true } = {}) {
+// ================================================================ lesson pane
+
+let openTasks = new Set();
+
+function openLesson(id) {
   state.current = id;
   save();
   drillExit();
   const l = current();
-  vlSelected = (l.progressions || [])[0]?.id || null;
+  vlIndex = 0;
   if (l.ear) {
     earExercise = l.ear.exercise;
     earSettings(earExercise).level = l.ear.level;
     if (l.ear.direction) earSettings(earExercise).direction = l.ear.direction;
   }
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
+  const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
+  openTasks = new Set(firstOpen ? [firstOpen.id] : []);
+  phoneView = 'lesson';
   renderAll();
-  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+  $('#lessonPane').scrollTop = 0;
 }
 
-function renderLessonHead() {
+function renderLesson() {
   const l = current();
-  $('#lessonHead').innerHTML = `
-    <div class="eyebrow">Week ${l.week} · Lesson ${l.n} of 3</div>
-    <h2>${esc(l.title)}</h2>
-    <p class="goal">${esc(l.goal)}</p>
-    <ul class="ideas">${l.ideas.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+  const i = LESSONS.indexOf(l);
+  $('#eyebrow').textContent = `Week ${l.week} · Lesson ${l.n} of 3`;
+  $('#prevLesson').disabled = i === 0;
+  $('#nextLesson').disabled = i === LESSONS.length - 1;
+  $('#lessonTitle').textContent = l.title;
+  $('#lessonGoal').textContent = l.goal;
+  $('#ideas').innerHTML = l.ideas.map((x) => `<li>${esc(x)}</li>`).join('');
+  $('#journal').value = lessonRec(l.id).journal || '';
+  renderTasks();
 }
 
 const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard', ear: 'Ear', spot: 'Analyze' };
+const ACTION_LABEL = (a) => (a.ear ? 'Open in Ear →' : a.progression ? 'Open in Lab →' : a.explorer ? 'Open in Explore →' : 'Open the Workbench →');
 
 function renderTasks() {
   const l = current();
   const rec = lessonRec(l.id);
   $('#tasks').innerHTML = l.tasks.map((t) => {
     const done = !!rec.tasks[t.id];
-    const links = (t.links || []).map((k) => `<a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.label)}</a>${k.note ? ` <span class="note">${esc(k.note)}</span>` : ''}`).join('');
-    const action = t.action ? `<button class="btn btn-sm" data-action='${esc(JSON.stringify(t.action))}'>Open in the app →</button>` : '';
+    const open = openTasks.has(t.id);
+    const links = (t.links || []).map((k) => `<li><a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.label)} ↗</a>${k.note ? ` <span class="note">${esc(k.note)}</span>` : ''}</li>`).join('');
     return `
-      <li class="task${done ? ' done' : ''}">
-        <input type="checkbox" data-task="${t.id}" ${done ? 'checked' : ''} aria-label="Done: ${esc(t.title)}">
+      <li class="task${done ? ' done' : ''}${open ? ' open' : ''}">
+        <label class="check"><input type="checkbox" data-task="${t.id}" ${done ? 'checked' : ''} aria-label="Done: ${esc(t.title)}"><span class="ring"></span></label>
+        <button class="task-head" data-toggle="${t.id}" aria-expanded="${open}">
+          <span><span class="task-title">${esc(t.title)}</span><span class="task-meta">${KIND_LABEL[t.kind] || t.kind} · ${t.minutes} min</span></span>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
         <div class="task-body">
-          <div class="task-title"><span class="task-meta">${KIND_LABEL[t.kind] || t.kind} · ${t.minutes}′</span>${esc(t.title)}</div>
-          ${t.detail ? `<div class="task-detail">${esc(t.detail)}</div>` : ''}
-          ${links ? `<div class="task-links">${links}</div>` : ''}
-          ${action}
+          ${t.detail ? `<p>${esc(t.detail)}</p>` : ''}
+          ${links ? `<ul class="task-links">${links}</ul>` : ''}
+          ${t.action ? `<button class="btn quiet" data-action='${esc(JSON.stringify(t.action))}'>${ACTION_LABEL(t.action)}</button>` : ''}
         </div>
       </li>`;
   }).join('');
   const done = lessonDone(l);
   const minutes = l.tasks.reduce((a, t) => a + t.minutes, 0);
-  $('#checklistPct').textContent = `${done}/${l.tasks.length} · ~${minutes} min`;
-  const i = LESSONS.indexOf(l);
-  const prev = LESSONS[i - 1];
-  const next = LESSONS[i + 1];
-  $('#lessonNav').innerHTML = `
-    ${prev ? `<button class="btn btn-sm" data-lesson="${prev.id}">← ${esc(prev.title)}</button>` : '<span></span>'}
-    ${next ? `<button class="btn btn-sm${done === l.tasks.length ? ' btn-primary' : ''}" data-lesson="${next.id}">${esc(next.title)} →</button>` : ''}`;
+  $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
+  $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
+  const next = LESSONS[LESSONS.indexOf(l) + 1];
+  $('#nextUp').innerHTML = done === l.tasks.length && next
+    ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {
   const id = e.target.dataset.task;
   if (!id) return;
   lessonRec(state.current).tasks[id] = e.target.checked;
+  if (e.target.checked) {
+    // Close the finished task and open the next unfinished one.
+    openTasks.delete(id);
+    const nextTask = current().tasks.find((t) => !lessonRec(state.current).tasks[t.id]);
+    if (nextTask) openTasks.add(nextTask.id);
+  }
   save();
   renderTasks();
-  renderCourse();
 });
 $('#tasks').addEventListener('click', (e) => {
+  const toggle = e.target.closest('[data-toggle]');
+  if (toggle) {
+    const id = toggle.dataset.toggle;
+    if (openTasks.has(id)) openTasks.delete(id); else openTasks.add(id);
+    renderTasks();
+    return;
+  }
   const b = e.target.closest('[data-action]');
   if (!b) return;
   const a = JSON.parse(b.dataset.action);
@@ -308,30 +423,44 @@ $('#tasks').addEventListener('click', (e) => {
     if (a.direction) earSettings(a.ear).direction = a.direction;
     save();
     renderEar();
-    scrollTo($('#earCard'));
+    showTab('ear');
   } else if (a.progression) {
-    vlSelected = a.progression;
+    const progs = current().progressions || [];
+    vlIndex = Math.max(0, progs.findIndex((p) => p.id === a.progression));
+    drillExit();
     renderVl();
-    scrollTo($('#vlCard'));
+    showTab('lab');
   } else if (a.explorer) {
-    scrollTo($('#explorerCard'));
+    showTab('explore');
   } else if (a.workbench) {
-    scrollTo($('#workbenchCard'));
+    showTab('workbench');
   }
 });
-$('#lessonNav').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-lesson]');
-  if (b) openLesson(b.dataset.lesson);
+$('#nextUp').addEventListener('click', (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); });
+$('#prevLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i > 0) openLesson(LESSONS[i - 1].id); });
+$('#nextLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i < LESSONS.length - 1) openLesson(LESSONS[i + 1].id); });
+
+let journalTimer = null;
+$('#journal').addEventListener('input', () => {
+  clearTimeout(journalTimer);
+  $('#journalSaved').textContent = 'Saving…';
+  journalTimer = setTimeout(() => {
+    lessonRec(state.current).journal = $('#journal').value;
+    save();
+    $('#journalSaved').textContent = 'Saved in this browser';
+  }, 400);
 });
 
 // ================================================================ progression view (lab + workbench)
 
 let tempo = 1.1; // seconds per chord
 let outerOnly = false;
+const CHECKED = 'Ranges, spacing, voice crossing, doubling, parallel and direct 5ths and octaves, overlaps, augmented and diminished leaps, and the leading tone and chordal 7th.';
 
 /**
- * Render a progression with its analysis into `root`. opts.reveal shows issues
- * of a "find the error" progression; opts.drill hides the chords still to play.
+ * Render a progression with its analysis into `root`. A "find the error"
+ * progression keeps its issues hidden until revealed; in drill mode the chords
+ * still to play are hidden and the drill panel replaces the controls.
  */
 function renderProgression(root, prog, { reveal = !prog.faulty, drillState = null } = {}) {
   const key = prog.keyObj || makeKey(prog.key.tonic, prog.key.mode);
@@ -346,44 +475,47 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
   const head = cols.map((c) => (c.type === 'chord'
     ? `<th class="chord-head" data-col="${c.k}" title="Play this chord">${rnHtml(steps[c.k].label || steps[c.k].rn || '—')}${steps[c.k].fn ? `<span class="fn">${steps[c.k].fn}</span>` : ''}</th>`
     : '<th></th>')).join('');
-  const rows = VOICES.map((v, i) => `<tr><th class="voice">${v}</th>${cols.map((c) => {
+  const rows = VOICES.map((v, i) => `<tr><th class="voice"><span class="long">${v}</span><span class="short">${v[0]}</span></th>${cols.map((c) => {
     if (c.type === 'chord') {
-      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k <= drillState.idx && c.k > 0 ? 'note drill-ok' : 'note';
+      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k > 0 ? 'note drill-ok' : 'note';
       return `<td class="${cls}" data-col="${c.k}">${hidden(c.k) ? '?' : prettyPitch(steps[c.k].voices[i])}</td>`;
     }
-    const mo = r.transitions[c.k - 1].motions[i];
     if (hidden(c.k)) return '<td class="motion"></td>';
+    const mo = r.transitions[c.k - 1].motions[i];
     return `<td class="motion${mo.dir === 0 ? ' held' : mo.leap ? ' leap' : ''}">${esc(mo.label)}</td>`;
   }).join('')}</tr>`).join('');
-  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice small">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
+  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
 
   const issues = [
     ...steps.flatMap((c, k) => c.issues.map((x) => ({ where: `Chord ${k + 1}`, ...x }))),
     ...r.transitions.flatMap((t, k) => t.issues.map((x) => ({ where: `${k + 1} → ${k + 2}`, ...x }))),
   ];
-  let issuesHtml;
-  if (drillState) issuesHtml = '';
-  else if (!reveal) issuesHtml = `<button class="btn btn-sm btn-amber" data-reveal>Reveal the errors (${issues.length})</button>`;
-  else if (issues.length) issuesHtml = `<ul class="issues">${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul>`;
-  else issuesHtml = '<ul class="issues"><li class="ok">No problems found: ranges, spacing, crossing, doubling, parallel and direct 5ths/8ves, overlaps, melodic intervals and tendency tones all check out.</li></ul>';
+  let result;
+  if (!reveal) result = '<button class="btn" data-reveal>Reveal the errors</button>';
+  else if (issues.length) result = `<div class="callout bad"><strong>${issues.length} problem${issues.length > 1 ? 's' : ''}</strong><ul>${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul></div>`;
+  else result = `<details class="callout ok"><summary>✓ No voice-leading problems</summary><p>Checked: ${CHECKED}</p></details>`;
+
+  const isLab = root.id === 'vlView';
+  const controls = drillState ? '<div class="callout drill" id="drillBox"></div>' : `
+    <div class="vl-controls">
+      <div class="row">
+        <button class="btn primary" data-play>▶ Play</button>
+        <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices</label>
+        <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
+      </div>
+      ${isLab ? '<div class="row"><button class="btn quiet" data-drill>Drill at the keyboard</button><button class="btn quiet" data-edit>Edit in Workbench</button></div>' : ''}
+    </div>`;
 
   root.innerHTML = `
     <div class="vl-scroll"><table class="vl"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}${outer}</tbody></table></div>
-    <div class="vl-controls">
-      <button class="btn btn-sm btn-primary" data-play>▶ Play</button>
-      <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices only</label>
-      <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
-      ${root.id === 'vlView' && !drillState ? '<button class="btn btn-sm" data-drill title="Play each chord yourself, checked note by note">Drill at the keyboard</button>' : ''}
-      ${root.id === 'vlView' ? '<button class="btn btn-sm" data-edit title="Copy into the workbench to change it">Edit in workbench</button>' : ''}
-    </div>
-    ${issuesHtml}`;
+    ${controls}
+    ${drillState ? '' : result}`;
 
   const midisOf = (k) => steps[k].voices.map((p) => p.midi);
   root.onclick = (e) => {
     if (e.target.closest('[data-play]')) {
       stopAll();
       steps.forEach((_, k) => {
-        if (hidden(k)) return;
         const m = midisOf(k);
         const notes = (outerOnly ? [m[0], m[3]] : m).sort((a, b) => a - b);
         notes.forEach((n, i) => audio.note(n, { at: k * tempo, dur: tempo * 0.95, kind: i === 0 ? 'bass' : 'upper' }));
@@ -391,10 +523,10 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
       });
       playTimers.push(setTimeout(() => markCol(root, -1), steps.length * tempo * 1000 + 100));
     }
-    const head2 = e.target.closest('.chord-head');
-    if (head2 && !hidden(Number(head2.dataset.col))) {
+    const headCell = e.target.closest('.chord-head');
+    if (headCell && !hidden(Number(headCell.dataset.col))) {
       stopAll();
-      const k = Number(head2.dataset.col);
+      const k = Number(headCell.dataset.col);
       audio.chord(midisOf(k).sort((a, b) => a - b), { dur: 1.4 });
       markCol(root, k);
       playTimers.push(setTimeout(() => markCol(root, -1), 1400));
@@ -404,10 +536,8 @@ function renderProgression(root, prog, { reveal = !prog.faulty, drillState = nul
     if (e.target.closest('[data-edit]')) {
       $('#wbKey').value = keyValue(key);
       $('#wbText').value = progressionToText(prog);
-      state.workbench = { key: $('#wbKey').value, text: $('#wbText').value };
-      save();
       wbCheck();
-      scrollTo($('#workbenchCard'));
+      showTab('workbench');
     }
   };
   root.oninput = (e) => {
@@ -421,48 +551,49 @@ function markCol(root, k) {
   if (k >= 0) root.querySelectorAll(`[data-col="${k}"]`).forEach((el) => el.classList.add('playing'));
 }
 
-const progressionToText = (prog) => prog.steps.map((s) => `${(s.rn || '').padEnd(6)}${s.rn ? '' : '      '}`.replace(/^(\S+)/, '$1:') + s.voices.join(' ')).join('\n');
+const progressionToText = (prog) => prog.steps.map((s) => `${s.rn ? `${s.rn}:` : ''}`.padEnd(7) + s.voices.join(' ')).join('\n');
 
-// ================================================================ voice-leading lab
+// ================================================================ lab
 
-let vlSelected = null;
+let vlIndex = 0;
 
 function renderVl() {
-  const l = current();
-  const progs = l.progressions || [];
-  const card = $('#vlCard');
-  if (!progs.length) {
-    $('#vlPills').innerHTML = '';
+  const progs = current().progressions || [];
+  const has = progs.length > 0;
+  $('#vlPrev').parentElement.hidden = !has;
+  if (!has) {
     $('#vlKey').textContent = '';
-    $('#vlNote').textContent = 'No worked progressions in this lesson. Use the workbench to check your own, or open another lesson’s examples:';
-    $('#vlView').innerHTML = `<div class="pills">${LESSONS.filter((x) => x.progressions).map((x) => `<button class="pill" data-lesson="${x.id}">W${x.week} L${x.n}</button>`).join('')}</div>`;
-    $('#vlView').onclick = (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); };
-    card.hidden = false;
+    $('#vlTitle').textContent = 'No worked examples in this lesson';
+    $('#vlNote').textContent = 'Write your own progression in the Workbench and it gets the same checks.';
+    $('#vlView').innerHTML = '<button class="btn" data-go-wb>Open the Workbench</button>';
+    $('#vlView').onclick = (e) => { if (e.target.closest('[data-go-wb]')) showTab('workbench'); };
     return;
   }
-  if (!progs.some((p) => p.id === vlSelected)) vlSelected = progs[0].id;
-  const prog = progressionById(vlSelected);
-  $('#vlPills').innerHTML = progs.map((p) => `<button class="pill${p.id === vlSelected ? ' active' : ''}${p.faulty ? ' err' : ''}" data-prog="${p.id}">${esc(p.title)}</button>`).join('');
+  vlIndex = Math.min(Math.max(vlIndex, 0), progs.length - 1);
+  const prog = progs[vlIndex];
+  $('#vlCount').textContent = `${vlIndex + 1} / ${progs.length}`;
+  $('#vlPrev').disabled = vlIndex === 0;
+  $('#vlNext').disabled = vlIndex === progs.length - 1;
   $('#vlKey').textContent = makeKey(prog.key.tonic, prog.key.mode).name;
+  const m = /^Find the errors?:\s*(.*)$/.exec(prog.title);
+  $('#vlTitle').innerHTML = m
+    ? `<span class="flag">Find the error${prog.faulty.length > 1 || /errors/.test(prog.title) ? 's' : ''}</span>${esc(m[1][0].toUpperCase() + m[1].slice(1))}`
+    : esc(prog.title);
   $('#vlNote').textContent = prog.note || '';
   renderProgression($('#vlView'), prog, drill && drill.prog.id === prog.id ? { drillState: drill } : {});
   if (drill) renderDrillBox();
 }
 
-$('#vlPills').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-prog]');
-  if (!b) return;
-  drillExit();
-  vlSelected = b.dataset.prog;
-  renderVl();
-});
+$('#vlPrev').addEventListener('click', () => { drillExit(); vlIndex -= 1; renderVl(); });
+$('#vlNext').addEventListener('click', () => { drillExit(); vlIndex += 1; renderVl(); });
 
 // ---------------------------------------------------------------- drill
 
-let drill = null; // { prog, idx (last solved chord), selected:Set, misses }
+let drill = null; // { prog, idx (last chord shown), selected:Set, misses }
 
 function drillStart(prog) {
   drill = { prog, idx: 0, selected: new Set(), misses: 0 };
+  setDock(true);
   renderVl();
   const first = prog.steps[0].voices.map((n) => parsePitch(n).midi);
   audio.chord(first.sort((a, b) => a - b), { dur: 1.4 });
@@ -472,7 +603,6 @@ function drillExit() {
   if (!drill) return;
   drill = null;
   document.querySelectorAll('.key.sel, .key.miss').forEach((el) => el.classList.remove('sel', 'miss'));
-  $('#vlView').querySelector('.drill-box')?.remove();
 }
 
 function drillTarget() {
@@ -481,23 +611,22 @@ function drillTarget() {
 }
 
 function renderDrillBox() {
-  const view = $('#vlView');
-  view.querySelector('.drill-box')?.remove();
-  const box = document.createElement('div');
-  box.className = 'drill-box';
+  const box = $('#drillBox');
+  if (!box) return;
   const target = drillTarget();
   const step = drill.prog.steps[drill.idx + 1];
   if (!target) {
-    box.innerHTML = `<strong>Done.</strong> <span>${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</span>
-      <div class="row"><button class="btn btn-sm btn-primary" data-drill-again>Again</button><button class="btn btn-sm" data-drill-exit>Exit drill</button></div>`;
+    box.innerHTML = `<strong>Done. ${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</strong>
+      <div class="row"><button class="btn primary" data-drill-again>Again</button><button class="btn quiet" data-drill-exit>Exit drill</button></div>`;
   } else {
-    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length} (${rnHtml(step.label || step.rn || '')}): pick the four notes on the keyboard (click toggles), or hold them on a MIDI keyboard.</span>
-      <span class="small muted" data-drill-msg>Selected: ${[...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ') || 'nothing yet'}</span>
+    const sel = [...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ');
+    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length}, <strong>${esc(step.label || step.rn || '')}</strong>. Tap its four notes on the keyboard, or hold them on a MIDI keyboard.</span>
+      <span class="sm muted" data-drill-msg>${sel ? `Selected: ${sel}` : 'Nothing selected yet.'}</span>
       <div class="row">
-        <button class="btn btn-sm btn-primary" data-drill-check>Check</button>
-        <button class="btn btn-sm" data-drill-clear>Clear</button>
-        <button class="btn btn-sm" data-drill-show>Show answer</button>
-        <button class="btn btn-sm" data-drill-exit>Exit drill</button>
+        <button class="btn primary" data-drill-check>Check</button>
+        <button class="btn" data-drill-clear>Clear</button>
+        <button class="btn quiet" data-drill-show>Show answer</button>
+        <button class="btn quiet" data-drill-exit>Exit</button>
       </div>`;
   }
   box.onclick = (e) => {
@@ -507,7 +636,6 @@ function renderDrillBox() {
     if (e.target.closest('[data-drill-exit]')) { drillExit(); renderVl(); }
     if (e.target.closest('[data-drill-again]')) drillStart(drill.prog);
   };
-  view.prepend(box);
 }
 
 function syncSelection() {
@@ -545,8 +673,8 @@ function drillCheck() {
   }
   drill.misses += 1;
   wrong.forEach((m) => keyEls.get(m)?.classList.add('miss'));
-  const msg = $('#vlView [data-drill-msg]');
-  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? `; red keys are not in the chord` : ''}. Shortest path from the last chord.`;
+  const msg = $('#drillBox [data-drill-msg]');
+  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? '; the outlined keys are not in the chord' : ''}. Move each voice the shortest way from the last chord.`;
 }
 
 function drillAdvance() {
@@ -602,11 +730,11 @@ function wbCheck() {
   if (!text.trim()) { view.innerHTML = ''; return; }
   const { steps, errors, notes } = parseWorkbench(text, key);
   if (errors.length) {
-    view.innerHTML = `<ul class="issues">${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>`;
+    view.innerHTML = `<div class="callout bad"><strong>Can’t read this yet</strong><ul>${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`;
     return;
   }
   renderProgression(view, { keyObj: key, steps, title: 'Workbench' });
-  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="small muted">${notes.map(esc).join('<br>')}</p>`);
+  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="callout info">${notes.map(esc).join('<br>')}</p>`);
 }
 
 $('#wbCheck').addEventListener('click', () => { wbCheck(); $('#wbView [data-play]')?.click(); });
@@ -630,47 +758,60 @@ function renderEar() {
   const ex = EXERCISES[earExercise];
   const s = earSettings(earExercise);
   if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
-  $('#earTabs').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<button class="pill${id === earExercise ? ' active' : ''}" data-ex="${id}" role="tab">${e.title}</button>`).join('');
-  $('#earLevels').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<button class="pill${id === s.level ? ' active' : ''}" data-level="${id}">${esc(lv.label)}</button>`).join('');
-  $('#earDirections').innerHTML = ex.directions ? Object.entries(ex.directions).map(([id, label]) => `<button class="pill${id === s.direction ? ' active' : ''}" data-dir="${id}">${label}</button>`).join('') : '';
+  $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
+  $('#earEx').value = earExercise;
+  $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
+  $('#earLevel').value = s.level;
+  $('#earDir').hidden = !ex.directions;
+  if (ex.directions) {
+    $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
+    $('#earDir').value = s.direction;
+  }
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
   const items = ex.levels[s.level].items.map(String);
-  $('#earAnswers').innerHTML = items.map((id, i) => `<button class="answer" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
-  $('#earFeedback').hidden = true;
-  $('#earStatus').textContent = 'Press New, sing it back, then answer.';
+  $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
+  setFeedback('', 'Press New, sing it back, then answer.');
   renderEarStats();
+}
+
+function setFeedback(cls, text) {
+  const fb = $('#earFeedback');
+  fb.className = `feedback ${cls}`;
+  fb.textContent = text;
 }
 
 function renderEarStats() {
   const st = earStat(earExercise);
   const pct = st.attempts ? Math.round((100 * st.correct) / st.attempts) : 0;
-  const recent = st.recent || [];
-  const recentPct = recent.length ? Math.round((100 * recent.filter(Boolean).length) / recent.length) : null;
-  $('#earStats').textContent = `${pct}% (${st.correct}/${st.attempts})${recentPct !== null ? ` · last ${recent.length}: ${recentPct}%` : ''}`;
+  $('#earStats').textContent = st.attempts ? `${pct}% · ${st.correct} of ${st.attempts}` : 'No answers yet';
   const ex = EXERCISES[earExercise];
+  const recent = st.recent || [];
   const weak = Object.entries(st.items || {})
     .filter(([, [att]]) => att >= 3)
-    .map(([id, [att, cor]]) => ({ id, acc: cor / att, att }))
+    .map(([id, [att, cor]]) => ({ id, acc: cor / att }))
     .sort((a, b) => a.acc - b.acc)
     .slice(0, 3);
-  $('#earWeak').textContent = weak.length ? `Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(' · ')}. These come up more often.` : '';
+  const parts = [];
+  if (recent.length) parts.push(`Last ${recent.length}: ${Math.round((100 * recent.filter(Boolean).length) / recent.length)}%`);
+  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
+  $('#earWeak').textContent = parts.join(' · ');
 }
 
 function earNew() {
   const s = earSettings(earExercise);
   question = makeQuestion(earExercise, s.level, { direction: s.direction, stats: earStat(earExercise) });
   answered = false;
-  $('#earFeedback').hidden = true;
-  document.querySelectorAll('#earAnswers .answer').forEach((b) => b.classList.remove('right', 'wrong'));
-  $('#earStatus').textContent = 'Listen, sing it back, then answer.';
-  playEvents(question.events);
+  document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
+  setFeedback('', 'Listen, sing it back, then answer.');
+  // Keys stay dark while a question plays, or the keyboard would give the answer away.
+  playEvents(question.events, { light: false });
 }
 
 function earReplay() {
   if (!question) { earNew(); return; }
-  playEvents(question.events);
+  playEvents(question.events, { light: answered });
 }
 
 function earAnswer(id) {
@@ -688,26 +829,18 @@ function earAnswer(id) {
   save();
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
-  const fb = $('#earFeedback');
-  fb.hidden = false;
-  fb.className = `feedback ${ok ? 'right' : 'wrong'}`;
-  fb.textContent = `${ok ? 'Right.' : 'Not quite.'} ${question.reveal}`;
-  $('#earStatus').textContent = 'Space for the next one, R to hear it again.';
+  setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
   renderEarStats();
 }
 
-$('#earCard').addEventListener('click', (e) => {
-  const t = e.target.closest('button');
-  if (!t) return;
-  if (t.dataset.ex) { earExercise = t.dataset.ex; renderEar(); }
-  if (t.dataset.level) { earSettings(earExercise).level = t.dataset.level; save(); renderEar(); }
-  if (t.dataset.dir) { earSettings(earExercise).direction = t.dataset.dir; save(); renderEar(); }
-  if (t.dataset.answer) earAnswer(t.dataset.answer);
-  if (t.id === 'earNew') earNew();
-  if (t.id === 'earReplay') earReplay();
-});
+$('#earEx').addEventListener('change', (e) => { earExercise = e.target.value; renderEar(); });
+$('#earLevel').addEventListener('change', (e) => { earSettings(earExercise).level = e.target.value; save(); renderEar(); });
+$('#earDir').addEventListener('change', (e) => { earSettings(earExercise).direction = e.target.value; save(); renderEar(); });
+$('#earAnswers').addEventListener('click', (e) => { const b = e.target.closest('[data-answer]'); if (b) earAnswer(b.dataset.answer); });
+$('#earNew').addEventListener('click', earNew);
+$('#earReplay').addEventListener('click', earReplay);
 
-// ================================================================ chord explorer
+// ================================================================ explore: chords
 
 let exKey = 'C-major';
 const DIATONIC = { major: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'], minor: ['i', 'ii°', 'III', 'iv', 'V', 'VI', 'vii°'] };
@@ -725,47 +858,55 @@ function renderExplorer() {
   $('#exChords').innerHTML = explorerChords(key).map((rn) => {
     const ch = parseRoman(rn, key);
     const label = romanLabel(key, ch.degree, { seventh: ch.seventh, inversion: ch.inversion }).text;
-    return `<button class="pill" data-rn="${esc(rn)}">${rnHtml(label)}</button>`;
+    return `<button class="tile" data-rn="${esc(rn)}">${rnHtml(label)}</button>`;
   }).join('');
+  $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
 }
 
-function showChord(rn) {
+function showChord(rn, btn) {
   const key = keyFromValue(exKey);
   const { chord, voices } = voiceChord(key, rn);
   const lab = romanLabel(key, chord.degree, { seventh: chord.seventh, inversion: chord.inversion });
   const [s, a, t, b] = voices;
-  const root = makePitchFromPc(chord.members[0]);
+  const stacked = stackThirds(chord.members);
+  const root = stacked[0];
   let quality;
   if (chord.seventh) {
     const sym = lab.symbol || (lab.numeral === lab.numeral.toLowerCase() ? 'm' : '');
     quality = QUALITY_7[sym];
   } else {
-    const [r, th, f] = chord.members.map((pc, i) => makePitchFromPc(pc, i));
-    quality = `${triadQuality(r, th, f)} triad`;
+    quality = `${triadQuality(...stacked)} triad`;
   }
   const memberName = ['root', '3rd', '5th', '7th'][chord.inversion];
-  const above = [...new Set([t, a, s].map((p) => interval(b, p).simpleName))]
-    .sort((x, y) => Number(y.slice(1)) - Number(x.slice(1)) || 0);
+  // Simple intervals above the bass, with a doubled bass shown as an octave.
+  const above = [...new Set([t, a, s].map((p) => {
+    const iv = interval(b, p);
+    return iv.simpleName === 'P1' && iv.gen > 0 ? 'P8' : iv.simpleName;
+  }))].sort((x, y) => Number(y.slice(1)) - Number(x.slice(1)));
   $('#exView').innerHTML = `
-    <strong>${rnHtml(lab.text)} in ${esc(key.name)}</strong> · ${esc(pcName(root.letter, root.acc))} ${esc(quality)}<br>
-    Bass ${prettyPitch(b)} is the ${memberName}${chord.inversion ? '' : ' (root position)'}.<br>
-    Above the bass: ${above.map(esc).join(', ')}.<br>
-    S ${prettyPitch(s)} · A ${prettyPitch(a)} · T ${prettyPitch(t)} · B ${prettyPitch(b)}`;
+    <strong>${esc(lab.text)} in ${esc(key.name)}: ${esc(pcName(root.letter, root.acc))} ${esc(quality)}</strong><br>
+    The bass, ${prettyPitch(b)}, is the ${memberName}${chord.inversion ? '' : ' (root position)'}.
+    Above it: ${above.map(esc).join(', ')}.<br>
+    Soprano ${prettyPitch(s)}, alto ${prettyPitch(a)}, tenor ${prettyPitch(t)}, bass ${prettyPitch(b)}.`;
+  document.querySelectorAll('#exChords .tile').forEach((el) => el.classList.toggle('active', el === btn));
   stopAll();
   audio.chord(voices.map((p) => p.midi).sort((x, y) => x - y), { dur: 1.6 });
 }
 
-// Spelled pitch for display, octave 4 upward so stacked thirds stay ascending.
-function makePitchFromPc(pc, i = 0) {
-  return parsePitch(`${['C', 'D', 'E', 'F', 'G', 'A', 'B'][pc.letter]}${{ '-2': 'bb', '-1': 'b', 0: '', 1: '#', 2: '##' }[pc.acc]}${4 + Math.floor(i / 4)}`);
+// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
+function stackThirds(members) {
+  const out = [];
+  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
+  return out;
 }
 
-$('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn); });
+$('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn, b); });
 $('#exKey').addEventListener('change', (e) => { exKey = e.target.value; renderExplorer(); });
 
-// ================================================================ drone & degrees
+// ================================================================ explore: drone and degrees
 
 const SOLFEGE = { major: ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'], minor: ['do', 're', 'me', 'fa', 'sol', 'le', 'ti'] };
+const droneTonicPc = () => parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12;
 
 function renderDegrees() {
   const key = keyFromValue($('#droneKey').value);
@@ -773,13 +914,13 @@ function renderDegrees() {
   $('#degreeButtons').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8].map((d) => {
     const pc = degreePc(key, d === 8 ? 1 : d, { raised: d === 7 });
     const p = pitchAtOrAbove(pc, d === 8 ? tonic.midi + 12 : tonic.midi);
-    return `<button class="pill mono" data-midi="${p.midi}">^${d === 8 ? 1 : d} ${SOLFEGE[key.mode][(d - 1) % 7]} · ${prettyPitch(p)}</button>`;
+    return `<button class="tile" data-midi="${p.midi}">^${d === 8 ? 1 : d} ${SOLFEGE[key.mode][(d - 1) % 7]}<span class="sub">${prettyPitch(p)}</span></button>`;
   }).join('');
 }
 
 $('#droneKey').addEventListener('change', () => {
   renderDegrees();
-  if (audio.droneOn()) audio.startDrone(parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12);
+  if (audio.droneOn()) audio.startDrone(droneTonicPc());
 });
 $('#droneToggle').addEventListener('click', () => {
   const btn = $('#droneToggle');
@@ -788,7 +929,7 @@ $('#droneToggle').addEventListener('click', () => {
     btn.textContent = '▶ Drone';
     btn.classList.remove('on');
   } else {
-    audio.startDrone(parsePitch(`${keyFromValue($('#droneKey').value).tonic}4`).midi % 12);
+    audio.startDrone(droneTonicPc());
     btn.textContent = '■ Drone';
     btn.classList.add('on');
   }
@@ -796,19 +937,6 @@ $('#droneToggle').addEventListener('click', () => {
 $('#degreeButtons').addEventListener('click', (e) => {
   const b = e.target.closest('[data-midi]');
   if (b) audio.note(Number(b.dataset.midi), { dur: 1.6, kind: 'upper' });
-});
-
-// ================================================================ journal
-
-let journalTimer = null;
-$('#journal').addEventListener('input', () => {
-  clearTimeout(journalTimer);
-  $('#journalSaved').textContent = 'Saving…';
-  journalTimer = setTimeout(() => {
-    lessonRec(state.current).journal = $('#journal').value;
-    save();
-    $('#journalSaved').textContent = 'Saved on this device';
-  }, 400);
 });
 
 // ================================================================ practice timer
@@ -837,7 +965,7 @@ function practiceTotals() {
 function renderTimer() {
   $('#timerSession').textContent = fmt(sessionSecs);
   const t = practiceTotals();
-  $('#timerTotals').textContent = `today ${hm(t.today)} · 7 days ${hm(t.week)}`;
+  $('#timerTotals').textContent = `Practice today ${hm(t.today)} · last 7 days ${hm(t.week)}`;
 }
 
 $('#timerToggle').addEventListener('click', () => {
@@ -845,7 +973,8 @@ $('#timerToggle').addEventListener('click', () => {
   if (ticking) {
     clearInterval(ticking);
     ticking = null;
-    btn.textContent = '▶';
+    $('#timerIcon').textContent = '▶';
+    btn.classList.remove('on');
     save();
   } else {
     ticking = setInterval(() => {
@@ -854,12 +983,13 @@ $('#timerToggle').addEventListener('click', () => {
       if (sessionSecs % 15 === 0) save();
       renderTimer();
     }, 1000);
-    btn.textContent = '❚❚';
+    $('#timerIcon').textContent = '❚❚';
+    btn.classList.add('on');
   }
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-// ================================================================ backup, restore, log
+// ================================================================ progress log, save, load
 
 function progressLog() {
   const l = current();
@@ -884,16 +1014,10 @@ function progressLog() {
       return `${ex.title}: ${Math.round((100 * st.correct) / st.attempts)}% (${st.correct}/${st.attempts})${weak.length ? `; weakest ${weak.join(', ')}` : ''}`;
     }),
     '',
-    `JOURNAL (W${l.week} L${l.n})`,
+    `NOTES (W${l.week} L${l.n})`,
     lessonRec(l.id).journal || 'No notes yet.',
   ];
   return lines.join('\n');
-}
-
-function openDialog(id) {
-  const d = $(id);
-  d.showModal();
-  d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
 }
 
 $('#copyLogBtn').addEventListener('click', async () => {
@@ -919,20 +1043,22 @@ $('#backupBtn').addEventListener('click', () => {
   a.download = `harmony-academy-progress-${today()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  const btn = $('#backupBtn');
-  btn.textContent = 'Saved ✓';
-  setTimeout(() => { btn.textContent = 'Save progress'; }, 2000);
+  $('#menu').hidden = true;
 });
 
 $('#restoreBtn').addEventListener('click', () => {
   $('#restoreError').textContent = '';
   $('#restoreText').value = '';
   $('#restoreFile').value = '';
+  $('#restoreFileName').textContent = '';
   openDialog('#restoreDialog');
 });
+$('#restoreChoose').addEventListener('click', () => $('#restoreFile').click());
 $('#restoreFile').addEventListener('change', async (e) => {
   const f = e.target.files[0];
-  if (f) $('#restoreText').value = await f.text();
+  if (!f) return;
+  $('#restoreFileName').textContent = f.name;
+  $('#restoreText').value = await f.text();
 });
 $('#restoreApply').addEventListener('click', () => {
   let data;
@@ -942,35 +1068,22 @@ $('#restoreApply').addEventListener('click', () => {
   state = { ...freshState(), ...data };
   save();
   $('#restoreDialog').close();
-  openLesson(state.current, { scroll: false });
+  openLesson(state.current);
   renderTimer();
 });
 
-// ================================================================ dock, sources, boot
-
-function setDock(open) {
-  state.dockOpen = open;
-  $('#dock').classList.toggle('closed', !open);
-  document.body.classList.toggle('dock-closed', !open);
-  $('#dockToggle').textContent = open ? '▾ Keyboard' : '▴ Keyboard';
-  $('#dockToggle').setAttribute('aria-expanded', String(open));
-}
-$('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
-$('#stopBtn').addEventListener('click', () => { stopAll(); });
+// ================================================================ boot
 
 function renderSources() {
-  $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
+  $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
 }
 
 function renderAll() {
-  renderCourse();
-  renderLessonHead();
-  renderTasks();
+  renderLesson();
+  renderTabs();
   renderVl();
   renderEar();
   renderExplorer();
-  $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
-  $('#journal').value = lessonRec(state.current).journal || '';
 }
 
 function boot() {
@@ -983,8 +1096,9 @@ function boot() {
   fillKeySelect($('#droneKey'), 'C-major');
   renderDegrees();
   renderSources();
-  setDock(state.dockOpen !== false);
-  openLesson(state.current, { scroll: false });
+  // Keyboard open by default on desktop, folded away on phones.
+  setDock(state.dockOpen ?? !narrow.matches);
+  openLesson(state.current);
   if (state.workbench.text) wbCheck();
   renderTimer();
 }

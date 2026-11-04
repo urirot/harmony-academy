@@ -33,9 +33,10 @@ const emit = (midi, on, kind) => listeners.forEach((fn) => fn(midi, on, kind));
 
 /**
  * Play one note. `at` is seconds from now; `kind` ('bass' | 'upper' | 'user')
- * only affects which colour the keyboard lights.
+ * only affects which colour the keyboard lights, and `light: false` keeps the
+ * keys dark (ear-training questions would otherwise show their answer).
  */
-export function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper' } = {}) {
+export function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper', light = true } = {}) {
   const c = ensure();
   const t0 = c.currentTime + 0.03 + at;
   const f = midiToFreq(midi);
@@ -67,10 +68,10 @@ export function note(midi, { at = 0, dur = 1.2, vel = 0.22, kind = 'upper' } = {
   sounding.add(voice);
   oscs[0].onended = () => sounding.delete(voice);
   const onDelay = Math.max(0, (t0 - c.currentTime) * 1000);
-  voice.timers = [
+  voice.timers = light ? [
     setTimeout(() => emit(midi, true, kind), onDelay),
     setTimeout(() => emit(midi, false, kind), onDelay + Math.min(dur, 1.5) * 1000),
-  ];
+  ] : [];
   return voice;
 }
 
@@ -86,7 +87,7 @@ export function stopAll() {
   const now = ctx.currentTime;
   sounding.forEach((v) => {
     v.timers.forEach(clearTimeout);
-    emit(v.midi, false);
+    if (v.timers.length) emit(v.midi, false);
     v.g.gain.cancelScheduledValues(now);
     v.g.gain.setTargetAtTime(0.0001, now, 0.02);
     v.oscs.forEach((o) => { try { o.stop(now + 0.15); } catch { /* already stopped */ } });

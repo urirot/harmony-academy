@@ -21,11 +21,16 @@ progress, and devices do not sync. Clearing site data or a private window
 loses it. On iPhone, add the page to the Home Screen, or Safari may clear it
 after a week unvisited.
 
-**Save progress** downloads `harmony-academy-progress-<date>.json`: a readable
-summary at the top, then everything needed to restore. **Load progress** reads
-that file back, in any browser or on any machine.
+**Save progress** (in the ⋯ menu, top right) downloads
+`harmony-academy-progress-<date>.json`: a readable summary at the top, then
+everything needed to restore. **Load progress** reads that file back, in any
+browser or on any machine.
 
 ## What is in it
+
+The lesson sits on the left and one tool on the right (Lab, Workbench, Ear,
+Explore); on a phone they become tabs. ☰ opens the course map. The keyboard
+folds away with its bar at the bottom.
 
 - **Course map**: 18 lessons. Each has a checklist that links the matching Open
   Music Theory chapter (with the page in the PDF), its worksheet, and the
@@ -39,7 +44,7 @@ that file back, in any browser or on any machine.
 - **Ear lab**: intervals (with random roots, up/down/together), scale degrees
   after a cadence, triad quality, inversions, seventh chords and cadence types.
   Items you miss come up more often.
-- **Chord explorer**, **drone with scale degrees**, **journal**, **practice timer**.
+- **Explore**: chord explorer and a drone with scale degrees. Plus per-lesson notes and a practice timer.
 
 ## Changing it
 
