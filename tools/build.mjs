@@ -14,7 +14,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
 // Dependency order: each module only imports from modules above it.
-const MODULES = ['theory', 'curriculum', 'audio', 'ear', 'app'];
+const MODULES = ['theory', 'curriculum', 'audio', 'ear', 'cloud', 'app'];
 
 function wrap(name) {
   let src = read(`js/${name}.js`);

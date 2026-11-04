@@ -5,6 +5,7 @@ import {
 } from './theory.js';
 import * as audio from './audio.js';
 import { EXERCISES, makeQuestion } from './ear.js';
+import { cloudAvailable, initCloud, signIn, signOut, readProgress, writeProgress } from './cloud.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -18,10 +19,9 @@ const TOOLS = ['lab', 'workbench', 'ear', 'explore'];
 function freshState() {
   return {
     version: 1,
-    current: 'w1l2',
-    // Lesson 1 was finished, and the interval record carried over, in the original app.
-    lessons: { w1l1: { tasks: Object.fromEntries(lessonById('w1l1').tasks.map((t) => [t.id, true])), journal: '' } },
-    ear: { intervals: { attempts: 28, correct: 5, items: {}, recent: [] } },
+    current: 'w1l1',
+    lessons: {},
+    ear: {},
     earSettings: {},
     practice: {},
     workbench: { key: 'C-major', text: '' },
@@ -32,13 +32,34 @@ function freshState() {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
-    if (saved && saved.version === 1) return { ...freshState(), ...saved };
+    if (saved && saved.version === 1) {
+      delete saved.lessonCollapsed; // retired setting
+      return { ...freshState(), ...saved };
+    }
   } catch { /* storage blocked or corrupt: start fresh */ }
   return freshState();
 }
 
+// Settings that belong to this device and stay out of sync: which tab is
+// open, whether the keyboard is showing. updatedAt is sync bookkeeping.
+const DEVICE_KEYS = ['tab', 'dockOpen', 'updatedAt'];
+function portable(st) {
+  const out = { ...st };
+  DEVICE_KEYS.forEach((k) => delete out[k]);
+  return out;
+}
+
 let state = loadState();
+let lastPayload = JSON.stringify(portable(state));
+
+/** Persist locally; when progress actually changed, stamp it and queue an upload. */
 function save() {
+  const payload = JSON.stringify(portable(state));
+  if (payload !== lastPayload) {
+    state.updatedAt = Date.now();
+    lastPayload = payload;
+    cloudChanged();
+  }
   try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* private mode */ }
 }
 const lessonRec = (id) => (state.lessons[id] ||= { tasks: {}, journal: '' });
@@ -1144,6 +1165,177 @@ $('#restoreApply').addEventListener('click', () => {
   renderTimer();
 });
 
+// ================================================================ account and sync
+
+const SYNC_META = 'harmony-academy:account';
+const cloud = { ready: false, user: null, status: '', error: '', at: 0, pushTimer: null, lastPull: 0 };
+
+const loadMeta = () => { try { return JSON.parse(localStorage.getItem(SYNC_META)) || {}; } catch { return {}; } };
+const saveMeta = (m) => { try { localStorage.setItem(SYNC_META, JSON.stringify(m)); } catch { /* storage blocked */ } };
+
+const tasksDone = (st) => Object.values(st.lessons || {}).reduce((n, r) => n + Object.values(r.tasks || {}).filter(Boolean).length, 0);
+const hasProgress = (st) => tasksDone(st) > 0
+  || Object.values(st.lessons || {}).some((r) => (r.journal || '').trim())
+  || Object.values(st.ear || {}).some((e) => e.attempts > 0)
+  || Object.values(st.practice || {}).some((sec) => sec > 0);
+
+function startCloud() {
+  if (!cloudAvailable()) return;
+  initCloud(onUser).then(() => { cloud.ready = true; renderAccount(); }).catch(() => { cloud.ready = false; renderAccount(); });
+}
+
+function cloudChanged() {
+  if (!cloud.user) return;
+  clearTimeout(cloud.pushTimer);
+  cloud.pushTimer = setTimeout(pushCloud, 3000);
+}
+
+async function pushCloud() {
+  clearTimeout(cloud.pushTimer);
+  cloud.pushTimer = null;
+  if (!cloud.user) return;
+  setSync('saving');
+  try {
+    await writeProgress(cloud.user.uid, portable(state), state.updatedAt || Date.now());
+    setSync('synced');
+  } catch (err) {
+    setSync('error', err.code || err.message);
+  }
+}
+
+/** Newest copy wins: take the account's if it is newer, upload ours if ours is. */
+async function pullCloud() {
+  if (!cloud.user) return;
+  cloud.lastPull = Date.now();
+  try {
+    const remote = await readProgress(cloud.user.uid);
+    const localAt = state.updatedAt || 0;
+    if (!remote) await pushCloud();
+    else if (remote.updatedAt > localAt) { applyRemote(remote); setSync('synced'); }
+    else if (localAt > remote.updatedAt) await pushCloud();
+    else setSync('synced');
+  } catch (err) {
+    setSync('error', err.code || err.message);
+  }
+}
+
+function applyRemote(remote) {
+  state = { ...freshState(), ...remote.state, tab: state.tab, dockOpen: state.dockOpen, updatedAt: remote.updatedAt };
+  lastPayload = JSON.stringify(portable(state));
+  ensureStart();
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* private mode */ }
+  openLesson(state.current);
+  renderTimer();
+}
+
+async function onUser(user) {
+  cloud.user = user;
+  if (!user) { setSync(''); return; }
+  setSync('saving');
+  const meta = loadMeta();
+  try {
+    const remote = await readProgress(user.uid);
+    if (meta.uid && meta.uid !== user.uid) {
+      // Someone else used this browser before: never hand them that progress.
+      applyRemote(remote || { state: freshState(), updatedAt: Date.now() });
+      if (!remote) await pushCloud();
+    } else if (!remote) {
+      await pushCloud(); // first device for this account
+    } else if (JSON.stringify(portable(state)) === JSON.stringify(remote.state)) {
+      // already identical
+    } else if (!hasProgress(state)) {
+      applyRemote(remote);
+    } else if (!hasProgress(remote.state)) {
+      await pushCloud();
+    } else if (meta.uid === user.uid) {
+      await pullCloud(); // this browser was already linked: newest copy wins
+    } else if (await chooseCopy(remote)) {
+      applyRemote(remote); // first sign-in here, and both copies have progress
+    } else {
+      await pushCloud();
+    }
+    saveMeta({ uid: user.uid });
+    setSync('synced');
+  } catch (err) {
+    setSync('error', err.code || err.message);
+  }
+}
+
+/** Ask which progress to keep. Resolves true for the account's copy. */
+function chooseCopy(remote) {
+  const when = new Date(remote.updatedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const tasks = (n) => `${n} task${n === 1 ? '' : 's'} done`;
+  $('#chooseAccount').textContent = `Use my account’s (${tasks(tasksDone(remote.state))}, saved ${when})`;
+  $('#chooseLocal').textContent = `Use this browser’s (${tasks(tasksDone(state))})`;
+  const d = $('#chooseDialog');
+  d.showModal();
+  return new Promise((resolve) => {
+    $('#chooseAccount').onclick = () => { d.close(); resolve(true); };
+    $('#chooseLocal').onclick = () => { d.close(); resolve(false); };
+    d.oncancel = (e) => e.preventDefault();
+  });
+}
+
+function setSync(status, error = '') {
+  cloud.status = status;
+  cloud.error = error;
+  if (status === 'synced') cloud.at = Date.now();
+  renderAccount();
+}
+
+const SIGN_IN_ERRORS = {
+  'auth/operation-not-allowed': 'Google sign-in isn’t switched on for this app yet.',
+  'auth/unauthorized-domain': 'This address isn’t allowed to sign in yet.',
+  'auth/network-request-failed': 'No connection. Try again when you’re online.',
+  'permission-denied': 'The server refused to save. Try signing out and in again.',
+};
+
+function renderAccount() {
+  const show = cloudAvailable() && cloud.ready;
+  $('#signInTop').hidden = !show || !!cloud.user;
+  $('#avatarBtn').hidden = !show || !cloud.user;
+  $('#account').hidden = !show;
+  if (!show) return;
+  const u = cloud.user;
+  if (u) {
+    $('#avatarBtn').innerHTML = u.photo ? `<img src="${esc(u.photo)}" alt="" referrerpolicy="no-referrer">` : esc((u.name || '?')[0].toUpperCase());
+    $('#avatarBtn').title = `${u.name} · ${syncText()}`;
+  }
+  $('#account').innerHTML = u
+    ? `<p><strong>${esc(u.name || '')}</strong><br><span class="sm muted">${esc(u.email || '')}</span><br><span class="sm ${cloud.status === 'error' ? 'bad' : 'muted'}">${esc(syncText())}</span></p>
+       <button class="menu-item" id="signOutBtn">Sign out</button>`
+    : `<p class="sm muted">Sign in to keep your progress on every device.</p>
+       <button class="menu-item" id="signInBtn">Sign in with Google</button>
+       ${cloud.error ? `<p class="sm bad">${esc(SIGN_IN_ERRORS[cloud.error] || 'Sign-in failed. Try again.')}</p>` : ''}`;
+}
+
+function syncText() {
+  if (cloud.status === 'saving') return 'Syncing…';
+  if (cloud.status === 'error') return SIGN_IN_ERRORS[cloud.error] || 'Couldn’t sync. Will retry.';
+  if (!cloud.at) return 'Synced';
+  const mins = Math.round((Date.now() - cloud.at) / 60000);
+  return mins < 1 ? 'Synced just now' : `Synced ${mins} min ago`;
+}
+
+async function doSignIn() {
+  cloud.error = '';
+  try { await signIn(); } catch (err) { cloud.error = err.code || err.message; renderAccount(); $('#menu').hidden = false; }
+}
+
+$('#signInTop').addEventListener('click', doSignIn);
+$('#avatarBtn').addEventListener('click', (e) => { e.stopPropagation(); renderAccount(); renderTimer(); togglePopover($('#avatarBtn'), $('#menu')); });
+$('#account').addEventListener('click', async (e) => {
+  if (e.target.closest('#signInBtn')) doSignIn();
+  if (e.target.closest('#signOutBtn')) { if (cloud.pushTimer) await pushCloud(); await signOut(); $('#menu').hidden = true; }
+});
+// Catch up with other devices when coming back to the app; flush edits when leaving.
+window.addEventListener('focus', () => { if (cloud.user && Date.now() - cloud.lastPull > 5000) pullCloud(); });
+document.addEventListener('visibilitychange', () => {
+  if (!cloud.user) return;
+  if (document.hidden && cloud.pushTimer) pushCloud();
+  if (!document.hidden && Date.now() - cloud.lastPull > 5000) pullCloud();
+});
+
 // ================================================================ boot
 
 $('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
@@ -1176,6 +1368,7 @@ function boot() {
   openLesson(state.current);
   if (state.workbench.text) wbCheck();
   renderTimer();
+  startCloud();
 }
 
 boot();

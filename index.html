@@ -15,10 +15,13 @@
     <div class="top-inner">
       <button class="app-name" id="crumb">Harmony Academy</button>
       <div class="spacer"></div>
+      <button class="btn quiet" id="signInTop" hidden>Sign in</button>
+      <button class="avatar" id="avatarBtn" hidden aria-label="Account"></button>
       <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
       <div class="menu-wrap">
         <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
         <div class="popover menu" id="menu" hidden>
+          <div class="account" id="account" hidden></div>
           <p class="sm muted" id="timerTotals"></p>
           <button class="menu-item" id="copyLogBtn">Progress log</button>
           <button class="menu-item" id="backupBtn">Save progress</button>
@@ -160,6 +163,15 @@
     <h2 class="dialog-title">Sources</h2>
     <ul class="sources" id="sources"></ul>
     <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog class="modal" id="chooseDialog">
+    <h2 class="dialog-title">Which progress should we keep?</h2>
+    <p class="muted">Your account already has saved progress, and so does this browser. Pick one; it replaces the other everywhere.</p>
+    <div class="choices">
+      <button class="btn primary" id="chooseAccount"></button>
+      <button class="btn" id="chooseLocal"></button>
+    </div>
   </dialog>
 
   <dialog class="modal" id="logDialog">

@@ -15,11 +15,15 @@ Copy it to any Mac or PC.
 Use Chrome or Edge. Both save progress and support a USB MIDI keyboard
 ("Connect MIDI" in the keyboard bar). Safari plays sound but has no Web MIDI.
 
-Progress (checklists, journal, ear-training scores, practice time) is stored in
-the browser, per address: the Pages link and the local file keep separate
-progress, and devices do not sync. Clearing site data or a private window
-loses it. On iPhone, add the page to the Home Screen, or Safari may clear it
-after a week unvisited.
+**Sign in with Google** (top right, on the web link) and your progress
+follows you: checklists, notes, ear-training scores, practice time and start
+date sync to your own record a few seconds after each change, and the newest
+copy loads when you open the app or return to it. Each person who signs in
+has their own record; nobody can read anyone else's. Which tab is open and
+whether the keyboard shows stay per device.
+
+Without signing in, progress stays in that browser only (and the offline file
+never signs in). Clearing site data or a private window loses it.
 
 **Save progress** (in the ⋯ menu, top right) downloads
 `harmony-academy-progress-<date>.json`: a readable summary at the top, then
@@ -63,6 +67,11 @@ npm test        # theory engine, curriculum voicings, ear-training generators
 To work on the source directly, serve the folder (`python3 -m http.server`)
 and open http://localhost:8000. Modules do not load from `file://`, which is why
 the build exists.
+
+Sign-in and sync use Firebase (project `harmony-academy-urirot`, personal
+Google account): Google Auth, and Firestore with one document per person at
+`users/{uid}`. `firestore.rules` restricts each document to its owner; deploy
+rule changes with `npx firebase-tools deploy --only firestore:rules`.
 
 The curriculum is data in `js/curriculum.js`. The tests run every progression
 in it through the checker, so a mistyped voicing fails `npm test`.
