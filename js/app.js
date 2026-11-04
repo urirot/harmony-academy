@@ -968,6 +968,8 @@ function renderAll() {
 }
 
 function boot() {
+  // Ask the browser not to evict saved progress under storage pressure.
+  navigator.storage?.persist?.().catch(() => {});
   buildPiano();
   setupMidi();
   fillKeySelect($('#wbKey'), state.workbench.key || 'C-major');
