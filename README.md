@@ -5,16 +5,22 @@ three sessions a week, with a voice-leading checker, ear training and a keyboard
 
 ## Using it
 
-Double-click `dist/harmony-academy.html`. It is one self-contained file: no
-server, no install, no network needed except for the course links. Copy it to
-any Mac or PC.
+Open **https://urirot.github.io/harmony-academy/** (GitHub Pages, rebuilt on
+every push to `main`).
+
+Or offline: double-click `dist/harmony-academy.html`. It is one self-contained
+file, so no server, no install, and no network except for the course links.
+Copy it to any Mac or PC.
 
 Use Chrome or Edge. Both save progress and support a USB MIDI keyboard
 ("Connect MIDI" in the keyboard bar). Safari plays sound but has no Web MIDI.
 
 Progress (checklists, journal, ear-training scores, practice time) is stored in
-the browser that opened the file. To move it to another machine or browser, use
-**Back up** there and **Restore** here.
+the browser, per address: the Pages link and the local file keep separate
+progress, and devices do not sync. To move it, use **Back up** on one and
+**Restore** on the other. Clearing site data or a private window loses it. On
+iPhone, add the page to the Home Screen, or Safari may clear it after a week
+unvisited.
 
 ## What is in it
 
