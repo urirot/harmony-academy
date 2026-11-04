@@ -39,11 +39,16 @@
     </nav>
 
     <section class="pane lesson-pane" id="lessonPane">
+      <div class="rail">
+        <button class="icon-btn" id="expandLesson" title="Show the lesson" aria-label="Show the lesson">⇥</button>
+        <button class="rail-label" id="railLabel" title="Show the lesson"></button>
+      </div>
       <div class="eyebrow-row">
         <span class="eyebrow" id="eyebrow"></span>
         <span class="stepper">
           <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson">‹</button>
           <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson">›</button>
+          <button class="icon-btn sm collapse-btn" id="collapseLesson" title="Hide the lesson to give the tools more room" aria-label="Hide the lesson">⇤</button>
         </span>
       </div>
       <h1 class="lesson-title" id="lessonTitle"></h1>

@@ -178,12 +178,21 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 
 /* ---------------------------------------------------------------- panes */
 main {
-  width: min(1280px, 100%); margin: 0 auto; min-height: 0;
+  width: min(1440px, 100%); margin: 0 auto; min-height: 0;
   display: grid; column-gap: var(--s8);
-  grid-template-columns: clamp(340px, 30vw, 400px) minmax(0, 760px);
+  grid-template-columns: clamp(380px, 36vw, 520px) minmax(0, 1fr);
   grid-template-rows: var(--tabs-h) minmax(0, 1fr);
   padding: 0 var(--s6);
 }
+.tool-pane > .panel, .tabs { max-width: 880px; }
+/* Collapsed lesson: a slim rail that brings it back. */
+.rail { display: none; }
+.collapse-btn { margin-left: var(--s2); }
+main.collapsed { grid-template-columns: 36px minmax(0, 1fr); column-gap: var(--s6); }
+main.collapsed .lesson-pane > :not(.rail) { display: none; }
+main.collapsed .rail { display: flex; flex-direction: column; align-items: center; gap: var(--s3); }
+.rail-label { writing-mode: vertical-rl; transform: rotate(180deg); border: none; background: none; padding: var(--s2) 0; font: 400 var(--fs-sm)/1 var(--sans); color: var(--muted); cursor: pointer; white-space: nowrap; }
+.rail-label:hover { color: var(--text); }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
@@ -324,6 +333,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
   .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
   .tab-lesson { display: block; }
+  .collapse-btn { display: none; }
   .lesson-pane, .tool-pane { grid-column: 1; grid-row: 2; padding: var(--s5) 0 var(--s7); }
   main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
 }
@@ -367,11 +377,16 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
     </nav>
 
     <section class="pane lesson-pane" id="lessonPane">
+      <div class="rail">
+        <button class="icon-btn" id="expandLesson" title="Show the lesson" aria-label="Show the lesson">⇥</button>
+        <button class="rail-label" id="railLabel" title="Show the lesson"></button>
+      </div>
       <div class="eyebrow-row">
         <span class="eyebrow" id="eyebrow"></span>
         <span class="stepper">
           <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson">‹</button>
           <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson">›</button>
+          <button class="icon-btn sm collapse-btn" id="collapseLesson" title="Hide the lesson to give the tools more room" aria-label="Hide the lesson">⇤</button>
         </span>
       </div>
       <h1 class="lesson-title" id="lessonTitle"></h1>
@@ -2040,7 +2055,19 @@ function renderTabs() {
   document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
+  // Phones show one pane at a time, so collapsing only applies to the two-pane layout.
+  $('#main').classList.toggle('collapsed', !!state.lessonCollapsed && !narrow.matches);
+  $('#railLabel').textContent = `Week ${l.week} · Lesson ${l.n} · ${l.title}`;
 }
+
+function setLessonCollapsed(collapsed) {
+  state.lessonCollapsed = collapsed;
+  save();
+  renderTabs();
+}
+$('#collapseLesson').addEventListener('click', () => setLessonCollapsed(true));
+$('#expandLesson').addEventListener('click', () => setLessonCollapsed(false));
+$('#railLabel').addEventListener('click', () => setLessonCollapsed(false));
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
