@@ -13,8 +13,7 @@
 <body>
   <header class="top">
     <div class="top-inner">
-      <button class="icon-btn" id="drawerBtn" aria-label="Course map" title="Course map">☰</button>
-      <button class="app-name" id="crumb" title="Course map">Harmony Academy</button>
+      <button class="app-name" id="crumb">Harmony Academy</button>
       <div class="spacer"></div>
       <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
       <div class="menu-wrap">
@@ -24,6 +23,7 @@
           <button class="menu-item" id="copyLogBtn">Progress log</button>
           <button class="menu-item" id="backupBtn">Save progress</button>
           <button class="menu-item" id="restoreBtn">Load progress</button>
+          <button class="menu-item" id="sourcesBtn">Sources</button>
         </div>
       </div>
     </div>
@@ -40,34 +40,39 @@
 
     <section class="pane lesson-pane" id="lessonPane">
       <div class="rail">
-        <button class="icon-btn" id="expandLesson" title="Show the lesson" aria-label="Show the lesson">⇥</button>
-        <button class="rail-label" id="railLabel" title="Show the lesson"></button>
+        <button class="icon-btn" id="expandLesson" title="Show the lessons" aria-label="Show the lessons">⇥</button>
+        <button class="rail-label" id="railLabel" title="Show the lessons"></button>
       </div>
-      <div class="eyebrow-row">
-        <span class="eyebrow" id="eyebrow"></span>
-        <span class="stepper">
-          <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson">‹</button>
-          <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson">›</button>
-          <button class="icon-btn sm collapse-btn" id="collapseLesson" title="Hide the lesson to give the tools more room" aria-label="Hide the lesson">⇤</button>
-        </span>
+      <div class="side-head">
+        <select class="week-select" id="weekSelect" aria-label="Week"></select>
+        <button class="icon-btn sm collapse-btn" id="collapseLesson" title="Hide the lessons to give the tools more room" aria-label="Hide the lessons">⇤</button>
       </div>
-      <h1 class="lesson-title" id="lessonTitle"></h1>
-      <p class="goal" id="lessonGoal"></p>
-
-      <h2 class="section-title">Key ideas</h2>
-      <ul class="ideas" id="ideas"></ul>
-
-      <div class="section-head">
-        <h2 class="section-title">Session</h2>
-        <span class="sm muted" id="checklistPct"></span>
+      <div class="pace">
+        <span class="sm muted" id="paceLine"></span>
+        <button class="btn quiet sm" id="startEdit">Change start</button>
+        <input type="date" id="startDate" aria-label="Start date" hidden>
       </div>
-      <div class="progress"><span id="progressFill"></span></div>
-      <ul class="tasks" id="tasks"></ul>
-      <div id="nextUp"></div>
+      <ol class="lessons" id="weekLessons"></ol>
 
-      <h2 class="section-title">Notes</h2>
-      <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
-      <p class="xs muted" id="journalSaved">Saved in this browser</p>
+      <!-- The open lesson's details; moved under its row when rendered. -->
+      <div class="lesson-body" id="lessonBody">
+        <p class="goal" id="lessonGoal"></p>
+
+        <h3 class="section-title">Key ideas</h3>
+        <ul class="ideas" id="ideas"></ul>
+
+        <div class="section-head">
+          <h3 class="section-title">Session</h3>
+          <span class="sm muted" id="checklistPct"></span>
+        </div>
+        <div class="progress"><span id="progressFill"></span></div>
+        <ul class="tasks" id="tasks"></ul>
+        <div id="nextUp"></div>
+
+        <h3 class="section-title">Notes</h3>
+        <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+        <p class="xs muted" id="journalSaved">Saved in this browser</p>
+      </div>
     </section>
 
     <section class="pane tool-pane" id="toolPane">
@@ -156,17 +161,10 @@
     <div class="piano-wrap"><div class="piano" id="piano"></div></div>
   </footer>
 
-  <dialog class="drawer" id="drawer">
-    <div class="drawer-head">
-      <div>
-        <h2 class="panel-title">Phase 1 · Classical harmony</h2>
-        <p class="sm muted" id="courseCount"></p>
-      </div>
-      <button class="icon-btn" data-close aria-label="Close">✕</button>
-    </div>
-    <nav id="course" aria-label="Lessons"></nav>
-    <h3 class="section-title">Sources</h3>
+  <dialog class="modal" id="sourcesDialog">
+    <h2 class="dialog-title">Sources</h2>
     <ul class="sources" id="sources"></ul>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
   </dialog>
 
   <dialog class="modal" id="logDialog">

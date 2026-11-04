@@ -103,7 +103,7 @@ function renderTabs() {
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
   // Phones show one pane at a time, so collapsing only applies to the two-pane layout.
   $('#main').classList.toggle('collapsed', !!state.lessonCollapsed && !narrow.matches);
-  $('#railLabel').textContent = `Week ${l.week} · Lesson ${l.n} · ${l.title}`;
+  $('#railLabel').textContent = `Week ${l.week} · ${l.title}`;
 }
 
 function setLessonCollapsed(collapsed) {
@@ -114,6 +114,8 @@ function setLessonCollapsed(collapsed) {
 $('#collapseLesson').addEventListener('click', () => setLessonCollapsed(true));
 $('#expandLesson').addEventListener('click', () => setLessonCollapsed(false));
 $('#railLabel').addEventListener('click', () => setLessonCollapsed(false));
+// On phones the header shows where you are; tapping it goes back to the lesson.
+$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
@@ -301,39 +303,112 @@ function playEvents(events, { light = true } = {}) {
   })));
 }
 
-// ================================================================ course drawer
+// ================================================================ week navigator
 
-function renderCourse() {
-  const status = (l) => {
-    const done = lessonDone(l);
-    if (done === l.tasks.length) return '<span class="status done" aria-label="Complete"></span>';
-    if (done > 0) return `<span class="status partial" aria-label="${done} of ${l.tasks.length} done"></span>`;
-    return '<span class="status" aria-label="Not started"></span>';
-  };
-  $('#course').innerHTML = WEEKS.map((w) => `
-    <div class="week">
-      <h3>Week ${w.n} · ${esc(w.title)}</h3>
-      ${LESSONS.filter((l) => l.week === w.n).map((l) => `
-        <button class="lesson-link${l.id === state.current ? ' active' : ''}" data-lesson="${l.id}">
-          ${status(l)}<span>${esc(l.title)}</span>
-        </button>`).join('')}
-    </div>`).join('');
-  const complete = LESSONS.filter((l) => lessonDone(l) === l.tasks.length).length;
-  $('#courseCount').textContent = `${complete} of ${LESSONS.length} lessons complete`;
+const statusClass = (l) => {
+  const done = lessonDone(l);
+  return done === l.tasks.length ? 'status done' : done > 0 ? 'status partial' : 'status';
+};
+
+/** The current lesson's week: its lessons as rows, with the open one's details under its row. */
+function renderWeek() {
+  const l = current();
+  const body = $('#lessonBody');
+  $('#lessonPane').appendChild(body); // park it before the list is rebuilt
+  $('#weekLessons').innerHTML = LESSONS.filter((x) => x.week === l.week).map((x) => {
+    const open = x.id === l.id;
+    return `
+      <li class="lesson${open ? ' open' : ''}">
+        <button class="lesson-row" data-lesson="${x.id}"${open ? ' aria-current="true"' : ''}>
+          <span class="${statusClass(x)}"></span>
+          <span class="lesson-row-text">
+            <span class="lesson-row-title"${open ? ' id="lessonTitle"' : ''}>${esc(x.title)}</span>
+            <span class="lesson-row-meta">Lesson ${x.n} · ${lessonDone(x)} of ${x.tasks.length} done</span>
+          </span>
+        </button>
+      </li>`;
+  }).join('');
+  $('#weekLessons .lesson.open').appendChild(body);
+  renderWeekHead();
 }
 
-function openDrawer() {
-  renderCourse();
-  openDialog('#drawer');
-  $('#course .lesson-link.active')?.focus();
+function renderWeekHead() {
+  $('#weekSelect').innerHTML = WEEKS.map((w) => {
+    const lessons = LESSONS.filter((x) => x.week === w.n);
+    const complete = lessons.every((x) => lessonDone(x) === x.tasks.length);
+    return `<option value="${w.n}">Week ${w.n} · ${esc(w.title)}${complete ? ' ✓' : ''}</option>`;
+  }).join('');
+  $('#weekSelect').value = String(current().week);
+  renderPace();
 }
-$('#drawerBtn').addEventListener('click', openDrawer);
-$('#crumb').addEventListener('click', openDrawer);
-$('#course').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-lesson]');
-  if (!b) return;
-  $('#drawer').close();
-  openLesson(b.dataset.lesson);
+
+// Refresh the open lesson's row after a task is ticked.
+function renderOpenRow() {
+  const l = current();
+  const row = $('#weekLessons .lesson.open .lesson-row');
+  if (!row) return;
+  row.querySelector('.status').className = statusClass(l);
+  row.querySelector('.lesson-row-meta').textContent = `Lesson ${l.n} · ${lessonDone(l)} of ${l.tasks.length} done`;
+  renderWeekHead();
+}
+
+$('#weekLessons').addEventListener('click', (e) => {
+  const b = e.target.closest('.lesson-row');
+  if (b && b.dataset.lesson !== state.current) openLesson(b.dataset.lesson);
+});
+$('#weekSelect').addEventListener('change', (e) => {
+  const lessons = LESSONS.filter((x) => x.week === Number(e.target.value));
+  const target = lessons.find((x) => lessonDone(x) < x.tasks.length) || lessons[0];
+  openLesson(target.id);
+});
+
+// ---------------------------------------------------------------- start date and pace
+
+const DAY = 86400000;
+const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+/** Record the start date once: the earliest practice day, or today. */
+function ensureStart() {
+  if (state.startedAt) return;
+  state.startedAt = Object.keys(state.practice).sort()[0] || today();
+  save();
+}
+
+function renderPace() {
+  const start = new Date(`${state.startedAt}T00:00:00`);
+  const days = Math.round((midnight(new Date()) - start) / DAY);
+  const opts = { day: 'numeric', month: 'short', ...(start.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) };
+  const started = start.toLocaleDateString('en-GB', opts);
+  if (days < 0) {
+    $('#paceLine').textContent = `Starts ${started}`;
+    return;
+  }
+  // Calendar weeks since starting, against the week of the first unfinished lesson.
+  const calWeek = Math.floor(days / 7) + 1;
+  const next = LESSONS.find((x) => lessonDone(x) < x.tasks.length);
+  let pace;
+  if (!next) pace = '<span class="done">Phase 1 complete</span>';
+  else {
+    const diff = calWeek - next.week;
+    const weeks = (n) => `${n} week${n > 1 ? 's' : ''}`;
+    pace = diff === 0 ? 'on pace' : diff > 0 ? `<span class="behind">${weeks(diff)} behind</span>` : `<span class="ahead">${weeks(-diff)} ahead</span>`;
+  }
+  $('#paceLine').innerHTML = `Started ${esc(started)} · week ${calWeek} · ${pace}`;
+}
+
+$('#startEdit').addEventListener('click', () => {
+  const input = $('#startDate');
+  input.value = state.startedAt;
+  input.max = today();
+  input.hidden = !input.hidden;
+  if (!input.hidden) input.focus();
+});
+$('#startDate').addEventListener('change', (e) => {
+  if (!e.target.value) return;
+  state.startedAt = e.target.value;
+  save();
+  e.target.hidden = true;
+  renderPace();
 });
 
 // ================================================================ lesson pane
@@ -361,11 +436,7 @@ function openLesson(id) {
 
 function renderLesson() {
   const l = current();
-  const i = LESSONS.indexOf(l);
-  $('#eyebrow').textContent = `Week ${l.week} · Lesson ${l.n} of 3`;
-  $('#prevLesson').disabled = i === 0;
-  $('#nextLesson').disabled = i === LESSONS.length - 1;
-  $('#lessonTitle').textContent = l.title;
+  renderWeek();
   $('#lessonGoal').textContent = l.goal;
   $('#ideas').innerHTML = l.ideas.map((x) => `<li>${esc(x)}</li>`).join('');
   $('#journal').value = lessonRec(l.id).journal || '';
@@ -417,6 +488,7 @@ $('#tasks').addEventListener('change', (e) => {
   }
   save();
   renderTasks();
+  renderOpenRow();
 });
 $('#tasks').addEventListener('click', (e) => {
   const toggle = e.target.closest('[data-toggle]');
@@ -449,8 +521,6 @@ $('#tasks').addEventListener('click', (e) => {
   }
 });
 $('#nextUp').addEventListener('click', (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); });
-$('#prevLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i > 0) openLesson(LESSONS[i - 1].id); });
-$('#nextLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i < LESSONS.length - 1) openLesson(LESSONS[i + 1].id); });
 
 let journalTimer = null;
 $('#journal').addEventListener('input', () => {
@@ -1009,6 +1079,7 @@ function progressLog() {
   const lines = [
     'HARMONY & EAR ACADEMY: PROGRESS LOG',
     `Date: ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`,
+    `Started: ${state.startedAt} (${$('#paceLine').textContent.replace(/^Started [^·]+· /, '')})`,
     `Current: Week ${l.week} Lesson ${l.n}: ${l.title}`,
     `Practice: today ${hm(t.today)}, last 7 days ${hm(t.week)}, total ${hm(t.total)}`,
     '',
@@ -1078,6 +1149,7 @@ $('#restoreApply').addEventListener('click', () => {
   if (!data || data.version !== 1 || typeof data.lessons !== 'object') { $('#restoreError').textContent = 'This does not look like a Harmony Academy progress file.'; return; }
   ['summary', 'savedAt', 'exportedAt'].forEach((k) => delete data[k]);
   state = { ...freshState(), ...data };
+  ensureStart();
   save();
   $('#restoreDialog').close();
   openLesson(state.current);
@@ -1085,6 +1157,8 @@ $('#restoreApply').addEventListener('click', () => {
 });
 
 // ================================================================ boot
+
+$('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
 
 function renderSources() {
   $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
@@ -1108,6 +1182,7 @@ function boot() {
   fillKeySelect($('#droneKey'), 'C-major');
   renderDegrees();
   renderSources();
+  ensureStart();
   // Keyboard open by default on desktop, folded away on phones.
   setDock(state.dockOpen ?? !narrow.matches);
   openLesson(state.current);

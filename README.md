@@ -28,9 +28,13 @@ browser or on any machine.
 
 ## What is in it
 
-The lesson sits on the left and one tool on the right (Lab, Workbench, Ear,
-Explore); on a phone they become tabs. ☰ opens the course map. The keyboard
-folds away with its bar at the bottom.
+The left panel is the course: one week at a time (switch weeks in its
+dropdown), with that week's lessons as rows and the selected lesson's ideas,
+tasks and notes opened in place. Under the week it shows your start date, how
+many calendar weeks have passed, and whether you are on pace, ahead or behind
+(the start date is editable). ⇤ folds the panel into a rail. One tool sits on
+the right (Lab, Workbench, Ear, Explore); on a phone everything becomes tabs.
+The keyboard folds away with its bar at the bottom.
 
 - **Course map**: 18 lessons. Each has a checklist that links the matching Open
   Music Theory chapter (with the page in the PDF), its worksheet, and the

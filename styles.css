@@ -148,9 +148,8 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 
 /* ---------------------------------------------------------------- header */
 .top { border-bottom: 1px solid var(--line); background: var(--bg); }
-.top-inner { height: 100%; max-width: 1280px; margin: 0 auto; padding: 0 var(--s4); display: flex; align-items: center; gap: var(--s2); }
-.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); cursor: pointer; padding: var(--s2); border-radius: var(--r); }
-.app-name:hover { background: var(--subtle); }
+.top-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--s6); display: flex; align-items: center; gap: var(--s2); }
+.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: default; }
 .timer { gap: var(--s2); padding: 0 var(--s3); }
 .timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .menu-wrap { position: relative; }
@@ -196,15 +195,36 @@ main.collapsed .rail { display: flex; flex-direction: column; align-items: cente
 .panel.active { display: flex; }
 
 /* ---------------------------------------------------------------- lesson pane */
-.eyebrow-row { display: flex; justify-content: space-between; align-items: center; }
-.eyebrow { font-size: var(--fs-sm); color: var(--muted); }
 .stepper { display: inline-flex; align-items: center; gap: var(--s1); }
-.lesson-title { font: 600 var(--fs-xl)/var(--lh-xl) var(--serif); margin: var(--s2) 0 var(--s3); }
+
+/* Week navigator: one week's lessons; the open one shows its details in place. */
+.side-head { display: flex; align-items: center; gap: var(--s2); }
+.week-select { flex: 1; min-width: 0; height: 40px; font: 600 var(--fs-md)/1 var(--sans); background-color: transparent; border-color: transparent; padding-left: var(--s2); margin-left: calc(-1 * var(--s2)); }
+.week-select:hover { border-color: var(--line-strong); }
+.pace { display: flex; align-items: center; flex-wrap: wrap; gap: 0 var(--s2); margin: var(--s1) 0 var(--s4); }
+.pace input[type="date"] { height: 28px; font: inherit; font-size: var(--fs-sm); color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 var(--s2); }
+.pace .behind { color: var(--warn); }
+.pace .ahead, .pace .done { color: var(--ok); }
+.lessons { list-style: none; border-top: 1px solid var(--line); }
+.lesson { border-bottom: 1px solid var(--line); }
+.lesson-row { display: flex; align-items: flex-start; gap: var(--s3); width: 100%; padding: var(--s3) 0; border: none; background: none; text-align: left; color: var(--text); font: inherit; cursor: pointer; }
+.lesson-row:hover .lesson-row-title { color: var(--accent); }
+.lesson-row .status { margin-top: 4px; }
+.lesson-row-text { display: flex; flex-direction: column; min-width: 0; }
+.lesson-row-title { font-weight: 600; }
+.lesson-row-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.lesson.open .lesson-row { padding-top: var(--s4); cursor: default; }
+.lesson.open .lesson-row:hover .lesson-row-title { color: inherit; }
+.lesson.open .lesson-row-title { font: 600 24px/32px var(--serif); }
+.lesson.open .lesson-row .status { margin-top: 8px; }
+.lesson-body { padding: 0 0 var(--s5) 28px; }
+#lessonPane > .lesson-body { display: none; }
+.lesson-body .section-title:first-of-type { margin-top: var(--s5); }
 .goal { color: var(--muted); max-width: 64ch; }
 .section-title { font-size: var(--fs-md); line-height: var(--lh-md); margin: var(--s6) 0 var(--s3); }
 .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
 .section-head .section-title { margin-bottom: var(--s3); }
-.ideas { padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--s2); max-width: 64ch; }
+.ideas { list-style: disc; padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--s2); max-width: 64ch; }
 .ideas li::marker { color: var(--muted); }
 .progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
@@ -285,10 +305,10 @@ main.collapsed .rail { display: flex; flex-direction: column; align-items: cente
 .callout.info { background: var(--subtle); color: var(--muted); }
 
 /* ---------------------------------------------------------------- dock */
-.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s4) env(safe-area-inset-bottom); }
-.dock-bar { max-width: 1280px; margin: 0 auto; height: 36px; display: flex; align-items: center; gap: var(--s2); }
+.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s6) env(safe-area-inset-bottom); }
+.dock-bar { max-width: 1376px; margin: 0 auto; height: 36px; display: flex; align-items: center; gap: var(--s2); }
 .dock.closed .piano-wrap { display: none; }
-.piano-wrap { max-width: 1280px; margin: 0 auto var(--s2); overflow-x: auto; }
+.piano-wrap { max-width: 1376px; margin: 0 auto var(--s2); overflow-x: auto; }
 .piano { position: relative; height: 104px; min-width: 760px; user-select: none; -webkit-user-select: none; touch-action: none; }
 .key { position: absolute; top: 0; border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
 .key.white { height: 100%; background: var(--key-white); border: 1px solid var(--key-edge); color: var(--muted); font-size: 10px; padding-bottom: 4px; z-index: 1; }
@@ -305,21 +325,15 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .modal { margin: auto; width: min(560px, calc(100% - 2 * var(--s4))); padding: var(--s5); border-radius: var(--r-lg); }
 .modal > * + * { margin-top: var(--s4); }
 .dialog-title { font-size: var(--fs-lg); line-height: var(--lh-lg); }
-.drawer { margin: 0 auto 0 0; height: 100%; max-height: 100%; width: 360px; max-width: 100%; padding: var(--s5); border: none; border-right: 1px solid var(--line); border-radius: 0; overflow-y: auto; }
-.drawer-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--s5); }
-.week + .week { margin-top: var(--s5); }
-.week h3 { font-size: var(--fs-sm); line-height: var(--lh-sm); font-weight: 400; color: var(--muted); margin-bottom: var(--s1); }
-.lesson-link { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; padding: var(--s2); margin: 0 calc(-1 * var(--s2)); border: none; border-radius: var(--r); background: none; color: var(--text); font: 400 var(--fs-base)/var(--lh-base) var(--sans); cursor: pointer; }
-.lesson-link:hover { background: var(--subtle); }
-.lesson-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
 .status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
 .status.done { border-color: var(--accent); background: var(--accent); }
-.drawer .section-title { margin-top: var(--s6); }
 .sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 
 /* ---------------------------------------------------------------- one pane below 1024px */
 @media (max-width: 1023px) {
+  .top-inner, .dock { padding-left: var(--s4); padding-right: var(--s4); }
+  .app-name { cursor: pointer; }
   main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
   .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
   .tab-lesson { display: block; }
@@ -329,10 +343,9 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 }
 @media (max-width: 640px) {
   .app-name { font-weight: 400; }
-  .lesson-title { font-size: 24px; line-height: 32px; }
+  .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
   .vl .voice .long { display: none; }
   .vl .voice .short { display: inline; }
   .vl th, .vl td { padding: 0 6px; }
   .piano { height: 96px; }
-  .drawer { width: 100%; }
 }
