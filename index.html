@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>Harmony & Ear Academy</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Harmony &amp; Ear Academy</h1>
+      <p>Phase 1 · Classical harmony &amp; voice leading · 3 sessions a week</p>
+    </div>
+    <div class="timer" id="timer">
+      <button class="btn btn-sm" id="timerToggle" title="Start or pause the practice timer">▶</button>
+      <span class="mono" id="timerSession">00:00</span>
+      <span class="muted" id="timerTotals"></span>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-sm" id="copyLogBtn" title="Copy a text summary of your progress">Progress log</button>
+      <button class="btn btn-sm" id="backupBtn" title="Download all progress as a JSON file">Back up</button>
+      <button class="btn btn-sm" id="restoreBtn" title="Restore progress from a backup">Restore</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="course" id="course" aria-label="Course map"></nav>
+
+    <main id="main">
+      <section class="lesson-head" id="lessonHead"></section>
+
+      <div class="grid">
+        <div class="col">
+          <section class="card" id="checklistCard">
+            <div class="card-title"><h2>Session checklist</h2><span class="mono accent" id="checklistPct"></span></div>
+            <ul class="tasks" id="tasks"></ul>
+            <div id="lessonNav" class="lesson-nav"></div>
+          </section>
+
+          <section class="card" id="vlCard">
+            <div class="card-title"><h2>Voice-leading lab</h2><span class="muted small" id="vlKey"></span></div>
+            <div class="pills" id="vlPills"></div>
+            <p class="small muted" id="vlNote"></p>
+            <div id="vlView"></div>
+          </section>
+
+          <section class="card" id="workbenchCard">
+            <div class="card-title"><h2>Workbench</h2><span class="muted small">Check your own part-writing</span></div>
+            <p class="small muted">One chord per line: an optional Roman numeral, then soprano, alto, tenor and bass. Sharps are <span class="mono">#</span>, flats <span class="mono">b</span>.</p>
+            <div class="row">
+              <label class="small" for="wbKey">Key</label>
+              <select id="wbKey"></select>
+              <button class="btn btn-sm btn-primary" id="wbCheck">Check &amp; play</button>
+              <button class="btn btn-sm" id="wbExample">Example</button>
+            </div>
+            <textarea id="wbText" class="mono" rows="5" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
+            <div id="wbView"></div>
+          </section>
+        </div>
+
+        <div class="col">
+          <section class="card" id="earCard">
+            <div class="card-title"><h2>Ear lab</h2><span class="mono accent" id="earStats"></span></div>
+            <div class="pills" id="earTabs" role="tablist"></div>
+            <div class="pills pills-sub" id="earLevels"></div>
+            <div class="pills pills-sub" id="earDirections"></div>
+            <p class="small muted" id="earHint"></p>
+            <div class="row">
+              <button class="btn btn-primary" id="earNew">▶ New <kbd>Space</kbd></button>
+              <button class="btn" id="earReplay">↻ Replay <kbd>R</kbd></button>
+              <span class="small muted" id="earStatus">Press New, sing it back, then answer.</span>
+            </div>
+            <div class="answers" id="earAnswers"></div>
+            <div class="feedback" id="earFeedback" hidden></div>
+            <p class="small muted" id="earWeak"></p>
+          </section>
+
+          <section class="card" id="explorerCard">
+            <div class="card-title"><h2>Chord explorer</h2>
+              <select id="exKey" aria-label="Explorer key"></select>
+            </div>
+            <div class="pills" id="exChords"></div>
+            <div id="exView" class="explain mono small">Pick a chord to hear it and see how it is built.</div>
+          </section>
+
+          <section class="card" id="droneCard">
+            <div class="card-title"><h2>Drone &amp; scale degrees</h2>
+              <div class="row">
+                <select id="droneKey" aria-label="Drone key"></select>
+                <button class="btn btn-sm" id="droneToggle">▶ Drone</button>
+              </div>
+            </div>
+            <p class="small muted">Start the drone, sing a degree, then tap it to check your pitch.</p>
+            <div class="pills" id="degreeButtons"></div>
+          </section>
+
+          <section class="card" id="journalCard">
+            <div class="card-title"><h2>Journal</h2><span class="muted small" id="journalSaved">Saved on this device</span></div>
+            <textarea id="journal" rows="5" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+          </section>
+
+          <section class="card" id="sourcesCard">
+            <div class="card-title"><h2>Sources</h2></div>
+            <ul class="sources" id="sources"></ul>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="dock" id="dock">
+    <div class="dock-bar">
+      <button class="btn btn-sm" id="dockToggle" aria-expanded="true">▾ Keyboard</button>
+      <span class="small muted" id="dockStatus">Click, or type A–K on your computer keyboard (Z/X shift octave)</span>
+      <span class="dock-right">
+        <span class="legend"><i class="sw sw-bass"></i>bass <i class="sw sw-upper"></i>upper <i class="sw sw-sel"></i>your notes</span>
+        <button class="btn btn-sm" id="midiBtn" hidden>Connect MIDI</button>
+        <button class="btn btn-sm" id="stopBtn" title="Stop all sound">■ Stop</button>
+      </span>
+    </div>
+    <div class="piano-wrap"><div class="piano" id="piano"></div></div>
+  </footer>
+
+  <dialog id="logDialog">
+    <h3>Progress log</h3>
+    <p class="small muted" id="logNote">Copied to the clipboard.</p>
+    <textarea id="logText" class="mono" rows="16" readonly></textarea>
+    <div class="row end"><button class="btn btn-primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog id="restoreDialog">
+    <h3>Restore progress</h3>
+    <p class="small muted">Choose a backup file, or paste its contents. This replaces everything stored on this device.</p>
+    <input type="file" id="restoreFile" accept="application/json,.json">
+    <textarea id="restoreText" class="mono" rows="8" placeholder="…or paste the backup JSON here"></textarea>
+    <p class="small error" id="restoreError"></p>
+    <div class="row end">
+      <button class="btn" data-close>Cancel</button>
+      <button class="btn btn-primary" id="restoreApply">Restore</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

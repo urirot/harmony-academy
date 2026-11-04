@@ -1,0 +1,9 @@
+{
+  "name": "Harmony & Ear Academy",
+  "short_name": "Harmony",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8f7f4",
+  "theme_color": "#1e3a8a",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
