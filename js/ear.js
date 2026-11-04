@@ -133,14 +133,18 @@ const INVERSION_SHAPES = {
   7: [0, 4, 7, 10], '6/5': [4, 7, 10, 12], '4/3': [7, 10, 12, 16], '4/2': [10, 12, 16, 19],
 };
 
+/** Every item an exercise can ask about, across all its levels. */
+export const allItems = (exercise) => [...new Set(Object.values(EXERCISES[exercise].levels).flatMap((lv) => lv.items.map(String)))];
+
 /**
  * Build a question. Returns { exercise, answer, choices, events, reveal } where
  * events are [{ at (s), notes: [midi…] ascending, dur (s) }].
  */
-export function makeQuestion(exercise, level, { direction = 'up', stats = {}, rand = Math.random } = {}) {
+export function makeQuestion(exercise, level, { direction = 'up', items = null, stats = {}, rand = Math.random } = {}) {
   const ex = EXERCISES[exercise];
   const lv = ex.levels[level] || Object.values(ex.levels)[0];
-  const ids = lv.items.map(String);
+  // A lesson drill may name its own items, e.g. only M3, P5 and P8.
+  const ids = (items || lv.items).map(String);
   const answer = weightedPick(ids, stats.items, rand);
   const choices = ids.map((id) => ({ id, label: ex.label(id) }));
   const events = [];

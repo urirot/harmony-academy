@@ -149,3 +149,29 @@ test('weighted picking favours weak items', async () => {
   for (let i = 0; i < 4000; i += 1) counts[weightedPick(['a', 'b'], { a: [10, 10], b: [10, 0] }, rand)] += 1;
   assert.ok(counts.b > counts.a * 3, JSON.stringify(counts));
 });
+
+test('every lesson explains itself and has a valid ear-training plan', async () => {
+  const { EXERCISES, allItems, makeQuestion } = await import('../js/ear.js');
+  const { progressionById } = await import('../js/curriculum.js');
+  for (const lesson of LESSONS) {
+    assert.ok(lesson.explain?.length >= 1, `${lesson.id}: no explanation`);
+    for (const sec of lesson.explain) {
+      assert.ok(sec.h && sec.p?.length, `${lesson.id}: section without heading or text`);
+      for (const h of sec.hear || []) {
+        if (typeof h === 'string') assert.ok(progressionById(h), `${lesson.id}: unknown example ${h}`);
+        else h.seq.flat().forEach((n) => assert.doesNotThrow(() => parsePitch(n), `${lesson.id}: bad note ${n}`));
+      }
+    }
+    assert.ok(lesson.practice?.length >= 1, `${lesson.id}: no ear-training plan`);
+    for (const d of lesson.practice) {
+      const ex = EXERCISES[d.exercise];
+      assert.ok(ex, `${lesson.id}: unknown exercise ${d.exercise}`);
+      if (d.level) assert.ok(ex.levels[d.level], `${lesson.id}: unknown level ${d.level}`);
+      if (d.items) d.items.forEach((id) => assert.ok(allItems(d.exercise).includes(String(id)), `${lesson.id}: unknown item ${id}`));
+      if (d.direction) assert.ok(ex.directions?.[d.direction], `${lesson.id}: unknown direction ${d.direction}`);
+      assert.ok(d.why && d.count > 0 && d.target > 0 && d.target <= 100);
+      const q = makeQuestion(d.exercise, d.level, { items: d.items?.map(String), direction: d.direction });
+      if (d.items) assert.ok(d.items.map(String).includes(q.answer), `${lesson.id}: drill asked outside its items`);
+    }
+  }
+});

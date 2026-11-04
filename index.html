@@ -12,22 +12,18 @@
 </head>
 <body>
   <header class="top">
-    <div class="top-inner">
-      <button class="app-name" id="crumb">Harmony Academy</button>
-      <div class="spacer"></div>
-      <button class="btn quiet" id="signInTop" hidden>Sign in</button>
-      <button class="avatar" id="avatarBtn" hidden aria-label="Account"></button>
-      <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
-      <div class="menu-wrap">
-        <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
-        <div class="popover menu" id="menu" hidden>
-          <div class="account" id="account" hidden></div>
-          <p class="sm muted" id="timerTotals"></p>
-          <button class="menu-item" id="copyLogBtn">Progress log</button>
-          <button class="menu-item" id="backupBtn">Save progress</button>
-          <button class="menu-item" id="restoreBtn">Load progress</button>
-          <button class="menu-item" id="sourcesBtn">Sources</button>
-        </div>
+    <button class="app-name" id="crumb">Harmony Academy</button>
+    <div class="spacer"></div>
+    <button class="btn quiet" id="signInTop" hidden>Sign in</button>
+    <button class="avatar" id="avatarBtn" hidden aria-label="Account"></button>
+    <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
+    <div class="menu-wrap">
+      <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <div class="popover menu" id="menu" hidden>
+        <div class="account" id="account" hidden></div>
+        <p class="sm muted" id="timerTotals"></p>
+        <button class="menu-item" id="timelineBtn">Timeline</button>
+        <button class="menu-item" id="sourcesBtn">Sources</button>
       </div>
     </div>
   </header>
@@ -35,29 +31,39 @@
   <main id="main" data-view="lesson">
     <nav class="tabs" id="tabs" role="tablist">
       <button class="tab tab-lesson" data-tab="lesson" role="tab">Lesson</button>
-      <button class="tab" data-tab="lab" role="tab">Lab</button>
-      <button class="tab" data-tab="workbench" role="tab">Workbench</button>
-      <button class="tab" data-tab="ear" role="tab">Ear</button>
+      <button class="tab" data-tab="ear" role="tab">Ear training</button>
       <button class="tab" data-tab="explore" role="tab">Explore</button>
     </nav>
 
     <section class="pane lesson-pane" id="lessonPane">
       <div class="side-head">
         <select class="week-select" id="weekSelect" aria-label="Week"></select>
+        <span class="stepper">
+          <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson" title="Previous lesson">‹</button>
+          <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson" title="Next lesson">›</button>
+        </span>
       </div>
-      <div class="pace">
-        <span class="sm muted" id="paceLine"></span>
-        <button class="btn quiet sm" id="startEdit">Change start</button>
-        <input type="date" id="startDate" aria-label="Start date" hidden>
-      </div>
+      <p class="pace sm muted" id="paceLine"></p>
       <ol class="lessons" id="weekLessons"></ol>
 
       <!-- The open lesson's details; moved under its row when rendered. -->
       <div class="lesson-body" id="lessonBody">
-        <p class="goal" id="lessonGoal"></p>
+        <div class="goal-row">
+          <p class="goal" id="lessonGoal"></p>
+          <button class="icon-btn sm notes-btn" id="notesBtn" title="Notes" aria-label="Notes" aria-expanded="false">✎<span class="dot" id="notesDot" hidden></span></button>
+        </div>
+        <div class="notes" id="notesBox" hidden>
+          <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+          <p class="xs muted" id="journalSaved">Saved</p>
+        </div>
 
-        <h3 class="section-title">Key ideas</h3>
-        <ul class="ideas" id="ideas"></ul>
+        <div id="explain"></div>
+
+        <div class="section-head">
+          <h3 class="section-title">Ear training</h3>
+          <span class="sm muted" id="practicePct"></span>
+        </div>
+        <ul class="drills" id="drills"></ul>
 
         <div class="section-head">
           <h3 class="section-title">Session</h3>
@@ -66,42 +72,13 @@
         <div class="progress"><span id="progressFill"></span></div>
         <ul class="tasks" id="tasks"></ul>
         <div id="nextUp"></div>
-
-        <h3 class="section-title">Notes</h3>
-        <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
-        <p class="xs muted" id="journalSaved">Saved in this browser</p>
       </div>
     </section>
 
     <section class="pane tool-pane" id="toolPane">
-      <div class="panel" id="panel-lab" data-panel="lab">
-        <div class="lab-head">
-          <span class="stepper">
-            <button class="icon-btn sm" id="vlPrev" aria-label="Previous example">‹</button>
-            <span class="sm muted" id="vlCount"></span>
-            <button class="icon-btn sm" id="vlNext" aria-label="Next example">›</button>
-          </span>
-          <span class="sm muted" id="vlKey"></span>
-        </div>
-        <h2 class="panel-title" id="vlTitle"></h2>
-        <p class="muted" id="vlNote"></p>
-        <div id="vlView"></div>
-      </div>
-
-      <div class="panel" id="panel-workbench" data-panel="workbench">
-        <h2 class="panel-title">Check your own part-writing</h2>
-        <p class="muted">One chord per line: a Roman numeral, then soprano, alto, tenor and bass. Write sharps as <span class="mono">#</span> and flats as <span class="mono">b</span>.</p>
-        <div class="row">
-          <select id="wbKey" aria-label="Key"></select>
-          <button class="btn primary" id="wbCheck">Check &amp; play</button>
-          <button class="btn quiet" id="wbExample">Example</button>
-        </div>
-        <textarea id="wbText" class="mono" rows="6" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
-        <div id="wbView"></div>
-      </div>
-
       <div class="panel" id="panel-ear" data-panel="ear">
-        <div class="ear-head">
+        <div class="session" id="session" hidden></div>
+        <div class="ear-head" id="earHead">
           <div class="row">
             <select id="earEx" aria-label="Drill"></select>
             <select id="earLevel" aria-label="Level"></select>
@@ -159,6 +136,13 @@
     <div class="piano-wrap"><div class="piano" id="piano"></div></div>
   </footer>
 
+  <dialog class="modal" id="timelineDialog">
+    <h2 class="dialog-title">Timeline</h2>
+    <p class="sm muted" id="timelineSummary"></p>
+    <div class="timeline" id="timeline"></div>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
   <dialog class="modal" id="sourcesDialog">
     <h2 class="dialog-title">Sources</h2>
     <ul class="sources" id="sources"></ul>
@@ -171,29 +155,6 @@
     <div class="choices">
       <button class="btn primary" id="chooseAccount"></button>
       <button class="btn" id="chooseLocal"></button>
-    </div>
-  </dialog>
-
-  <dialog class="modal" id="logDialog">
-    <h2 class="dialog-title">Progress log</h2>
-    <p class="sm muted" id="logNote">Copied to the clipboard.</p>
-    <textarea id="logText" class="mono" rows="14" readonly></textarea>
-    <div class="row end"><button class="btn primary" data-close>Done</button></div>
-  </dialog>
-
-  <dialog class="modal" id="restoreDialog">
-    <h2 class="dialog-title">Load progress</h2>
-    <p class="muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
-    <div class="row">
-      <button class="btn" id="restoreChoose">Choose file…</button>
-      <span class="sm muted" id="restoreFileName"></span>
-      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
-    </div>
-    <textarea id="restoreText" class="mono" rows="6" placeholder="…or paste the file’s contents here"></textarea>
-    <p class="sm bad" id="restoreError"></p>
-    <div class="row end">
-      <button class="btn quiet" data-close>Cancel</button>
-      <button class="btn primary" id="restoreApply">Load</button>
     </div>
   </dialog>
 

@@ -1,58 +1,44 @@
 # Harmony & Ear Academy
 
 A personal study app for Phase 1 of classical harmony: 18 lessons over six weeks,
-three sessions a week, with a voice-leading checker, ear training and a keyboard.
+three sessions a week: explanations you can hear, ear training set for each lesson, and a keyboard.
 
 ## Using it
 
 Open **https://urirot.github.io/harmony-academy/** (GitHub Pages, rebuilt on
-every push to `main`).
-
-Or offline: double-click `dist/harmony-academy.html`. It is one self-contained
-file, so no server, no install, and no network except for the course links.
-Copy it to any Mac or PC.
-
-Use Chrome or Edge. Both save progress and support a USB MIDI keyboard
-("Connect MIDI" in the keyboard bar). Safari plays sound but has no Web MIDI.
-
-**Sign in with Google** (top right, on the web link) and your progress
-follows you: checklists, notes, ear-training scores, practice time and start
-date sync to your own record a few seconds after each change, and the newest
-copy loads when you open the app or return to it. Each person who signs in
-has their own record; nobody can read anyone else's. Which tab is open and
+every push to `main`), and **Sign in with Google** at the top right. Each
+person who signs in gets their own record: ticked tasks, drill scores, notes,
+practice time and the start date (the day of the first sign-in) sync a few
+seconds after each change, and the newest copy loads when the app opens or you
+come back to it. Nobody can read anyone else's record. Which tab is open and
 whether the keyboard shows stay per device.
 
-Without signing in, progress stays in that browser only (and the offline file
-never signs in). Clearing site data or a private window loses it.
+Without signing in, progress stays in that browser only. The offline file,
+`dist/harmony-academy.html`, opens by double-click and never signs in.
 
-**Save progress** (in the ⋯ menu, top right) downloads
-`harmony-academy-progress-<date>.json`: a readable summary at the top, then
-everything needed to restore. **Load progress** reads that file back, in any
-browser or on any machine.
+Use Chrome or Edge for a USB MIDI keyboard ("MIDI" in the keyboard bar);
+Safari plays sound but has no Web MIDI.
 
 ## What is in it
 
-The left panel is the course: one week at a time (switch weeks in its
-dropdown), with that week's lessons as rows and the selected lesson's ideas,
-tasks and notes opened in place. Under the week it shows your start date, how
-many calendar weeks have passed, and whether you are on pace, ahead or behind
-(the start date is editable). ⇤ folds the panel into a rail. One tool sits on
-the right (Lab, Workbench, Ear, Explore); on a phone everything becomes tabs.
-The keyboard folds away with its bar at the bottom.
+The screen is split in half. On the left, the course: one week at a time
+(dropdown, or ‹ › to step through lessons), the start date and whether you are
+on pace, ahead or behind, and the open lesson:
 
-- **Course map**: 18 lessons. Each has a checklist that links the matching Open
-  Music Theory chapter (with the page in the PDF), its worksheet, and the
-  Edinburgh and Berklee Coursera videos where they fit.
-- **Voice-leading lab**: every worked progression is analyzed for range,
-  spacing, crossing, doubling, parallel and direct 5ths/8ves, overlap, augmented
-  leaps and unresolved tendency tones. "Find the error" examples hide their
-  errors until you reveal them. Drill mode has you play each chord yourself.
-- **Workbench**: type your own SATB answers (one chord per line, e.g.
-  `ii6: D5 A4 F4 F3`) and get the same analysis and playback.
-- **Ear lab**: intervals (with random roots, up/down/together), scale degrees
-  after a cadence, triad quality, inversions, seventh chords and cadence types.
-  Items you miss come up more often.
-- **Explore**: chord explorer and a drone with scale degrees. Plus per-lesson notes and a practice timer.
+- **Explanation** in short sections, with **Hear it** buttons that play each
+  example (mistakes in red next to their fixes).
+- **Ear training**: one to three drills chosen for the lesson, each 20
+  questions with an 80% target. Passing counts toward finishing the lesson.
+- **Session**: the outside work, each linked to the matching Open Music Theory
+  chapter (with the page in the PDF), worksheet, and Edinburgh or Berklee
+  Coursera videos.
+- **Notes** behind the ✎ icon.
+
+On the right: **Ear training** (lesson drills, or free practice in six drills:
+intervals, scale degrees, triads, inversions, seventh chords, cadences; missed
+items come up more often) and **Explore** (chords in any key, a drone with
+scale degrees). The ⋯ menu has the account, practice totals, a **Timeline** of
+what you did each day, and the sources.
 
 ## Changing it
 
@@ -73,5 +59,7 @@ Google account): Google Auth, and Firestore with one document per person at
 `users/{uid}`. `firestore.rules` restricts each document to its owner; deploy
 rule changes with `npx firebase-tools deploy --only firestore:rules`.
 
-The curriculum is data in `js/curriculum.js`. The tests run every progression
-in it through the checker, so a mistyped voicing fails `npm test`.
+The curriculum is data in `js/curriculum.js`. The tests run every example
+progression through a voice-leading checker (so a mistyped voicing fails
+`npm test`), and check that every lesson has an explanation and a valid
+ear-training plan.

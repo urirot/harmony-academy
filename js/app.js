@@ -1,7 +1,7 @@
 import { LESSONS, WEEKS, SOURCES, lessonById, progressionById } from './curriculum.js';
 import {
-  parsePitch, parseRoman, romanLabel, makeKey, voiceChord, analyzeProgression, interval,
-  degreePc, pitchAtOrAbove, prettyPitch, prettyName, pcName, triadQuality, VOICES,
+  parsePitch, parseRoman, romanLabel, makeKey, voiceChord, interval,
+  degreePc, pitchAtOrAbove, prettyPitch, prettyName, pcName, triadQuality,
 } from './theory.js';
 import * as audio from './audio.js';
 import { EXERCISES, makeQuestion } from './ear.js';
@@ -14,18 +14,20 @@ const narrow = window.matchMedia('(max-width: 1023px)');
 // ================================================================ state
 
 const STORE = 'harmony-academy:v1';
-const TOOLS = ['lab', 'workbench', 'ear', 'explore'];
+const TOOLS = ['ear', 'explore'];
+const HISTORY_MAX = 500;
 
 function freshState() {
   return {
     version: 1,
     current: 'w1l1',
     lessons: {},
+    drills: {},
+    history: [],
     ear: {},
     earSettings: {},
     practice: {},
-    workbench: { key: 'C-major', text: '' },
-    tab: 'lab',
+    tab: 'ear',
   };
 }
 
@@ -33,7 +35,7 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
     if (saved && saved.version === 1) {
-      delete saved.lessonCollapsed; // retired setting
+      ['lessonCollapsed', 'workbench'].forEach((k) => delete saved[k]); // retired features
       return { ...freshState(), ...saved };
     }
   } catch { /* storage blocked or corrupt: start fresh */ }
@@ -62,9 +64,22 @@ function save() {
   }
   try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* private mode */ }
 }
+
 const lessonRec = (id) => (state.lessons[id] ||= { tasks: {}, journal: '' });
-const lessonDone = (l) => l.tasks.filter((t) => lessonRec(l.id).tasks[t.id]).length;
 const current = () => lessonById(state.current) || LESSONS[0];
+const drillKey = (lessonId, i) => `${lessonId}:${i}`;
+const drillPassed = (lessonId, i) => !!state.drills[drillKey(lessonId, i)]?.passed;
+
+// A lesson is done when its tasks are ticked and its drills passed.
+const lessonTotal = (l) => l.tasks.length + (l.practice || []).length;
+const lessonDone = (l) => l.tasks.filter((t) => lessonRec(l.id).tasks[t.id]).length
+  + (l.practice || []).filter((_, i) => drillPassed(l.id, i)).length;
+const lessonComplete = (l) => lessonDone(l) === lessonTotal(l);
+
+/** Add an entry to the timeline. */
+function logEvent(type, text, lesson = state.current) {
+  state.history = [...(state.history || []), { t: Date.now(), type, text, lesson }].slice(-HISTORY_MAX);
+}
 
 // ================================================================ keys
 
@@ -79,19 +94,15 @@ function fillKeySelect(sel, value) {
   sel.value = value;
 }
 
-// ================================================================ roman numeral display
-
-/** "V6/5 (passing)" → serif numeral with stacked figure, plus a small label. */
+/** "V6/5" → numeral with a stacked figure. */
 function rnHtml(text) {
-  if (!text) return '';
   const m = /^(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°oø+M]?)([0-9/–]*)(.*)$/.exec(text);
   if (!m) return `<span class="rn">${esc(text)}</span>`;
-  const [, num, sym, fig, rest] = m;
+  const [, num, sym, fig] = m;
   let figHtml = '';
   if (fig.includes('/')) figHtml = `<span class="fig">${fig.split('/').map((f) => `<span>${esc(f)}</span>`).join('')}</span>`;
   else if (fig) figHtml = `<sup>${esc(fig)}</sup>`;
-  const label = rest.trim().replace(/^\((.*)\)$/, '$1');
-  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${label ? `<span class="lbl">${esc(label)}</span>` : ''}`;
+  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>`;
 }
 
 // ================================================================ tabs and layout
@@ -111,7 +122,7 @@ function showTab(tab) {
 }
 
 function renderTabs() {
-  if (!TOOLS.includes(state.tab)) state.tab = 'lab';
+  if (!TOOLS.includes(state.tab)) state.tab = 'ear';
   const lessonView = narrow.matches && phoneView === 'lesson';
   $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
   document.querySelectorAll('#tabs .tab').forEach((b) => {
@@ -123,22 +134,21 @@ function renderTabs() {
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
 }
-// On phones the header shows where you are; tapping it goes back to the lesson.
-$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
+// On phones the header shows where you are; tapping it goes back to the lesson.
+$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
 // ================================================================ popovers and dialogs
 
 function togglePopover(btn, pop) {
   const open = pop.hidden;
   document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
-  document.querySelectorAll('[aria-expanded][aria-haspopup], #helpBtn').forEach((b) => b.setAttribute('aria-expanded', 'false'));
   pop.hidden = !open;
   btn.setAttribute('aria-expanded', String(open));
 }
-$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
+$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderAccount(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
 $('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePopover($('#helpBtn'), $('#help')); });
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.popover')) document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
@@ -153,8 +163,8 @@ function openDialog(id) {
   d.showModal();
   d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
 }
-// Clicking the backdrop closes a dialog.
-document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => {
+// Clicking the backdrop closes a dialog (except the one that must be answered).
+document.querySelectorAll('dialog:not(#chooseDialog)').forEach((d) => d.addEventListener('click', (e) => {
   if (e.target !== d) return;
   const r = d.getBoundingClientRect();
   if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
@@ -197,7 +207,6 @@ function buildPiano() {
     e.preventDefault();
     userNote(Number(el.dataset.midi));
   });
-  centerPiano();
 }
 
 // Show the middle of the keyboard when it is wider than the screen.
@@ -219,15 +228,14 @@ audio.onNote((midi, on, kind) => {
   }
 });
 
+const SHARP_SPELL = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) - 1}`);
+
 /** A note the user played (click, computer key or MIDI). */
 function userNote(midi, vel = 0.22) {
   audio.note(midi, { dur: 1.1, vel, kind: 'user' });
   $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
-  if (drill) drillToggle(midi);
 }
-
-const SHARP_SPELL = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) - 1}`);
 
 // Computer keyboard: A row is the white keys from C, W row the black keys.
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
@@ -252,7 +260,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Web MIDI, where the browser has it (Chrome, Edge; not Safari).
-const held = new Set();
 function setupMidi() {
   if (!navigator.requestMIDIAccess) return;
   const btn = $('#midiBtn');
@@ -274,14 +281,9 @@ function setupMidi() {
   });
 }
 function onMidi({ data: [status, midi, vel] }) {
-  const cmd = status & 0xf0;
-  if (cmd === 0x90 && vel > 0) {
-    held.add(midi);
+  if ((status & 0xf0) === 0x90 && vel > 0) {
     audio.note(midi, { dur: 1.2, vel: 0.08 + (vel / 127) * 0.25, kind: 'user' });
     $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
-    if (drill) drillFromMidi();
-  } else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) {
-    held.delete(midi);
   }
 }
 
@@ -295,14 +297,14 @@ function setDock(open) {
 $('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
 $('#stopBtn').addEventListener('click', () => stopAll());
 
-// ================================================================ playback helpers
+// ================================================================ playback
 
 let playTimers = [];
 function stopAll() {
   audio.stopAll();
   playTimers.forEach(clearTimeout);
   playTimers = [];
-  document.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
+  document.querySelectorAll('.hear.playing').forEach((el) => el.classList.remove('playing'));
 }
 
 function playEvents(events, { light = true } = {}) {
@@ -312,11 +314,26 @@ function playEvents(events, { light = true } = {}) {
   })));
 }
 
+/** A "hear it" example as note events: a progression id, or a { seq, step } sequence. */
+function hearEvents(spec) {
+  if (typeof spec === 'string') {
+    const prog = progressionById(spec);
+    return prog.steps.map((s, k) => ({ at: k * 1.1, dur: 1.05, notes: s.voices.map((n) => parsePitch(n).midi).sort((a, b) => a - b) }));
+  }
+  return spec.seq.map((group, k) => ({ at: k * spec.step, dur: Math.max(spec.step * 0.95, 0.4), notes: group.map((n) => parsePitch(n).midi).sort((a, b) => a - b) }));
+}
+
+function hearLabel(spec) {
+  if (typeof spec !== 'string') return { title: spec.label, note: '', faulty: false };
+  const prog = progressionById(spec);
+  return { title: prog.title, note: prog.note, faulty: !!prog.faulty };
+}
+
 // ================================================================ week navigator
 
 const statusClass = (l) => {
   const done = lessonDone(l);
-  return done === l.tasks.length ? 'status done' : done > 0 ? 'status partial' : 'status';
+  return done === lessonTotal(l) ? 'status done' : done > 0 ? 'status partial' : 'status';
 };
 
 /** The current lesson's week: its lessons as rows, with the open one's details under its row. */
@@ -332,7 +349,7 @@ function renderWeek() {
           <span class="${statusClass(x)}"></span>
           <span class="lesson-row-text">
             <span class="lesson-row-title"${open ? ' id="lessonTitle"' : ''}>${esc(x.title)}</span>
-            <span class="lesson-row-meta">Lesson ${x.n} · ${lessonDone(x)} of ${x.tasks.length} done</span>
+            <span class="lesson-row-meta">Lesson ${x.n} · ${lessonDone(x)} of ${lessonTotal(x)} done</span>
           </span>
         </button>
       </li>`;
@@ -343,22 +360,33 @@ function renderWeek() {
 
 function renderWeekHead() {
   $('#weekSelect').innerHTML = WEEKS.map((w) => {
-    const lessons = LESSONS.filter((x) => x.week === w.n);
-    const complete = lessons.every((x) => lessonDone(x) === x.tasks.length);
+    const complete = LESSONS.filter((x) => x.week === w.n).every(lessonComplete);
     return `<option value="${w.n}">Week ${w.n} · ${esc(w.title)}${complete ? ' ✓' : ''}</option>`;
   }).join('');
   $('#weekSelect').value = String(current().week);
+  const i = LESSONS.indexOf(current());
+  $('#prevLesson').disabled = i === 0;
+  $('#nextLesson').disabled = i === LESSONS.length - 1;
   renderPace();
 }
 
-// Refresh the open lesson's row after a task is ticked.
+// Refresh the open lesson's row after a task or drill changes.
 function renderOpenRow() {
   const l = current();
   const row = $('#weekLessons .lesson.open .lesson-row');
   if (!row) return;
   row.querySelector('.status').className = statusClass(l);
-  row.querySelector('.lesson-row-meta').textContent = `Lesson ${l.n} · ${lessonDone(l)} of ${l.tasks.length} done`;
+  row.querySelector('.lesson-row-meta').textContent = `Lesson ${l.n} · ${lessonDone(l)} of ${lessonTotal(l)} done`;
   renderWeekHead();
+}
+
+/** Record a lesson as finished on the timeline the first time everything in it is done. */
+function checkLessonComplete(l) {
+  const rec = lessonRec(l.id);
+  if (lessonComplete(l) && !rec.completedAt) {
+    rec.completedAt = Date.now();
+    logEvent('lesson', `Finished W${l.week} L${l.n}: ${l.title}`, l.id);
+  }
 }
 
 $('#weekLessons').addEventListener('click', (e) => {
@@ -367,74 +395,58 @@ $('#weekLessons').addEventListener('click', (e) => {
 });
 $('#weekSelect').addEventListener('change', (e) => {
   const lessons = LESSONS.filter((x) => x.week === Number(e.target.value));
-  const target = lessons.find((x) => lessonDone(x) < x.tasks.length) || lessons[0];
-  openLesson(target.id);
+  openLesson((lessons.find((x) => !lessonComplete(x)) || lessons[0]).id);
 });
+$('#prevLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i > 0) openLesson(LESSONS[i - 1].id); });
+$('#nextLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i < LESSONS.length - 1) openLesson(LESSONS[i + 1].id); });
 
 // ---------------------------------------------------------------- start date and pace
 
 const DAY = 86400000;
 const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const shortDate = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) });
 
-/** Record the start date once: the earliest practice day, or today. */
+/**
+ * The start date is the day of the first sign-in (set when the account is
+ * created); before anyone signs in, it is the first day the app was used.
+ */
 function ensureStart() {
   if (state.startedAt) return;
   state.startedAt = Object.keys(state.practice).sort()[0] || today();
   save();
 }
 
-function renderPace() {
+/** Calendar weeks since starting, against the week of the first unfinished lesson. */
+function paceInfo() {
   const start = new Date(`${state.startedAt}T00:00:00`);
-  const days = Math.round((midnight(new Date()) - start) / DAY);
-  const opts = { day: 'numeric', month: 'short', ...(start.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) };
-  const started = start.toLocaleDateString('en-GB', opts);
-  if (days < 0) {
-    $('#paceLine').textContent = `Starts ${started}`;
-    return;
-  }
-  // Calendar weeks since starting, against the week of the first unfinished lesson.
+  const days = Math.max(0, Math.round((midnight(new Date()) - start) / DAY));
   const calWeek = Math.floor(days / 7) + 1;
-  const next = LESSONS.find((x) => lessonDone(x) < x.tasks.length);
+  const next = LESSONS.find((x) => !lessonComplete(x));
   let pace;
-  if (!next) pace = '<span class="done">Phase 1 complete</span>';
-  else {
+  let cls = '';
+  if (!next) { pace = 'Phase 1 complete'; cls = 'done'; } else {
     const diff = calWeek - next.week;
     const weeks = (n) => `${n} week${n > 1 ? 's' : ''}`;
-    pace = diff === 0 ? 'on pace' : diff > 0 ? `<span class="behind">${weeks(diff)} behind</span>` : `<span class="ahead">${weeks(-diff)} ahead</span>`;
+    if (diff === 0) pace = 'on pace';
+    else if (diff > 0) { pace = `${weeks(diff)} behind`; cls = 'behind'; } else { pace = `${weeks(-diff)} ahead`; cls = 'ahead'; }
   }
-  $('#paceLine').innerHTML = `Started ${esc(started)} · week ${calWeek} · ${pace}`;
+  const head = `Started ${shortDate(start)} · week ${calWeek} · `;
+  return { text: head + pace, html: esc(head) + (cls ? `<span class="${cls}">${esc(pace)}</span>` : esc(pace)) };
 }
 
-$('#startEdit').addEventListener('click', () => {
-  const input = $('#startDate');
-  input.value = state.startedAt;
-  input.max = today();
-  input.hidden = !input.hidden;
-  if (!input.hidden) input.focus();
-});
-$('#startDate').addEventListener('change', (e) => {
-  if (!e.target.value) return;
-  state.startedAt = e.target.value;
-  save();
-  e.target.hidden = true;
-  renderPace();
-});
+function renderPace() {
+  $('#paceLine').innerHTML = paceInfo().html;
+}
 
-// ================================================================ lesson pane
+// ================================================================ lesson
 
 let openTasks = new Set();
 
 function openLesson(id) {
   state.current = id;
   save();
-  drillExit();
+  endSession();
   const l = current();
-  vlIndex = 0;
-  if (l.ear) {
-    earExercise = l.ear.exercise;
-    earSettings(earExercise).level = l.ear.level;
-    if (l.ear.direction) earSettings(earExercise).direction = l.ear.direction;
-  }
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
   const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
   openTasks = new Set(firstOpen ? [firstOpen.id] : []);
@@ -447,13 +459,77 @@ function renderLesson() {
   const l = current();
   renderWeek();
   $('#lessonGoal').textContent = l.goal;
-  $('#ideas').innerHTML = l.ideas.map((x) => `<li>${esc(x)}</li>`).join('');
-  $('#journal').value = lessonRec(l.id).journal || '';
+  const journal = lessonRec(l.id).journal || '';
+  $('#journal').value = journal;
+  $('#notesBox').hidden = true;
+  $('#notesBtn').setAttribute('aria-expanded', 'false');
+  $('#notesDot').hidden = !journal.trim();
+  renderExplain();
+  renderDrills();
   renderTasks();
 }
 
-const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard', ear: 'Ear', spot: 'Analyze' };
-const ACTION_LABEL = (a) => (a.ear ? 'Open in Ear →' : a.progression ? 'Open in Lab →' : a.explorer ? 'Open in Explore →' : 'Open the Workbench →');
+function renderExplain() {
+  const l = current();
+  $('#explain').innerHTML = (l.explain || []).map((sec, s) => `
+    <section class="explain">
+      <h3 class="section-title">${esc(sec.h)}</h3>
+      ${sec.p.map((p) => `<p>${esc(p)}</p>`).join('')}
+      ${sec.hear ? `<ul class="hears">${sec.hear.map((h, i) => {
+        const lab = hearLabel(h);
+        return `<li><button class="hear${lab.faulty ? ' faulty' : ''}" data-hear="${s}:${i}"><span class="play-icon" aria-hidden="true">▶</span><span><span class="hear-title">${esc(lab.title)}</span>${lab.note ? `<span class="hear-note">${esc(lab.note)}</span>` : ''}</span></button></li>`;
+      }).join('')}</ul>` : ''}
+    </section>`).join('');
+}
+
+$('#explain').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-hear]');
+  if (!b) return;
+  const [s, i] = b.dataset.hear.split(':').map(Number);
+  const events = hearEvents(current().explain[s].hear[i]);
+  playEvents(events);
+  b.classList.add('playing');
+  const end = Math.max(...events.map((ev) => ev.at + ev.dur));
+  playTimers.push(setTimeout(() => b.classList.remove('playing'), end * 1000 + 100));
+});
+
+// ---------------------------------------------------------------- ear-training plan
+
+function drillLabel(d) {
+  const ex = EXERCISES[d.exercise];
+  const items = d.items ? d.items.map((id) => ex.label(String(id))).join(', ') : ex.levels[d.level].label;
+  const dir = d.direction && ex.directions ? ` · ${ex.directions[d.direction].toLowerCase()}` : '';
+  return `${ex.title}: ${items}${dir}`;
+}
+
+function renderDrills() {
+  const l = current();
+  const plan = l.practice || [];
+  $('#drills').innerHTML = plan.map((d, i) => {
+    const rec = state.drills[drillKey(l.id, i)];
+    const result = rec ? `${rec.passed ? '✓ ' : ''}Best ${rec.best}%` : `Not tried · aim for ${d.target}%`;
+    return `
+      <li class="drill${rec?.passed ? ' passed' : ''}">
+        <div class="drill-text">
+          <span class="drill-title">${esc(drillLabel(d))}</span>
+          <span class="drill-why">${esc(d.why)}</span>
+          <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
+        </div>
+        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${rec ? 'Again' : 'Start'}</button>
+      </li>`;
+  }).join('');
+  const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
+  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} passed` : '';
+}
+
+$('#drills').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-drill]');
+  if (b) startSession(current().id, Number(b.dataset.drill));
+});
+
+// ---------------------------------------------------------------- tasks
+
+const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard' };
 
 function renderTasks() {
   const l = current();
@@ -472,28 +548,31 @@ function renderTasks() {
         <div class="task-body">
           ${t.detail ? `<p>${esc(t.detail)}</p>` : ''}
           ${links ? `<ul class="task-links">${links}</ul>` : ''}
-          ${t.action ? `<button class="btn quiet" data-action='${esc(JSON.stringify(t.action))}'>${ACTION_LABEL(t.action)}</button>` : ''}
+          ${t.action?.explorer ? '<button class="btn quiet" data-explore>Open Explore →</button>' : ''}
         </div>
       </li>`;
   }).join('');
-  const done = lessonDone(l);
+  const done = l.tasks.filter((t) => rec.tasks[t.id]).length;
   const minutes = l.tasks.reduce((a, t) => a + t.minutes, 0);
   $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
   $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
   const next = LESSONS[LESSONS.indexOf(l) + 1];
-  $('#nextUp').innerHTML = done === l.tasks.length && next
+  $('#nextUp').innerHTML = lessonComplete(l) && next
     ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {
   const id = e.target.dataset.task;
   if (!id) return;
-  lessonRec(state.current).tasks[id] = e.target.checked;
+  const l = current();
+  lessonRec(l.id).tasks[id] = e.target.checked;
   if (e.target.checked) {
+    logEvent('task', l.tasks.find((t) => t.id === id).title);
     // Close the finished task and open the next unfinished one.
     openTasks.delete(id);
-    const nextTask = current().tasks.find((t) => !lessonRec(state.current).tasks[t.id]);
+    const nextTask = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
     if (nextTask) openTasks.add(nextTask.id);
+    checkLessonComplete(l);
   }
   save();
   renderTasks();
@@ -505,31 +584,19 @@ $('#tasks').addEventListener('click', (e) => {
     const id = toggle.dataset.toggle;
     if (openTasks.has(id)) openTasks.delete(id); else openTasks.add(id);
     renderTasks();
-    return;
   }
-  const b = e.target.closest('[data-action]');
-  if (!b) return;
-  const a = JSON.parse(b.dataset.action);
-  if (a.ear) {
-    earExercise = a.ear;
-    if (a.level) earSettings(a.ear).level = a.level;
-    if (a.direction) earSettings(a.ear).direction = a.direction;
-    save();
-    renderEar();
-    showTab('ear');
-  } else if (a.progression) {
-    const progs = current().progressions || [];
-    vlIndex = Math.max(0, progs.findIndex((p) => p.id === a.progression));
-    drillExit();
-    renderVl();
-    showTab('lab');
-  } else if (a.explorer) {
-    showTab('explore');
-  } else if (a.workbench) {
-    showTab('workbench');
-  }
+  if (e.target.closest('[data-explore]')) showTab('explore');
 });
 $('#nextUp').addEventListener('click', (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); });
+
+// ---------------------------------------------------------------- notes
+
+$('#notesBtn').addEventListener('click', () => {
+  const box = $('#notesBox');
+  box.hidden = !box.hidden;
+  $('#notesBtn').setAttribute('aria-expanded', String(!box.hidden));
+  if (!box.hidden) $('#journal').focus();
+});
 
 let journalTimer = null;
 $('#journal').addEventListener('input', () => {
@@ -537,307 +604,18 @@ $('#journal').addEventListener('input', () => {
   $('#journalSaved').textContent = 'Saving…';
   journalTimer = setTimeout(() => {
     lessonRec(state.current).journal = $('#journal').value;
+    $('#notesDot').hidden = !$('#journal').value.trim();
     save();
-    $('#journalSaved').textContent = 'Saved in this browser';
+    $('#journalSaved').textContent = 'Saved';
   }, 400);
 });
 
-// ================================================================ progression view (lab + workbench)
-
-let tempo = 1.1; // seconds per chord
-let outerOnly = false;
-const CHECKED = 'Ranges, spacing, voice crossing, doubling, parallel and direct 5ths and octaves, overlaps, augmented and diminished leaps, and the leading tone and chordal 7th.';
-
-/**
- * Render a progression with its analysis into `root`. A "find the error"
- * progression keeps its issues hidden until revealed; in drill mode the chords
- * still to play are hidden and the drill panel replaces the controls.
- */
-function renderProgression(root, prog, { reveal = !prog.faulty, drillState = null } = {}) {
-  const key = prog.keyObj || makeKey(prog.key.tonic, prog.key.mode);
-  const r = analyzeProgression(prog.steps, key, { standalone: prog.standalone });
-  const steps = r.chords;
-  const cols = [];
-  steps.forEach((c, k) => {
-    if (k > 0 && !prog.standalone) cols.push({ type: 'motion', k });
-    cols.push({ type: 'chord', k });
-  });
-  const hidden = (k) => drillState && k > drillState.idx;
-  const head = cols.map((c) => (c.type === 'chord'
-    ? `<th class="chord-head" data-col="${c.k}" title="Play this chord">${rnHtml(steps[c.k].label || steps[c.k].rn || '—')}${steps[c.k].fn ? `<span class="fn">${steps[c.k].fn}</span>` : ''}</th>`
-    : '<th></th>')).join('');
-  const rows = VOICES.map((v, i) => `<tr><th class="voice"><span class="long">${v}</span><span class="short">${v[0]}</span></th>${cols.map((c) => {
-    if (c.type === 'chord') {
-      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k > 0 ? 'note drill-ok' : 'note';
-      return `<td class="${cls}" data-col="${c.k}">${hidden(c.k) ? '?' : prettyPitch(steps[c.k].voices[i])}</td>`;
-    }
-    if (hidden(c.k)) return '<td class="motion"></td>';
-    const mo = r.transitions[c.k - 1].motions[i];
-    return `<td class="motion${mo.dir === 0 ? ' held' : mo.leap ? ' leap' : ''}">${esc(mo.label)}</td>`;
-  }).join('')}</tr>`).join('');
-  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
-
-  const issues = [
-    ...steps.flatMap((c, k) => c.issues.map((x) => ({ where: `Chord ${k + 1}`, ...x }))),
-    ...r.transitions.flatMap((t, k) => t.issues.map((x) => ({ where: `${k + 1} → ${k + 2}`, ...x }))),
-  ];
-  let result;
-  if (!reveal) result = '<button class="btn" data-reveal>Reveal the errors</button>';
-  else if (issues.length) result = `<div class="callout bad"><strong>${issues.length} problem${issues.length > 1 ? 's' : ''}</strong><ul>${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul></div>`;
-  else result = `<details class="callout ok"><summary>✓ No voice-leading problems</summary><p>Checked: ${CHECKED}</p></details>`;
-
-  const isLab = root.id === 'vlView';
-  const controls = drillState ? '<div class="callout drill" id="drillBox"></div>' : `
-    <div class="vl-controls">
-      <div class="row">
-        <button class="btn primary" data-play>▶ Play</button>
-        <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices</label>
-        <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
-      </div>
-      ${isLab ? '<div class="row"><button class="btn quiet" data-drill>Drill at the keyboard</button><button class="btn quiet" data-edit>Edit in Workbench</button></div>' : ''}
-    </div>`;
-
-  root.innerHTML = `
-    <div class="vl-scroll"><table class="vl"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}${outer}</tbody></table></div>
-    ${controls}
-    ${drillState ? '' : result}`;
-
-  const midisOf = (k) => steps[k].voices.map((p) => p.midi);
-  root.onclick = (e) => {
-    if (e.target.closest('[data-play]')) {
-      stopAll();
-      steps.forEach((_, k) => {
-        const m = midisOf(k);
-        const notes = (outerOnly ? [m[0], m[3]] : m).sort((a, b) => a - b);
-        notes.forEach((n, i) => audio.note(n, { at: k * tempo, dur: tempo * 0.95, kind: i === 0 ? 'bass' : 'upper' }));
-        playTimers.push(setTimeout(() => markCol(root, k), k * tempo * 1000 + 30));
-      });
-      playTimers.push(setTimeout(() => markCol(root, -1), steps.length * tempo * 1000 + 100));
-    }
-    const headCell = e.target.closest('.chord-head');
-    if (headCell && !hidden(Number(headCell.dataset.col))) {
-      stopAll();
-      const k = Number(headCell.dataset.col);
-      audio.chord(midisOf(k).sort((a, b) => a - b), { dur: 1.4 });
-      markCol(root, k);
-      playTimers.push(setTimeout(() => markCol(root, -1), 1400));
-    }
-    if (e.target.closest('[data-reveal]')) renderProgression(root, prog, { reveal: true });
-    if (e.target.closest('[data-drill]')) drillStart(prog);
-    if (e.target.closest('[data-edit]')) {
-      $('#wbKey').value = keyValue(key);
-      $('#wbText').value = progressionToText(prog);
-      wbCheck();
-      showTab('workbench');
-    }
-  };
-  root.oninput = (e) => {
-    if (e.target.matches('[data-tempo]')) tempo = 2.5 - Number(e.target.value);
-    if (e.target.matches('[data-outer]')) outerOnly = e.target.checked;
-  };
-}
-
-function markCol(root, k) {
-  root.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
-  if (k >= 0) root.querySelectorAll(`[data-col="${k}"]`).forEach((el) => el.classList.add('playing'));
-}
-
-const progressionToText = (prog) => prog.steps.map((s) => `${s.rn ? `${s.rn}:` : ''}`.padEnd(7) + s.voices.join(' ')).join('\n');
-
-// ================================================================ lab
-
-let vlIndex = 0;
-
-function renderVl() {
-  const progs = current().progressions || [];
-  const has = progs.length > 0;
-  $('#vlPrev').parentElement.hidden = !has;
-  if (!has) {
-    $('#vlKey').textContent = '';
-    $('#vlTitle').textContent = 'No worked examples in this lesson';
-    $('#vlNote').textContent = 'Write your own progression in the Workbench and it gets the same checks.';
-    $('#vlView').innerHTML = '<button class="btn" data-go-wb>Open the Workbench</button>';
-    $('#vlView').onclick = (e) => { if (e.target.closest('[data-go-wb]')) showTab('workbench'); };
-    return;
-  }
-  vlIndex = Math.min(Math.max(vlIndex, 0), progs.length - 1);
-  const prog = progs[vlIndex];
-  $('#vlCount').textContent = `${vlIndex + 1} / ${progs.length}`;
-  $('#vlPrev').disabled = vlIndex === 0;
-  $('#vlNext').disabled = vlIndex === progs.length - 1;
-  $('#vlKey').textContent = makeKey(prog.key.tonic, prog.key.mode).name;
-  const m = /^Find the errors?:\s*(.*)$/.exec(prog.title);
-  $('#vlTitle').innerHTML = m
-    ? `<span class="flag">Find the error${prog.faulty.length > 1 || /errors/.test(prog.title) ? 's' : ''}</span>${esc(m[1][0].toUpperCase() + m[1].slice(1))}`
-    : esc(prog.title);
-  $('#vlNote').textContent = prog.note || '';
-  renderProgression($('#vlView'), prog, drill && drill.prog.id === prog.id ? { drillState: drill } : {});
-  if (drill) renderDrillBox();
-}
-
-$('#vlPrev').addEventListener('click', () => { drillExit(); vlIndex -= 1; renderVl(); });
-$('#vlNext').addEventListener('click', () => { drillExit(); vlIndex += 1; renderVl(); });
-
-// ---------------------------------------------------------------- drill
-
-let drill = null; // { prog, idx (last chord shown), selected:Set, misses }
-
-function drillStart(prog) {
-  drill = { prog, idx: 0, selected: new Set(), misses: 0 };
-  setDock(true);
-  renderVl();
-  const first = prog.steps[0].voices.map((n) => parsePitch(n).midi);
-  audio.chord(first.sort((a, b) => a - b), { dur: 1.4 });
-}
-
-function drillExit() {
-  if (!drill) return;
-  drill = null;
-  document.querySelectorAll('.key.sel, .key.miss').forEach((el) => el.classList.remove('sel', 'miss'));
-}
-
-function drillTarget() {
-  const step = drill.prog.steps[drill.idx + 1];
-  return step ? step.voices.map((n) => parsePitch(n).midi) : null;
-}
-
-function renderDrillBox() {
-  const box = $('#drillBox');
-  if (!box) return;
-  const target = drillTarget();
-  const step = drill.prog.steps[drill.idx + 1];
-  if (!target) {
-    box.innerHTML = `<strong>Done. ${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</strong>
-      <div class="row"><button class="btn primary" data-drill-again>Again</button><button class="btn quiet" data-drill-exit>Exit drill</button></div>`;
-  } else {
-    const sel = [...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ');
-    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length}, <strong>${esc(step.label || step.rn || '')}</strong>. Tap its four notes on the keyboard, or hold them on a MIDI keyboard.</span>
-      <span class="sm muted" data-drill-msg>${sel ? `Selected: ${sel}` : 'Nothing selected yet.'}</span>
-      <div class="row">
-        <button class="btn primary" data-drill-check>Check</button>
-        <button class="btn" data-drill-clear>Clear</button>
-        <button class="btn quiet" data-drill-show>Show answer</button>
-        <button class="btn quiet" data-drill-exit>Exit</button>
-      </div>`;
-  }
-  box.onclick = (e) => {
-    if (e.target.closest('[data-drill-check]')) drillCheck();
-    if (e.target.closest('[data-drill-clear]')) { drill.selected.clear(); syncSelection(); renderDrillBox(); }
-    if (e.target.closest('[data-drill-show]')) { drill.misses += 1; drillAdvance(); }
-    if (e.target.closest('[data-drill-exit]')) { drillExit(); renderVl(); }
-    if (e.target.closest('[data-drill-again]')) drillStart(drill.prog);
-  };
-}
-
-function syncSelection() {
-  keyEls.forEach((el, m) => {
-    el.classList.toggle('sel', !!drill && drill.selected.has(m));
-    el.classList.remove('miss');
-  });
-}
-
-function drillToggle(midi) {
-  if (!drillTarget()) return;
-  if (drill.selected.has(midi)) drill.selected.delete(midi);
-  else drill.selected.add(midi);
-  syncSelection();
-  renderDrillBox();
-}
-
-function drillFromMidi() {
-  if (!drillTarget()) return;
-  drill.selected = new Set(held);
-  syncSelection();
-  renderDrillBox();
-  if (held.size === drillTarget().length) drillCheck();
-}
-
-function drillCheck() {
-  const target = drillTarget();
-  if (!target) return;
-  const want = new Set(target);
-  const right = [...drill.selected].filter((m) => want.has(m));
-  const wrong = [...drill.selected].filter((m) => !want.has(m));
-  if (right.length === want.size && wrong.length === 0) {
-    drillAdvance();
-    return;
-  }
-  drill.misses += 1;
-  wrong.forEach((m) => keyEls.get(m)?.classList.add('miss'));
-  const msg = $('#drillBox [data-drill-msg]');
-  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? '; the outlined keys are not in the chord' : ''}. Move each voice the shortest way from the last chord.`;
-}
-
-function drillAdvance() {
-  drill.idx += 1;
-  drill.selected.clear();
-  syncSelection();
-  const step = drill.prog.steps[drill.idx];
-  audio.chord(step.voices.map((n) => parsePitch(n).midi).sort((a, b) => a - b), { dur: 1.3 });
-  renderVl();
-}
-
-// ================================================================ workbench
-
-const WB_EXAMPLE = 'I:    E5 C5 G4 C3\nii6:  D5 A4 F4 F3\nV7:   D5 B4 F4 G3\nI:    C5 C5 E4 C3';
-
-function normalizeRn(rn) {
-  return rn.trim().replace(/^([ivIV]+)o/, '$1°').replace(/(65|43|42|64)$/, (f) => `${f[0]}/${f[1]}`);
-}
-
-function parseWorkbench(text, key) {
-  const lines = text.split(/\n|\|/).map((s) => s.trim()).filter(Boolean);
-  const steps = [];
-  const errors = [];
-  const notes = [];
-  lines.forEach((line, i) => {
-    let rn = null;
-    let rest = line;
-    const m = /^([^:\s]+)\s*:\s*(.*)$/.exec(line);
-    if (m) { rn = normalizeRn(m[1]); rest = m[2]; }
-    const voices = rest.split(/[\s,]+/).filter(Boolean)
-      .map((n) => n.replace(/♯/g, '#').replace(/♭/g, 'b').replace(/^[a-g]/, (c) => c.toUpperCase()));
-    if (voices.length !== 4) errors.push(`Line ${i + 1}: expected 4 notes (soprano alto tenor bass), found ${voices.length}.`);
-    voices.forEach((n) => { try { parsePitch(n); } catch { errors.push(`Line ${i + 1}: “${n}” is not a note. Write it like C4, F#3 or Bb2.`); } });
-    if (rn) {
-      try {
-        const ch = parseRoman(rn, key);
-        const typed = /^[ivIV]+/.exec(rn)[0];
-        const proper = romanLabel(key, ch.degree, { seventh: ch.seventh, inversion: ch.inversion }).numeral;
-        if (typed !== proper) notes.push(`Line ${i + 1}: in ${key.name} this chord is ${proper}${ch.figure}, not ${typed}${ch.figure}. Checked as ${proper}.`);
-      } catch { errors.push(`Line ${i + 1}: can’t read the Roman numeral “${rn}”. Try I, ii6, V7, V6/5, vii°6.`); rn = null; }
-    }
-    steps.push({ rn: rn || undefined, voices });
-  });
-  return { steps, errors, notes };
-}
-
-function wbCheck() {
-  const key = keyFromValue($('#wbKey').value);
-  const text = $('#wbText').value;
-  state.workbench = { key: $('#wbKey').value, text };
-  save();
-  const view = $('#wbView');
-  if (!text.trim()) { view.innerHTML = ''; return; }
-  const { steps, errors, notes } = parseWorkbench(text, key);
-  if (errors.length) {
-    view.innerHTML = `<div class="callout bad"><strong>Can’t read this yet</strong><ul>${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`;
-    return;
-  }
-  renderProgression(view, { keyObj: key, steps, title: 'Workbench' });
-  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="callout info">${notes.map(esc).join('<br>')}</p>`);
-}
-
-$('#wbCheck').addEventListener('click', () => { wbCheck(); $('#wbView [data-play]')?.click(); });
-$('#wbExample').addEventListener('click', () => { $('#wbKey').value = 'C-major'; $('#wbText').value = WB_EXAMPLE; wbCheck(); });
-$('#wbText').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); $('#wbCheck').click(); } });
-$('#wbKey').addEventListener('change', wbCheck);
-
-// ================================================================ ear lab
+// ================================================================ ear training
 
 let earExercise = 'intervals';
 let question = null;
 let answered = false;
+let session = null; // a lesson drill in progress: { lessonId, index, spec, asked, correct }
 
 function earSettings(ex) {
   const def = EXERCISES[ex];
@@ -845,26 +623,95 @@ function earSettings(ex) {
 }
 const earStat = (ex) => (state.ear[ex] ||= { attempts: 0, correct: 0, items: {}, recent: [] });
 
-function renderEar() {
-  const ex = EXERCISES[earExercise];
-  const s = earSettings(earExercise);
-  if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
-  $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
-  $('#earEx').value = earExercise;
-  $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
-  $('#earLevel').value = s.level;
-  $('#earDir').hidden = !ex.directions;
-  if (ex.directions) {
-    $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
-    $('#earDir').value = s.direction;
+/** The items and direction the next question uses: the drill's, or the free-practice settings. */
+function activeConfig() {
+  if (session) {
+    const d = session.spec;
+    return { exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' };
   }
+  const s = earSettings(earExercise);
+  return { exercise: earExercise, level: s.level, items: null, direction: s.direction };
+}
+
+function renderEar() {
+  const cfg = activeConfig();
+  const ex = EXERCISES[cfg.exercise];
+  if (!session) {
+    const s = earSettings(earExercise);
+    if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
+    $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
+    $('#earEx').value = earExercise;
+    $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
+    $('#earLevel').value = s.level;
+    $('#earDir').hidden = !ex.directions;
+    if (ex.directions) {
+      $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
+      $('#earDir').value = s.direction;
+    }
+  }
+  $('#earHead').hidden = !!session;
+  renderSession();
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
-  const items = ex.levels[s.level].items.map(String);
+  const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
   $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
-  setFeedback('', 'Press New, sing it back, then answer.');
+  setFeedback('', session ? 'Press New for the first question.' : 'Press New, sing it back, then answer.');
   renderEarStats();
+}
+
+function renderSession() {
+  const box = $('#session');
+  box.hidden = !session;
+  if (!session) return;
+  const l = lessonById(session.lessonId);
+  const d = session.spec;
+  const pct = session.asked ? Math.round((100 * session.correct) / session.asked) : 0;
+  const finished = session.asked >= d.count;
+  box.innerHTML = `
+    <div class="session-head">
+      <span class="sm muted">Lesson drill · W${l.week} L${l.n}</span>
+      <button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>
+    </div>
+    <div class="session-title">${esc(drillLabel(d))}</div>
+    <p class="sm muted">${esc(d.why)}</p>
+    <div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>
+    <p class="sm">${finished
+      ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
+      : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`}</p>
+    ${finished ? '<div class="row"><button class="btn primary" data-again>Again</button><button class="btn" data-back>Back to the lesson</button></div>' : ''}`;
+}
+
+$('#session').addEventListener('click', (e) => {
+  if (e.target.closest('[data-end]')) { endSession(); renderEar(); }
+  if (e.target.closest('[data-again]')) startSession(session.lessonId, session.index);
+  if (e.target.closest('[data-back]')) { endSession(); renderEar(); showTab('lesson'); }
+});
+
+function startSession(lessonId, index) {
+  const spec = lessonById(lessonId).practice[index];
+  session = { lessonId, index, spec, asked: 0, correct: 0 };
+  earExercise = spec.exercise;
+  showTab('ear');
+  renderEar();
+}
+
+function endSession() {
+  session = null;
+  question = null;
+}
+
+function finishSession() {
+  const { lessonId, index, spec } = session;
+  const pct = Math.round((100 * session.correct) / spec.count);
+  const key = drillKey(lessonId, index);
+  const prev = state.drills[key];
+  const passed = pct >= spec.target;
+  state.drills[key] = { best: Math.max(prev?.best || 0, pct), last: pct, passed: !!prev?.passed || passed, at: Date.now() };
+  logEvent('drill', `${drillLabel(spec)}: ${session.correct}/${spec.count} (${pct}%)${passed ? ' ✓' : ''}`, lessonId);
+  checkLessonComplete(lessonById(lessonId));
+  save();
+  if (lessonId === state.current) { renderDrills(); renderOpenRow(); renderTasks(); }
 }
 
 function setFeedback(cls, text) {
@@ -874,10 +721,10 @@ function setFeedback(cls, text) {
 }
 
 function renderEarStats() {
-  const st = earStat(earExercise);
+  const ex = activeConfig().exercise;
+  const st = earStat(ex);
   const pct = st.attempts ? Math.round((100 * st.correct) / st.attempts) : 0;
   $('#earStats').textContent = st.attempts ? `${pct}% · ${st.correct} of ${st.attempts}` : 'No answers yet';
-  const ex = EXERCISES[earExercise];
   const recent = st.recent || [];
   const weak = Object.entries(st.items || {})
     .filter(([, [att]]) => att >= 3)
@@ -886,13 +733,14 @@ function renderEarStats() {
     .slice(0, 3);
   const parts = [];
   if (recent.length) parts.push(`Last ${recent.length}: ${Math.round((100 * recent.filter(Boolean).length) / recent.length)}%`);
-  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
-  $('#earWeak').textContent = parts.join(' · ');
+  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${EXERCISES[ex].label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
+  $('#earWeak').textContent = session ? '' : parts.join(' · ');
 }
 
 function earNew() {
-  const s = earSettings(earExercise);
-  question = makeQuestion(earExercise, s.level, { direction: s.direction, stats: earStat(earExercise) });
+  if (session && session.asked >= session.spec.count) return;
+  const cfg = activeConfig();
+  question = makeQuestion(cfg.exercise, cfg.level, { direction: cfg.direction, items: cfg.items, stats: earStat(cfg.exercise) });
   answered = false;
   document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
   setFeedback('', 'Listen, sing it back, then answer.');
@@ -910,17 +758,23 @@ function earAnswer(id) {
   if (answered) return;
   answered = true;
   const ok = id === question.answer;
-  const st = earStat(earExercise);
+  const st = earStat(question.exercise);
   st.attempts += 1;
   if (ok) st.correct += 1;
   const item = (st.items[question.answer] ||= [0, 0]);
   item[0] += 1;
   if (ok) item[1] += 1;
   st.recent = [...(st.recent || []), ok].slice(-20);
-  save();
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
   setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
+  if (session) {
+    session.asked += 1;
+    if (ok) session.correct += 1;
+    if (session.asked >= session.spec.count) finishSession();
+    renderSession();
+  }
+  save();
   renderEarStats();
 }
 
@@ -954,6 +808,13 @@ function renderExplorer() {
   $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
 }
 
+// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
+function stackThirds(members) {
+  const out = [];
+  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
+  return out;
+}
+
 function showChord(rn, btn) {
   const key = keyFromValue(exKey);
   const { chord, voices } = voiceChord(key, rn);
@@ -982,13 +843,6 @@ function showChord(rn, btn) {
   document.querySelectorAll('#exChords .tile').forEach((el) => el.classList.toggle('active', el === btn));
   stopAll();
   audio.chord(voices.map((p) => p.midi).sort((x, y) => x - y), { dur: 1.6 });
-}
-
-// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
-function stackThirds(members) {
-  const out = [];
-  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
-  return out;
 }
 
 $('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn, b); });
@@ -1080,90 +934,37 @@ $('#timerToggle').addEventListener('click', () => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-// ================================================================ progress log, save, load
+// ================================================================ timeline
 
-function progressLog() {
-  const l = current();
+function renderTimeline() {
   const t = practiceTotals();
-  const lines = [
-    'HARMONY & EAR ACADEMY: PROGRESS LOG',
-    `Date: ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`,
-    `Started: ${state.startedAt} (${$('#paceLine').textContent.replace(/^Started [^·]+· /, '')})`,
-    `Current: Week ${l.week} Lesson ${l.n}: ${l.title}`,
-    `Practice: today ${hm(t.today)}, last 7 days ${hm(t.week)}, total ${hm(t.total)}`,
-    '',
-    'LESSONS',
-    ...LESSONS.map((x) => {
-      const d = lessonDone(x);
-      return `[${d === x.tasks.length ? 'x' : d ? '~' : ' '}] W${x.week} L${x.n} ${x.title} (${d}/${x.tasks.length})`;
-    }),
-    '',
-    'EAR TRAINING',
-    ...Object.entries(EXERCISES).filter(([id]) => state.ear[id]?.attempts).map(([id, ex]) => {
-      const st = state.ear[id];
-      const weak = Object.entries(st.items || {}).filter(([, [a]]) => a >= 3).sort(([, [a1, c1]], [, [a2, c2]]) => c1 / a1 - c2 / a2).slice(0, 2)
-        .map(([item, [a, c]]) => `${ex.label(item)} ${Math.round((100 * c) / a)}%`);
-      return `${ex.title}: ${Math.round((100 * st.correct) / st.attempts)}% (${st.correct}/${st.attempts})${weak.length ? `; weakest ${weak.join(', ')}` : ''}`;
-    }),
-    '',
-    `NOTES (W${l.week} L${l.n})`,
-    lessonRec(l.id).journal || 'No notes yet.',
-  ];
-  return lines.join('\n');
+  const done = LESSONS.filter(lessonComplete).length;
+  $('#timelineSummary').textContent = `${paceInfo().text} · ${done} of ${LESSONS.length} lessons finished · ${hm(t.total)} practised`;
+  // One group per day that has events or practice time, newest first.
+  const days = new Map();
+  const day = (key) => {
+    if (!days.has(key)) days.set(key, { events: [], secs: 0 });
+    return days.get(key);
+  };
+  (state.history || []).forEach((ev) => day(new Date(ev.t).toLocaleDateString('en-CA')).events.push(ev));
+  Object.entries(state.practice).forEach(([key, secs]) => { day(key).secs = secs; });
+  const ICON = { task: '✓', drill: '♪', lesson: '★' };
+  const keys = [...days.keys()].sort().reverse();
+  $('#timeline').innerHTML = keys.length ? keys.map((key) => {
+    const d = days.get(key);
+    const label = new Date(`${key}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    return `
+      <section class="tl-day">
+        <h3><span>${esc(label)}</span>${d.secs ? `<span class="sm muted">${hm(d.secs)} practice</span>` : ''}</h3>
+        <ul>${d.events.slice().reverse().map((ev) => `
+          <li class="tl-${ev.type}"><span class="tl-icon" aria-hidden="true">${ICON[ev.type] || '·'}</span><span class="tl-text">${esc(ev.text)}</span>
+          <span class="xs muted">${new Date(ev.t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span></li>`).join('')}</ul>
+      </section>`;
+  }).join('') : '<p class="muted">Nothing yet. Tick a task or finish a drill and it shows up here.</p>';
 }
 
-$('#copyLogBtn').addEventListener('click', async () => {
-  const text = progressLog();
-  $('#logText').value = text;
-  try {
-    await navigator.clipboard.writeText(text);
-    $('#logNote').textContent = 'Copied to the clipboard. Paste it into a chat to pick up where you left off.';
-  } catch {
-    $('#logNote').textContent = 'Select the text below and copy it.';
-  }
-  openDialog('#logDialog');
-});
-
-// The saved file leads with the readable progress log, so it makes sense opened
-// in a text editor; the rest is the full state that "Load progress" reads back.
-$('#backupBtn').addEventListener('click', () => {
-  save();
-  const file = { summary: progressLog().split('\n'), savedAt: new Date().toISOString(), ...state };
-  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `harmony-academy-progress-${today()}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  $('#menu').hidden = true;
-});
-
-$('#restoreBtn').addEventListener('click', () => {
-  $('#restoreError').textContent = '';
-  $('#restoreText').value = '';
-  $('#restoreFile').value = '';
-  $('#restoreFileName').textContent = '';
-  openDialog('#restoreDialog');
-});
-$('#restoreChoose').addEventListener('click', () => $('#restoreFile').click());
-$('#restoreFile').addEventListener('change', async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  $('#restoreFileName').textContent = f.name;
-  $('#restoreText').value = await f.text();
-});
-$('#restoreApply').addEventListener('click', () => {
-  let data;
-  try { data = JSON.parse($('#restoreText').value); } catch { $('#restoreError').textContent = 'That is not valid JSON. Use a file from “Save progress”.'; return; }
-  if (!data || data.version !== 1 || typeof data.lessons !== 'object') { $('#restoreError').textContent = 'This does not look like a Harmony Academy progress file.'; return; }
-  ['summary', 'savedAt', 'exportedAt'].forEach((k) => delete data[k]);
-  state = { ...freshState(), ...data };
-  ensureStart();
-  save();
-  $('#restoreDialog').close();
-  openLesson(state.current);
-  renderTimer();
-});
+$('#timelineBtn').addEventListener('click', () => { renderTimeline(); openDialog('#timelineDialog'); });
+$('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
 
 // ================================================================ account and sync
 
@@ -1175,6 +976,7 @@ const saveMeta = (m) => { try { localStorage.setItem(SYNC_META, JSON.stringify(m
 
 const tasksDone = (st) => Object.values(st.lessons || {}).reduce((n, r) => n + Object.values(r.tasks || {}).filter(Boolean).length, 0);
 const hasProgress = (st) => tasksDone(st) > 0
+  || Object.keys(st.drills || {}).length > 0
   || Object.values(st.lessons || {}).some((r) => (r.journal || '').trim())
   || Object.values(st.ear || {}).some((e) => e.attempts > 0)
   || Object.values(st.practice || {}).some((sec) => sec > 0);
@@ -1228,6 +1030,14 @@ function applyRemote(remote) {
   renderTimer();
 }
 
+/** A new account starts its clock today: the start date is the day of the first sign-in. */
+async function createAccountCopy() {
+  state.startedAt = today();
+  save();
+  await pushCloud();
+  renderPace();
+}
+
 async function onUser(user) {
   cloud.user = user;
   if (!user) { setSync(''); return; }
@@ -1238,9 +1048,9 @@ async function onUser(user) {
     if (meta.uid && meta.uid !== user.uid) {
       // Someone else used this browser before: never hand them that progress.
       applyRemote(remote || { state: freshState(), updatedAt: Date.now() });
-      if (!remote) await pushCloud();
+      if (!remote) await createAccountCopy();
     } else if (!remote) {
-      await pushCloud(); // first device for this account
+      await createAccountCopy(); // first device for this account
     } else if (JSON.stringify(portable(state)) === JSON.stringify(remote.state)) {
       // already identical
     } else if (!hasProgress(state)) {
@@ -1285,10 +1095,13 @@ function setSync(status, error = '') {
 
 const SIGN_IN_ERRORS = {
   'auth/operation-not-allowed': 'Google sign-in isn’t switched on for this app yet.',
-  'auth/unauthorized-domain': 'This address isn’t allowed to sign in yet.',
+  'auth/configuration-not-found': 'Sign-in isn’t set up for this app yet (Firebase Authentication is off).',
+  'auth/unauthorized-domain': 'This address isn’t on the app’s allowed sign-in list yet.',
   'auth/network-request-failed': 'No connection. Try again when you’re online.',
   'permission-denied': 'The server refused to save. Try signing out and in again.',
 };
+// Unknown errors show their code, so a failure can be traced.
+const errorText = (code) => SIGN_IN_ERRORS[code] || `Sign-in failed (${code}).`;
 
 function renderAccount() {
   const show = cloudAvailable() && cloud.ready;
@@ -1306,12 +1119,12 @@ function renderAccount() {
        <button class="menu-item" id="signOutBtn">Sign out</button>`
     : `<p class="sm muted">Sign in to keep your progress on every device.</p>
        <button class="menu-item" id="signInBtn">Sign in with Google</button>
-       ${cloud.error ? `<p class="sm bad">${esc(SIGN_IN_ERRORS[cloud.error] || 'Sign-in failed. Try again.')}</p>` : ''}`;
+       ${cloud.error ? `<p class="sm bad">${esc(errorText(cloud.error))}</p>` : ''}`;
 }
 
 function syncText() {
   if (cloud.status === 'saving') return 'Syncing…';
-  if (cloud.status === 'error') return SIGN_IN_ERRORS[cloud.error] || 'Couldn’t sync. Will retry.';
+  if (cloud.status === 'error') return SIGN_IN_ERRORS[cloud.error] || `Couldn’t sync (${cloud.error}). Will retry.`;
   if (!cloud.at) return 'Synced';
   const mins = Math.round((Date.now() - cloud.at) / 60000);
   return mins < 1 ? 'Synced just now' : `Synced ${mins} min ago`;
@@ -1322,7 +1135,7 @@ async function doSignIn() {
   try { await signIn(); } catch (err) { cloud.error = err.code || err.message; renderAccount(); $('#menu').hidden = false; }
 }
 
-$('#signInTop').addEventListener('click', doSignIn);
+$('#signInTop').addEventListener('click', (e) => { e.stopPropagation(); doSignIn(); });
 $('#avatarBtn').addEventListener('click', (e) => { e.stopPropagation(); renderAccount(); renderTimer(); togglePopover($('#avatarBtn'), $('#menu')); });
 $('#account').addEventListener('click', async (e) => {
   if (e.target.closest('#signInBtn')) doSignIn();
@@ -1338,8 +1151,6 @@ document.addEventListener('visibilitychange', () => {
 
 // ================================================================ boot
 
-$('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
-
 function renderSources() {
   $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
 }
@@ -1347,7 +1158,6 @@ function renderSources() {
 function renderAll() {
   renderLesson();
   renderTabs();
-  renderVl();
   renderEar();
   renderExplorer();
 }
@@ -1357,16 +1167,12 @@ function boot() {
   navigator.storage?.persist?.().catch(() => {});
   buildPiano();
   setupMidi();
-  fillKeySelect($('#wbKey'), state.workbench.key || 'C-major');
-  $('#wbText').value = state.workbench.text || '';
   fillKeySelect($('#droneKey'), 'C-major');
   renderDegrees();
   renderSources();
   ensureStart();
-  // Keyboard open by default on desktop, folded away on phones.
-  setDock(state.dockOpen ?? !narrow.matches);
+  setDock(state.dockOpen ?? false); // folded away until asked for
   openLesson(state.current);
-  if (state.workbench.text) wbCheck();
   renderTimer();
   startCloud();
 }

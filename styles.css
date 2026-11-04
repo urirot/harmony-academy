@@ -147,8 +147,7 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .degrees { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* ---------------------------------------------------------------- header */
-.top { border-bottom: 1px solid var(--line); background: var(--bg); }
-.top-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--s6); display: flex; align-items: center; gap: var(--s2); }
+.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s6); border-bottom: 1px solid var(--line); background: var(--bg); }
 .app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: default; }
 .timer { gap: var(--s2); padding: 0 var(--s3); }
 .timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
@@ -171,14 +170,14 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .sw-sel { background: var(--lit-sel); }
 
 /* ---------------------------------------------------------------- panes */
+/* Lesson and tools share the width equally, edge to edge. */
 main {
-  width: min(1440px, 100%); margin: 0 auto; min-height: 0;
+  min-height: 0;
   display: grid; column-gap: var(--s8);
-  grid-template-columns: clamp(380px, 36vw, 520px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: var(--tabs-h) minmax(0, 1fr);
   padding: 0 var(--s6);
 }
-.tool-pane > .panel, .tabs { max-width: 880px; }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
@@ -198,8 +197,7 @@ main {
 .side-head { display: flex; align-items: center; gap: var(--s2); }
 .week-select { flex: 1; min-width: 0; height: 40px; font: 600 var(--fs-md)/1 var(--sans); background-color: transparent; border-color: transparent; padding-left: var(--s2); margin-left: calc(-1 * var(--s2)); }
 .week-select:hover { border-color: var(--line-strong); }
-.pace { display: flex; align-items: center; flex-wrap: wrap; gap: 0 var(--s2); margin: var(--s1) 0 var(--s4); }
-.pace input[type="date"] { height: 28px; font: inherit; font-size: var(--fs-sm); color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 var(--s2); }
+.pace { margin: var(--s1) 0 var(--s4); }
 .pace .behind { color: var(--warn); }
 .pace .ahead, .pace .done { color: var(--ok); }
 .lessons { list-style: none; border-top: 1px solid var(--line); }
@@ -221,8 +219,35 @@ main {
 .section-title { font-size: var(--fs-md); line-height: var(--lh-md); margin: var(--s6) 0 var(--s3); }
 .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
 .section-head .section-title { margin-bottom: var(--s3); }
-.ideas { list-style: disc; padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--s2); max-width: 64ch; }
-.ideas li::marker { color: var(--muted); }
+
+/* Notes: folded behind the pencil; a dot means there is something written. */
+.goal-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s3); }
+.notes-btn { position: relative; flex: none; }
+.notes-btn[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+.notes-btn .dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.notes { margin-top: var(--s3); }
+
+/* Explanation, with "hear it" examples under each section. */
+.explain p { max-width: 68ch; }
+.explain p + p { margin-top: var(--s3); }
+.hears { list-style: none; display: flex; flex-direction: column; gap: var(--s2); margin-top: var(--s3); }
+.hear { display: flex; align-items: flex-start; gap: var(--s3); width: 100%; text-align: left; padding: var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.hear:hover { border-color: var(--accent); }
+.hear .play-icon { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 10px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.hear.playing .play-icon { background: var(--accent); color: var(--on-accent); }
+.hear.faulty .play-icon { background: var(--bad-soft); color: var(--bad); }
+.hear-title { display: block; font-weight: 600; font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.hear.faulty .hear-title { color: var(--bad); }
+.hear-note { display: block; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+
+/* The lesson's ear-training plan. */
+.drills { list-style: none; border-top: 1px solid var(--line); }
+.drill { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill-text { display: flex; flex-direction: column; min-width: 0; }
+.drill-title { font-weight: 600; }
+.drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.drill.passed .drill-meta { color: var(--ok); }
 .progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
 
@@ -251,8 +276,6 @@ main {
 /* ---------------------------------------------------------------- tool pane */
 .panel-title { font-size: var(--fs-md); line-height: var(--lh-md); }
 .panel > .muted { max-width: 64ch; }
-.lab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: calc(-1 * var(--s2)); }
-.flag { display: inline-block; margin-right: var(--s2); font-size: var(--fs-sm); font-weight: 600; color: var(--bad); }
 .ear-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }
 .feedback { min-height: var(--lh-base); color: var(--muted); }
 .feedback.right { color: var(--ok); }
@@ -262,50 +285,21 @@ main {
 .drone-head { margin-top: var(--s6); }
 .drone-head .panel-title { margin: 0; }
 
-/* SATB table */
-.vl-scroll { overflow-x: auto; margin: var(--s2) 0; }
-.vl { border-collapse: collapse; font-size: var(--fs-sm); }
-.vl th, .vl td { height: 36px; padding: 0 var(--s2); text-align: center; white-space: nowrap; }
-.vl thead th { border-bottom: 1px solid var(--line); padding-bottom: var(--s2); vertical-align: bottom; }
-.vl th.voice { text-align: left; font-weight: 400; color: var(--muted); padding-left: 0; padding-right: var(--s4); }
-.vl .voice .short { display: none; }
-.vl .chord-head { cursor: pointer; border-radius: var(--r) var(--r) 0 0; min-width: 56px; }
-.vl .chord-head:hover { background: var(--subtle); }
-.vl .rn { font: 600 var(--fs-lg)/1 var(--serif); }
-.vl .fn { display: block; margin-top: var(--s1); font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
-.vl .lbl { display: block; font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
-.vl td.note { font: 600 var(--fs-base)/1 var(--mono); font-variant-numeric: tabular-nums; }
-.vl td.motion { font-size: var(--fs-xs); color: var(--muted); }
-.vl td.motion.held { color: var(--accent); font-weight: 600; }
-.vl td.motion.leap { color: var(--warn); }
-.vl tr.outer td, .vl tr.outer th { font-size: var(--fs-xs); color: var(--muted); }
-.vl .playing { background: var(--subtle); }
-.vl td.hidden-note { color: var(--line-strong); }
-.vl td.drill-ok { color: var(--ok); }
 .fig { display: inline-flex; flex-direction: column; font-size: 0.6em; line-height: 0.95; vertical-align: middle; margin-left: 1px; }
-.vl-controls { display: flex; flex-direction: column; gap: var(--s2); }
-.vl-controls label { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--fs-sm); color: var(--muted); }
-.vl-controls input[type="range"] { width: 96px; accent-color: var(--accent); }
-.vl-controls input[type="checkbox"] { accent-color: var(--accent); }
+.ok { color: var(--ok); }
 
-.callout { padding: var(--s3) var(--s4); border-radius: var(--r); font-size: var(--fs-sm); line-height: var(--lh-sm); }
-.callout.bad { background: var(--bad-soft); color: var(--bad); }
-.callout.bad strong { display: block; margin-bottom: var(--s1); }
-.callout.bad ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-.callout .where { font-weight: 600; margin-right: var(--s2); }
-.callout.ok { background: var(--ok-soft); color: var(--ok); }
-.callout.ok summary { cursor: pointer; list-style: none; }
-.callout.ok summary::-webkit-details-marker { display: none; }
-.callout.ok summary::after { content: ' ⓘ'; opacity: 0.7; }
-.callout.ok p { margin-top: var(--s2); color: var(--text); opacity: 0.8; }
-.callout.drill { background: var(--accent-soft); color: var(--text); display: flex; flex-direction: column; gap: var(--s2); }
-.callout.info { background: var(--subtle); color: var(--muted); }
+/* A lesson drill in progress. */
+.session { padding: var(--s4); border-radius: var(--r); background: var(--accent-soft); display: flex; flex-direction: column; gap: var(--s2); }
+.session-head { display: flex; justify-content: space-between; align-items: center; }
+.session-title { font-weight: 600; font-size: var(--fs-md); line-height: var(--lh-md); }
+.session-bar { height: 4px; border-radius: 2px; background: var(--surface); overflow: hidden; }
+.session-bar span { display: block; height: 100%; background: var(--accent); transition: width 0.25s; }
 
 /* ---------------------------------------------------------------- dock */
 .dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s6) env(safe-area-inset-bottom); }
-.dock-bar { max-width: 1376px; margin: 0 auto; height: 36px; display: flex; align-items: center; gap: var(--s2); }
+.dock-bar { height: 36px; display: flex; align-items: center; gap: var(--s2); }
 .dock.closed .piano-wrap { display: none; }
-.piano-wrap { max-width: 1376px; margin: 0 auto var(--s2); overflow-x: auto; }
+.piano-wrap { margin-bottom: var(--s2); overflow-x: auto; }
 .piano { position: relative; height: 104px; min-width: 760px; user-select: none; -webkit-user-select: none; touch-action: none; }
 .key { position: absolute; top: 0; border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
 .key.white { height: 100%; background: var(--key-white); border: 1px solid var(--key-edge); color: var(--muted); font-size: 10px; padding-bottom: 4px; z-index: 1; }
@@ -313,8 +307,6 @@ main {
 .key.lit-bass { background: var(--lit-bass) !important; color: var(--on-accent); }
 .key.lit-upper { background: var(--lit-upper) !important; color: #1C1D21; }
 .key.lit-user { background: var(--accent-soft) !important; }
-.key.sel { background: var(--lit-sel) !important; color: #fff; }
-.key.miss { box-shadow: inset 0 0 0 3px var(--bad); }
 
 /* ---------------------------------------------------------------- dialogs */
 dialog { color: var(--text); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
@@ -325,11 +317,18 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
 .status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
 .status.done { border-color: var(--accent); background: var(--accent); }
+.timeline { max-height: 60vh; overflow-y: auto; }
+.tl-day + .tl-day { margin-top: var(--s4); }
+.tl-day h3 { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--fs-base); padding-bottom: var(--s1); border-bottom: 1px solid var(--line); margin-bottom: var(--s2); }
+.tl-day ul { list-style: none; display: flex; flex-direction: column; gap: var(--s1); }
+.tl-day li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: var(--s2); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.tl-icon { color: var(--muted); text-align: center; }
+.tl-lesson .tl-icon, .tl-lesson .tl-text { color: var(--accent); font-weight: 600; }
 .sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 
 /* ---------------------------------------------------------------- one pane below 1024px */
 @media (max-width: 1023px) {
-  .top-inner, .dock { padding-left: var(--s4); padding-right: var(--s4); }
+  .top, .dock { padding-left: var(--s4); padding-right: var(--s4); }
   .app-name { cursor: pointer; }
   main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
   .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
@@ -340,8 +339,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 @media (max-width: 640px) {
   .app-name { font-weight: 400; }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
-  .vl .voice .long { display: none; }
-  .vl .voice .short { display: inline; }
-  .vl th, .vl td { padding: 0 6px; }
+  .lesson-body { padding-left: 0; }
+  .drill { flex-wrap: wrap; }
   .piano { height: 96px; }
 }

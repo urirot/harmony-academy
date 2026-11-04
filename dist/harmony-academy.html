@@ -157,8 +157,7 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .degrees { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* ---------------------------------------------------------------- header */
-.top { border-bottom: 1px solid var(--line); background: var(--bg); }
-.top-inner { height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--s6); display: flex; align-items: center; gap: var(--s2); }
+.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s6); border-bottom: 1px solid var(--line); background: var(--bg); }
 .app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: default; }
 .timer { gap: var(--s2); padding: 0 var(--s3); }
 .timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
@@ -181,14 +180,14 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .sw-sel { background: var(--lit-sel); }
 
 /* ---------------------------------------------------------------- panes */
+/* Lesson and tools share the width equally, edge to edge. */
 main {
-  width: min(1440px, 100%); margin: 0 auto; min-height: 0;
+  min-height: 0;
   display: grid; column-gap: var(--s8);
-  grid-template-columns: clamp(380px, 36vw, 520px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: var(--tabs-h) minmax(0, 1fr);
   padding: 0 var(--s6);
 }
-.tool-pane > .panel, .tabs { max-width: 880px; }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
@@ -208,8 +207,7 @@ main {
 .side-head { display: flex; align-items: center; gap: var(--s2); }
 .week-select { flex: 1; min-width: 0; height: 40px; font: 600 var(--fs-md)/1 var(--sans); background-color: transparent; border-color: transparent; padding-left: var(--s2); margin-left: calc(-1 * var(--s2)); }
 .week-select:hover { border-color: var(--line-strong); }
-.pace { display: flex; align-items: center; flex-wrap: wrap; gap: 0 var(--s2); margin: var(--s1) 0 var(--s4); }
-.pace input[type="date"] { height: 28px; font: inherit; font-size: var(--fs-sm); color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 var(--s2); }
+.pace { margin: var(--s1) 0 var(--s4); }
 .pace .behind { color: var(--warn); }
 .pace .ahead, .pace .done { color: var(--ok); }
 .lessons { list-style: none; border-top: 1px solid var(--line); }
@@ -231,8 +229,35 @@ main {
 .section-title { font-size: var(--fs-md); line-height: var(--lh-md); margin: var(--s6) 0 var(--s3); }
 .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
 .section-head .section-title { margin-bottom: var(--s3); }
-.ideas { list-style: disc; padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--s2); max-width: 64ch; }
-.ideas li::marker { color: var(--muted); }
+
+/* Notes: folded behind the pencil; a dot means there is something written. */
+.goal-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s3); }
+.notes-btn { position: relative; flex: none; }
+.notes-btn[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+.notes-btn .dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.notes { margin-top: var(--s3); }
+
+/* Explanation, with "hear it" examples under each section. */
+.explain p { max-width: 68ch; }
+.explain p + p { margin-top: var(--s3); }
+.hears { list-style: none; display: flex; flex-direction: column; gap: var(--s2); margin-top: var(--s3); }
+.hear { display: flex; align-items: flex-start; gap: var(--s3); width: 100%; text-align: left; padding: var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.hear:hover { border-color: var(--accent); }
+.hear .play-icon { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 10px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.hear.playing .play-icon { background: var(--accent); color: var(--on-accent); }
+.hear.faulty .play-icon { background: var(--bad-soft); color: var(--bad); }
+.hear-title { display: block; font-weight: 600; font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.hear.faulty .hear-title { color: var(--bad); }
+.hear-note { display: block; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+
+/* The lesson's ear-training plan. */
+.drills { list-style: none; border-top: 1px solid var(--line); }
+.drill { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill-text { display: flex; flex-direction: column; min-width: 0; }
+.drill-title { font-weight: 600; }
+.drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.drill.passed .drill-meta { color: var(--ok); }
 .progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
 
@@ -261,8 +286,6 @@ main {
 /* ---------------------------------------------------------------- tool pane */
 .panel-title { font-size: var(--fs-md); line-height: var(--lh-md); }
 .panel > .muted { max-width: 64ch; }
-.lab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: calc(-1 * var(--s2)); }
-.flag { display: inline-block; margin-right: var(--s2); font-size: var(--fs-sm); font-weight: 600; color: var(--bad); }
 .ear-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }
 .feedback { min-height: var(--lh-base); color: var(--muted); }
 .feedback.right { color: var(--ok); }
@@ -272,50 +295,21 @@ main {
 .drone-head { margin-top: var(--s6); }
 .drone-head .panel-title { margin: 0; }
 
-/* SATB table */
-.vl-scroll { overflow-x: auto; margin: var(--s2) 0; }
-.vl { border-collapse: collapse; font-size: var(--fs-sm); }
-.vl th, .vl td { height: 36px; padding: 0 var(--s2); text-align: center; white-space: nowrap; }
-.vl thead th { border-bottom: 1px solid var(--line); padding-bottom: var(--s2); vertical-align: bottom; }
-.vl th.voice { text-align: left; font-weight: 400; color: var(--muted); padding-left: 0; padding-right: var(--s4); }
-.vl .voice .short { display: none; }
-.vl .chord-head { cursor: pointer; border-radius: var(--r) var(--r) 0 0; min-width: 56px; }
-.vl .chord-head:hover { background: var(--subtle); }
-.vl .rn { font: 600 var(--fs-lg)/1 var(--serif); }
-.vl .fn { display: block; margin-top: var(--s1); font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
-.vl .lbl { display: block; font: 400 var(--fs-xs)/var(--lh-xs) var(--sans); color: var(--muted); }
-.vl td.note { font: 600 var(--fs-base)/1 var(--mono); font-variant-numeric: tabular-nums; }
-.vl td.motion { font-size: var(--fs-xs); color: var(--muted); }
-.vl td.motion.held { color: var(--accent); font-weight: 600; }
-.vl td.motion.leap { color: var(--warn); }
-.vl tr.outer td, .vl tr.outer th { font-size: var(--fs-xs); color: var(--muted); }
-.vl .playing { background: var(--subtle); }
-.vl td.hidden-note { color: var(--line-strong); }
-.vl td.drill-ok { color: var(--ok); }
 .fig { display: inline-flex; flex-direction: column; font-size: 0.6em; line-height: 0.95; vertical-align: middle; margin-left: 1px; }
-.vl-controls { display: flex; flex-direction: column; gap: var(--s2); }
-.vl-controls label { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--fs-sm); color: var(--muted); }
-.vl-controls input[type="range"] { width: 96px; accent-color: var(--accent); }
-.vl-controls input[type="checkbox"] { accent-color: var(--accent); }
+.ok { color: var(--ok); }
 
-.callout { padding: var(--s3) var(--s4); border-radius: var(--r); font-size: var(--fs-sm); line-height: var(--lh-sm); }
-.callout.bad { background: var(--bad-soft); color: var(--bad); }
-.callout.bad strong { display: block; margin-bottom: var(--s1); }
-.callout.bad ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-.callout .where { font-weight: 600; margin-right: var(--s2); }
-.callout.ok { background: var(--ok-soft); color: var(--ok); }
-.callout.ok summary { cursor: pointer; list-style: none; }
-.callout.ok summary::-webkit-details-marker { display: none; }
-.callout.ok summary::after { content: ' ⓘ'; opacity: 0.7; }
-.callout.ok p { margin-top: var(--s2); color: var(--text); opacity: 0.8; }
-.callout.drill { background: var(--accent-soft); color: var(--text); display: flex; flex-direction: column; gap: var(--s2); }
-.callout.info { background: var(--subtle); color: var(--muted); }
+/* A lesson drill in progress. */
+.session { padding: var(--s4); border-radius: var(--r); background: var(--accent-soft); display: flex; flex-direction: column; gap: var(--s2); }
+.session-head { display: flex; justify-content: space-between; align-items: center; }
+.session-title { font-weight: 600; font-size: var(--fs-md); line-height: var(--lh-md); }
+.session-bar { height: 4px; border-radius: 2px; background: var(--surface); overflow: hidden; }
+.session-bar span { display: block; height: 100%; background: var(--accent); transition: width 0.25s; }
 
 /* ---------------------------------------------------------------- dock */
 .dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s6) env(safe-area-inset-bottom); }
-.dock-bar { max-width: 1376px; margin: 0 auto; height: 36px; display: flex; align-items: center; gap: var(--s2); }
+.dock-bar { height: 36px; display: flex; align-items: center; gap: var(--s2); }
 .dock.closed .piano-wrap { display: none; }
-.piano-wrap { max-width: 1376px; margin: 0 auto var(--s2); overflow-x: auto; }
+.piano-wrap { margin-bottom: var(--s2); overflow-x: auto; }
 .piano { position: relative; height: 104px; min-width: 760px; user-select: none; -webkit-user-select: none; touch-action: none; }
 .key { position: absolute; top: 0; border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
 .key.white { height: 100%; background: var(--key-white); border: 1px solid var(--key-edge); color: var(--muted); font-size: 10px; padding-bottom: 4px; z-index: 1; }
@@ -323,8 +317,6 @@ main {
 .key.lit-bass { background: var(--lit-bass) !important; color: var(--on-accent); }
 .key.lit-upper { background: var(--lit-upper) !important; color: #1C1D21; }
 .key.lit-user { background: var(--accent-soft) !important; }
-.key.sel { background: var(--lit-sel) !important; color: #fff; }
-.key.miss { box-shadow: inset 0 0 0 3px var(--bad); }
 
 /* ---------------------------------------------------------------- dialogs */
 dialog { color: var(--text); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
@@ -335,11 +327,18 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
 .status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
 .status.done { border-color: var(--accent); background: var(--accent); }
+.timeline { max-height: 60vh; overflow-y: auto; }
+.tl-day + .tl-day { margin-top: var(--s4); }
+.tl-day h3 { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--fs-base); padding-bottom: var(--s1); border-bottom: 1px solid var(--line); margin-bottom: var(--s2); }
+.tl-day ul { list-style: none; display: flex; flex-direction: column; gap: var(--s1); }
+.tl-day li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: var(--s2); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.tl-icon { color: var(--muted); text-align: center; }
+.tl-lesson .tl-icon, .tl-lesson .tl-text { color: var(--accent); font-weight: 600; }
 .sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 
 /* ---------------------------------------------------------------- one pane below 1024px */
 @media (max-width: 1023px) {
-  .top-inner, .dock { padding-left: var(--s4); padding-right: var(--s4); }
+  .top, .dock { padding-left: var(--s4); padding-right: var(--s4); }
   .app-name { cursor: pointer; }
   main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
   .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
@@ -350,31 +349,26 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 @media (max-width: 640px) {
   .app-name { font-weight: 400; }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
-  .vl .voice .long { display: none; }
-  .vl .voice .short { display: inline; }
-  .vl th, .vl td { padding: 0 6px; }
+  .lesson-body { padding-left: 0; }
+  .drill { flex-wrap: wrap; }
   .piano { height: 96px; }
 }
 </style>
 </head>
 <body>
   <header class="top">
-    <div class="top-inner">
-      <button class="app-name" id="crumb">Harmony Academy</button>
-      <div class="spacer"></div>
-      <button class="btn quiet" id="signInTop" hidden>Sign in</button>
-      <button class="avatar" id="avatarBtn" hidden aria-label="Account"></button>
-      <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
-      <div class="menu-wrap">
-        <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
-        <div class="popover menu" id="menu" hidden>
-          <div class="account" id="account" hidden></div>
-          <p class="sm muted" id="timerTotals"></p>
-          <button class="menu-item" id="copyLogBtn">Progress log</button>
-          <button class="menu-item" id="backupBtn">Save progress</button>
-          <button class="menu-item" id="restoreBtn">Load progress</button>
-          <button class="menu-item" id="sourcesBtn">Sources</button>
-        </div>
+    <button class="app-name" id="crumb">Harmony Academy</button>
+    <div class="spacer"></div>
+    <button class="btn quiet" id="signInTop" hidden>Sign in</button>
+    <button class="avatar" id="avatarBtn" hidden aria-label="Account"></button>
+    <button class="btn timer" id="timerToggle" title="Start or pause the practice timer"><span id="timerIcon">▶</span><span class="mono" id="timerSession">00:00</span></button>
+    <div class="menu-wrap">
+      <button class="icon-btn" id="menuBtn" aria-label="More" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <div class="popover menu" id="menu" hidden>
+        <div class="account" id="account" hidden></div>
+        <p class="sm muted" id="timerTotals"></p>
+        <button class="menu-item" id="timelineBtn">Timeline</button>
+        <button class="menu-item" id="sourcesBtn">Sources</button>
       </div>
     </div>
   </header>
@@ -382,29 +376,39 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   <main id="main" data-view="lesson">
     <nav class="tabs" id="tabs" role="tablist">
       <button class="tab tab-lesson" data-tab="lesson" role="tab">Lesson</button>
-      <button class="tab" data-tab="lab" role="tab">Lab</button>
-      <button class="tab" data-tab="workbench" role="tab">Workbench</button>
-      <button class="tab" data-tab="ear" role="tab">Ear</button>
+      <button class="tab" data-tab="ear" role="tab">Ear training</button>
       <button class="tab" data-tab="explore" role="tab">Explore</button>
     </nav>
 
     <section class="pane lesson-pane" id="lessonPane">
       <div class="side-head">
         <select class="week-select" id="weekSelect" aria-label="Week"></select>
+        <span class="stepper">
+          <button class="icon-btn sm" id="prevLesson" aria-label="Previous lesson" title="Previous lesson">‹</button>
+          <button class="icon-btn sm" id="nextLesson" aria-label="Next lesson" title="Next lesson">›</button>
+        </span>
       </div>
-      <div class="pace">
-        <span class="sm muted" id="paceLine"></span>
-        <button class="btn quiet sm" id="startEdit">Change start</button>
-        <input type="date" id="startDate" aria-label="Start date" hidden>
-      </div>
+      <p class="pace sm muted" id="paceLine"></p>
       <ol class="lessons" id="weekLessons"></ol>
 
       <!-- The open lesson's details; moved under its row when rendered. -->
       <div class="lesson-body" id="lessonBody">
-        <p class="goal" id="lessonGoal"></p>
+        <div class="goal-row">
+          <p class="goal" id="lessonGoal"></p>
+          <button class="icon-btn sm notes-btn" id="notesBtn" title="Notes" aria-label="Notes" aria-expanded="false">✎<span class="dot" id="notesDot" hidden></span></button>
+        </div>
+        <div class="notes" id="notesBox" hidden>
+          <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
+          <p class="xs muted" id="journalSaved">Saved</p>
+        </div>
 
-        <h3 class="section-title">Key ideas</h3>
-        <ul class="ideas" id="ideas"></ul>
+        <div id="explain"></div>
+
+        <div class="section-head">
+          <h3 class="section-title">Ear training</h3>
+          <span class="sm muted" id="practicePct"></span>
+        </div>
+        <ul class="drills" id="drills"></ul>
 
         <div class="section-head">
           <h3 class="section-title">Session</h3>
@@ -413,42 +417,13 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
         <div class="progress"><span id="progressFill"></span></div>
         <ul class="tasks" id="tasks"></ul>
         <div id="nextUp"></div>
-
-        <h3 class="section-title">Notes</h3>
-        <textarea id="journal" rows="4" placeholder="Questions, what you heard, what went wrong at the keyboard…"></textarea>
-        <p class="xs muted" id="journalSaved">Saved in this browser</p>
       </div>
     </section>
 
     <section class="pane tool-pane" id="toolPane">
-      <div class="panel" id="panel-lab" data-panel="lab">
-        <div class="lab-head">
-          <span class="stepper">
-            <button class="icon-btn sm" id="vlPrev" aria-label="Previous example">‹</button>
-            <span class="sm muted" id="vlCount"></span>
-            <button class="icon-btn sm" id="vlNext" aria-label="Next example">›</button>
-          </span>
-          <span class="sm muted" id="vlKey"></span>
-        </div>
-        <h2 class="panel-title" id="vlTitle"></h2>
-        <p class="muted" id="vlNote"></p>
-        <div id="vlView"></div>
-      </div>
-
-      <div class="panel" id="panel-workbench" data-panel="workbench">
-        <h2 class="panel-title">Check your own part-writing</h2>
-        <p class="muted">One chord per line: a Roman numeral, then soprano, alto, tenor and bass. Write sharps as <span class="mono">#</span> and flats as <span class="mono">b</span>.</p>
-        <div class="row">
-          <select id="wbKey" aria-label="Key"></select>
-          <button class="btn primary" id="wbCheck">Check &amp; play</button>
-          <button class="btn quiet" id="wbExample">Example</button>
-        </div>
-        <textarea id="wbText" class="mono" rows="6" spellcheck="false" placeholder="I:  G4 E4 C4 C3&#10;V:  G4 D4 B3 G2&#10;I:  G4 E4 C4 C3"></textarea>
-        <div id="wbView"></div>
-      </div>
-
       <div class="panel" id="panel-ear" data-panel="ear">
-        <div class="ear-head">
+        <div class="session" id="session" hidden></div>
+        <div class="ear-head" id="earHead">
           <div class="row">
             <select id="earEx" aria-label="Drill"></select>
             <select id="earLevel" aria-label="Level"></select>
@@ -506,6 +481,13 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
     <div class="piano-wrap"><div class="piano" id="piano"></div></div>
   </footer>
 
+  <dialog class="modal" id="timelineDialog">
+    <h2 class="dialog-title">Timeline</h2>
+    <p class="sm muted" id="timelineSummary"></p>
+    <div class="timeline" id="timeline"></div>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
   <dialog class="modal" id="sourcesDialog">
     <h2 class="dialog-title">Sources</h2>
     <ul class="sources" id="sources"></ul>
@@ -518,29 +500,6 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
     <div class="choices">
       <button class="btn primary" id="chooseAccount"></button>
       <button class="btn" id="chooseLocal"></button>
-    </div>
-  </dialog>
-
-  <dialog class="modal" id="logDialog">
-    <h2 class="dialog-title">Progress log</h2>
-    <p class="sm muted" id="logNote">Copied to the clipboard.</p>
-    <textarea id="logText" class="mono" rows="14" readonly></textarea>
-    <div class="row end"><button class="btn primary" data-close>Done</button></div>
-  </dialog>
-
-  <dialog class="modal" id="restoreDialog">
-    <h2 class="dialog-title">Load progress</h2>
-    <p class="muted">Choose a file from “Save progress”, or paste its contents. This replaces the progress stored in this browser.</p>
-    <div class="row">
-      <button class="btn" id="restoreChoose">Choose file…</button>
-      <span class="sm muted" id="restoreFileName"></span>
-      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
-    </div>
-    <textarea id="restoreText" class="mono" rows="6" placeholder="…or paste the file’s contents here"></textarea>
-    <p class="sm bad" id="restoreError"></p>
-    <div class="row end">
-      <button class="btn quiet" data-close>Cancel</button>
-      <button class="btn primary" id="restoreApply">Load</button>
     </div>
   </dialog>
 
@@ -914,6 +873,10 @@ __m.curriculum = (() => {
 // Phase 1 syllabus: classical tonal harmony and four-part voice leading,
 // three sessions a week for six weeks.
 //
+// Each lesson has an explanation in short sections, "hear it" examples, a
+// pre-set ear-training plan (drills with a question count and a target score),
+// and a checklist of outside work.
+//
 // Sources, and how far each link was verified (2026-11-04):
 // - Open Music Theory v2 (OMT) is the backbone. It is free, and its PDF is in
 //   ~/Downloads, so every reading cites the PDF page as well. Chapter links use
@@ -948,6 +911,15 @@ const berklee = (module, videos) => ({
   note: 'Coursera',
 });
 
+// "Hear it" examples. A string is a progression id from this file; the
+// helpers make short note or chord sequences.
+const melody = (label, names, step = 0.45) => ({ label, seq: names.map((n) => [n]), step });
+const chords = (label, groups, step = 1.1) => ({ label, seq: groups, step });
+const together = (label, low, high) => ({ label, seq: [[low], [high], [low, high]], step: 0.7 });
+
+// A drill: which ear exercise, which items, how many questions, what score.
+const drill = (exercise, why, opts = {}) => ({ exercise, why, count: 20, target: 80, ...opts });
+
 const SOURCES = [
   { name: 'Open Music Theory, v2', url: `${OMT_BASE}/`, note: 'Free. The PDF in your Downloads matches the page numbers cited here.' },
   { name: 'Edinburgh: Fundamentals of Music Theory', url: 'https://www.coursera.org/learn/edinburgh-music-theory', note: 'Coursera. Free preview covers module 1 only; modules 4–6 are the harmony part.' },
@@ -964,35 +936,79 @@ const LESSONS = [
     id: 'w1l1', week: 1, n: 1,
     title: 'Scales, Keys & Intervals',
     goal: 'Spell major scales and name any interval by size and quality.',
-    ideas: [
-      'A major scale is W–W–H–W–W–W–H. Scale degrees ^1–^7 name each note by its job in the key.',
-      'Interval size counts letter names (C–E is a 3rd); quality comes from the half steps (C–E is major, C–E♭ minor).',
-      'Unisons, 4ths, 5ths and octaves are perfect; 2nds, 3rds, 6ths and 7ths are major or minor.',
+    explain: [
+      {
+        h: 'The major scale',
+        p: [
+          'Every major scale has the same pattern of whole (W) and half (H) steps: W–W–H–W–W–W–H. In C major that is C–D–E–F–G–A–B–C, all white keys. The two half steps sit between ^3–^4 (mi–fa) and ^7–^1 (ti–do), and that last half step is why ti pulls so hard toward do.',
+          'Numbering the notes ^1 to ^7 (or singing them do re mi fa sol la ti) lets you talk about every key at once: ^5 is G in C major and D in G major, but it always does the same job.',
+        ],
+        hear: [melody('C major scale, up and down', ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'], 0.35)],
+      },
+      {
+        h: 'Naming an interval',
+        p: [
+          'An interval has a size and a quality. For the size, count letter names including both ends: C up to E is C–D–E, a 3rd. For the quality, imagine the major scale on the lower note. If the upper note is in it, the interval is major (2nds, 3rds, 6ths, 7ths) or perfect (unisons, 4ths, 5ths, octaves).',
+          'A half step smaller than major is minor (C–E♭ is a minor 3rd). A half step larger than major or perfect is augmented; a half step smaller than minor or perfect is diminished.',
+        ],
+      },
+      {
+        h: 'Three anchors for the ear',
+        p: [
+          'Learn three intervals until they are automatic: the octave (the same note, higher), the perfect 5th (open and hollow) and the major 3rd (the bright interval at the bottom of a major chord). Every other interval is easier to judge against these.',
+          'Sing each one before you answer. Matching it with your voice trains the ear faster than listening alone.',
+        ],
+        hear: [together('Major 3rd: C–E', 'C4', 'E4'), together('Perfect 5th: C–G', 'C4', 'G4'), together('Octave: C–C', 'C4', 'C5')],
+      },
+    ],
+    practice: [
+      drill('intervals', 'The three anchors, rising. Sing the bottom note, then the top, then answer.', { level: 'anchor', direction: 'up' }),
+      drill('degrees', 'After the cadence sets the key, name the note as do, re, mi, fa or sol.', { level: 'do-sol' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 30, title: 'Edinburgh: scales, keys and intervals', detail: 'M1 “More on Scales”; M2 “Keys and Key Signatures” and “Intervals”.', links: [edinburgh(1, 'More on Scales'), edinburgh(2, 'Keys and Key Signatures, Intervals')] },
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Major Scales and Intervals', detail: 'Skim scales; read Intervals closely, especially the “major scale” method for quality.', links: [omt('Major Scales, Scale Degrees, and Key Signatures', 125), omt('Intervals', 163)] },
       { id: 'sheet', kind: 'write', minutes: 20, title: 'Intervals worksheet #1', detail: 'Write and identify intervals. Check yourself by playing each one.', links: [worksheet('Intervals 1', '2021/10/WK-Intervals-1.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Anchor intervals: M3, P5, P8', detail: 'Ten minutes in the ear lab on the anchor set. Sing each interval before answering.', action: { ear: 'intervals', level: 'anchor' }, links: [berklee(1, 'Major 2nd and 3rd Intervals; Tonal Center')] },
+      { id: 'berklee', kind: 'watch', minutes: 15, title: 'Berklee: major 2nds, 3rds and the tonal center', detail: 'Module 1 “Major 2nd and 3rd Intervals” and “Tonal Center”.', links: [berklee(1, 'Major 2nd and 3rd Intervals; Tonal Center')] },
     ],
-    ear: { exercise: 'intervals', level: 'anchor' },
   },
   {
     id: 'w1l2', week: 1, n: 2,
     title: 'Triad Inversions & Voice Leading (I → V → I)',
     goal: 'Build triads in every inversion and connect I and V with the smallest possible moves.',
-    ideas: [
-      'Root position is 5/3, first inversion 6/3 (written 6), second inversion 6/4: the figures are intervals above the bass, not the root.',
-      'Shortest path: keep common tones in the same voice and move the other voices by step.',
-      'I and V share one note (G in C major). Hold it; the other upper voices step: C→B and E→D.',
-      'The leading tone (^7, B in C) wants to rise to ^1. In the soprano it must.',
+    explain: [
+      {
+        h: 'Triads and their inversions',
+        p: [
+          'A triad stacks two 3rds: root, 3rd and 5th (C–E–G). Which of them is in the bass decides the position. Root in the bass is root position. The 3rd in the bass is first inversion, and the 5th in the bass is second inversion.',
+          'The figures under a chord count intervals up from the bass, never from the root. Root position is 5/3 (a 5th and a 3rd above the bass), first inversion 6/3, usually written just 6, and second inversion 6/4.',
+        ],
+        hear: [chords('C major: root position, then 6, then 6/4', [['C3', 'E4', 'G4', 'C5'], ['E3', 'G4', 'C5', 'E5'], ['G3', 'C4', 'E4', 'G4']], 1.2)],
+      },
+      {
+        h: 'The shortest path',
+        p: [
+          'When the chord changes, each voice should move as little as it can. Keep a note the two chords share in the same voice (a common tone) and move the other voices by step. Leave the leaps to the bass, which carries the harmony.',
+        ],
+      },
+      {
+        h: 'I → V → I in C',
+        p: [
+          'C major (C–E–G) and G major (G–B–D) share one note, G. Hold it in the soprano. The alto steps E→D, the tenor steps C→B, and both step back. The bass leaps C→G→C.',
+          'B is the leading tone. It rises to C, and when it is in the soprano it must. Compare the last example, where every voice drops a 4th at once: the soprano and bass move in parallel octaves and the alto and bass in parallel 5ths, and the voices stop sounding independent.',
+        ],
+        hear: ['w1l2-ivi', 'w1l2-ivi-ti', 'w1l2-err'],
+      },
+    ],
+    practice: [
+      drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm' }),
+      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh: building triads and inversions', detail: 'M4 “Listening to Triads” and “Building Triads”; M5 “Chord Inversions”.', links: [edinburgh(4, 'Listening to Triads, Building Triads'), edinburgh(5, 'Chord Inversions')] },
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Triads; Inversion and Figured Bass', detail: 'Triads (qualities, spelling); then the triad half of Inversion and Figured Bass.', links: [omt('Triads', 177), omt('Inversion and Figured Bass', 195, 'figured-bass')] },
       { id: 'sheet', kind: 'write', minutes: 15, title: 'Triadic inversions worksheet', detail: 'Identify and write triads in inversion with figures.', links: [worksheet('Inversion and Figured Bass 1', '2021/10/WK-Inversion-and-Figured-Bass-1.pdf')] },
-      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard drill: I → V → I, hold the G', detail: 'Bass in the left hand, three voices in the right. Play it in C, G and F without looking. Use the drill mode in the lab to check C.', action: { progression: 'w1l2-ivi' } },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: major vs. minor triads, then inversions', detail: 'Berklee M2 builds the same triads and adds P4 and P5.', action: { ear: 'triads', level: 'mm' }, links: [berklee(2, 'P4 and P5; Building Major and Minor Triads')] },
+      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: I → V → I, holding the G', detail: 'Bass in the left hand, three voices in the right. Play it in C, then G and F, without looking. Use “Hear it” above to check C.' },
     ],
     progressions: [
       {
@@ -1014,8 +1030,8 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w1l2-err', title: 'Find the errors: everything moves together', key: C, faulty: ['parallel'],
-        note: 'Every voice drops a 4th at once. Listen for the hollow sound, then find which pairs move in parallel octaves and fifths.',
+        id: 'w1l2-err', title: 'The mistake: everything moves together', key: C, faulty: ['parallel'],
+        note: 'Every voice drops a 4th at once: parallel octaves in the outer voices, parallel 5ths between alto and bass.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['C5', 'G4', 'E4', 'C3'] },
           { rn: 'V', fn: 'D', voices: ['G4', 'D4', 'B3', 'G2'] },
@@ -1023,23 +1039,43 @@ const LESSONS = [
       },
     ],
     explorer: ['I', 'I6', 'I6/4', 'V', 'V6', 'V6/4'],
-    ear: { exercise: 'triads', level: 'mm' },
   },
   {
     id: 'w1l3', week: 1, n: 3,
     title: 'Cadences & Contrary Motion',
     goal: 'Tell PAC, IAC and HC apart by ear, and see why outer voices prefer contrary motion.',
-    ideas: [
-      'PAC: V–I, both in root position, ^1 in the soprano over the final I. Change either condition and it is an IAC.',
-      'HC: the phrase stops on V. It sounds open, like a comma.',
-      'Four kinds of motion between two voices: contrary, similar, parallel, oblique (OMT definitions).',
-      'Similar motion into a perfect 5th or octave in the outer voices is fine only if the soprano moves by step.',
+    explain: [
+      {
+        h: 'Cadences end phrases',
+        p: [
+          'A cadence is the punctuation at the end of a phrase. An authentic cadence goes from V to I. It is perfect (PAC) when both chords are in root position and the soprano ends on do. Change either condition, for example mi on top, and it becomes imperfect (IAC): still conclusive, but softer.',
+          'A half cadence (HC) stops on V. It sounds open, like a comma, and the next phrase usually answers it.',
+        ],
+        hear: ['w1l3-pac', 'w1l3-iac', 'w1l3-hc'],
+      },
+      {
+        h: 'Four kinds of motion',
+        p: [
+          'Any two voices move in one of four ways. Contrary: opposite directions. Similar: the same direction, ending on a different interval. Parallel: the same direction, keeping the same interval. Oblique: one voice holds while the other moves.',
+          'Contrary motion keeps voices most independent, so the soprano and bass, the two lines the ear follows most, prefer it. In the PAC above the soprano goes C–B–C while the bass goes C–G–C: contrary both times.',
+        ],
+      },
+      {
+        h: 'Direct 5ths and octaves',
+        p: [
+          'Reaching a perfect 5th or octave between soprano and bass in similar motion is acceptable only if the soprano moves by step. If the soprano leaps too, the arrival sounds like a parallel. In the example, the soprano leaps E→G while the bass leaps C→G.',
+        ],
+        hear: ['w1l3-err'],
+      },
+    ],
+    practice: [
+      drill('cadences', 'Does it end on the tonic? If so, is the soprano on do (PAC) or mi (IAC)? If not, it is a half cadence.', { level: 'basic' }),
+      drill('degrees', 'The soprano’s last note decides PAC vs IAC. Practise hearing do, mi and sol against the key.', { items: [1, 3, 5] }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: cadences', detail: 'M5 “Cadences”; the M4 reading “Perfect and Imperfect Cadences”.', links: [edinburgh(5, 'Cadences'), edinburgh(4, 'Perfect and Imperfect Cadences (reading)')] },
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Introduction to Harmony, Cadences, and Phrase Endings', detail: 'Read through “Writing Half Cadences”. Then the “Types of motion” section of Introduction to Species Counterpoint.', links: [omt('Introduction to Harmony, Cadences, and Phrase Endings', 401, 'intro-to-harmony'), omt('Introduction to Species Counterpoint (Types of motion)', 229, 'species-counterpoint')] },
-      { id: 'sheet', kind: 'write', minutes: 20, title: 'Cadences worksheet', detail: 'Write authentic and half cadences with I and V only, in major and minor. Type your answers into the workbench to check them.', links: [worksheet('Introduction to Harmony, Cadences, and Phrase Endings', '2021/07/WK-Introduction-to-Harmon-Cadences-and-Phrase-Endings.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: PAC, IAC or HC?', detail: 'Listen to the soprano on the last chord: do, or mi? Then is the bass ending on do or sol?', action: { ear: 'cadences', level: 'basic' } },
+      { id: 'sheet', kind: 'write', minutes: 20, title: 'Cadences worksheet', detail: 'Write authentic and half cadences with I and V only, in major and minor. Play each one at the keyboard.', links: [worksheet('Introduction to Harmony, Cadences, and Phrase Endings', '2021/07/WK-Introduction-to-Harmon-Cadences-and-Phrase-Endings.pdf')] },
     ],
     progressions: [
       {
@@ -1069,7 +1105,7 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w1l3-err', title: 'Find the error: outer voices', key: C, faulty: ['direct'],
+        id: 'w1l3-err', title: 'The mistake: direct octaves', key: C, faulty: ['direct'],
         note: 'Soprano and bass both rise and land on an octave, and the soprano gets there by leap.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['E4', 'C4', 'G3', 'C3'] },
@@ -1077,7 +1113,6 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'cadences', level: 'basic' },
   },
 
   // ---------------------------------------------------------------- week 2
@@ -1085,22 +1120,41 @@ const LESSONS = [
     id: 'w2l1', week: 2, n: 1,
     title: 'SATB Chord Construction',
     goal: 'Voice any diatonic triad in four parts with correct range, spacing and doubling.',
-    ideas: [
-      'Ranges: soprano C4–G5, alto G3–D5, tenor C3–G4, bass F2–D4.',
-      'Spacing: no more than an octave between soprano–alto or alto–tenor; up to a 12th between tenor and bass.',
-      'No voice crossing: S above A above T above B.',
-      'Double the bass note of a triad by default. Never double the leading tone or a chordal 7th.',
+    explain: [
+      {
+        h: 'Four voices, four ranges',
+        p: [
+          'Classical harmony is written for soprano, alto, tenor and bass. Keep each in its range: soprano C4–G5, alto G3–D5, tenor C3–G4, bass F2–D4.',
+          'Keep the upper three voices close: no more than an octave between soprano and alto, or between alto and tenor. The bass may sit up to a 12th below the tenor. Voices never cross: the alto stays below the soprano, and so on down.',
+        ],
+      },
+      {
+        h: 'Which note to double',
+        p: [
+          'A triad has three notes and there are four voices, so one note is doubled. In root position, double the bass, which is the root. Never double the leading tone: it has only one place to go, and two voices going there make parallel octaves. Never double a chordal 7th either, for the same reason.',
+        ],
+        hear: ['w2l1-iivi'],
+      },
+      {
+        h: 'The triads of a key',
+        p: [
+          'Each scale degree carries a triad with a fixed quality. In major, I, IV and V are major; ii, iii and vi are minor; vii° is diminished. Capital numerals mean major, lower-case minor, and ° diminished. Open Explore to hear all seven and see how each is voiced.',
+        ],
+      },
+    ],
+    practice: [
+      drill('triads', 'Add the diminished triad: tight and unstable, like vii°.', { level: 'mmd' }),
+      drill('intervals', 'Berklee’s next step: major 2nd, 3rd, 6th and 7th, perfect 4th, 5th and octave, rising.', { level: 'berklee', direction: 'up' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 12, title: 'Edinburgh: triads in a key', detail: 'M4 “Elaborating Key: Triads and Scales”; M5 “Chord Names”.', links: [edinburgh(4, 'Elaborating Key: Triads and Scales'), edinburgh(5, 'Chord Names')] },
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Roman Numerals and SATB Chord Construction', detail: 'Focus on “Writing Chords in SATB Style”: the six rules.', links: [omt('Roman Numerals and SATB Chord Construction', 208)] },
-      { id: 'play', kind: 'play', minutes: 15, title: 'Voice all seven triads of C major', detail: 'Use the chord explorer to hear each one; then write each in the workbench in a different spacing and fix whatever it flags.', action: { explorer: true } },
-      { id: 'spot', kind: 'play', minutes: 10, title: 'Spot the four construction errors', detail: 'Four chords, one error each. Name it before you reveal.', action: { progression: 'w2l1-errs' } },
+      { id: 'play', kind: 'play', minutes: 15, title: 'Voice all seven triads of C major', detail: 'Hear each in Explore, then write each on paper in two different spacings and play them.', action: { explorer: true } },
     ],
     progressions: [
       {
-        id: 'w2l1-errs', title: 'Find the errors: one per chord', key: C, standalone: true, faulty: ['spacing', 'doubling', 'crossing', 'range'],
-        note: 'These are four separate chords, not a progression. Each breaks one SATB rule.',
+        id: 'w2l1-errs', title: 'Four faulty chords', key: C, standalone: true, faulty: ['spacing', 'doubling', 'crossing', 'range'],
+        note: 'Too wide between alto and tenor; doubled leading tone; alto below tenor; alto and tenor out of range.',
         steps: [
           { rn: 'I', voices: ['E5', 'C5', 'G3', 'C3'] },
           { rn: 'V', voices: ['B4', 'G4', 'B3', 'G2'] },
@@ -1110,7 +1164,7 @@ const LESSONS = [
       },
       {
         id: 'w2l1-iivi', title: 'I – IV – V – I, cleanly voiced', key: C,
-        note: 'Every chord doubles its bass. Watch the upper voices: C holds, then everything steps.',
+        note: 'Every chord doubles its bass. C holds into IV, then everything steps.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['C5', 'G4', 'E4', 'C3'] },
           { rn: 'IV', fn: 'PD', voices: ['C5', 'A4', 'F4', 'F3'] },
@@ -1120,28 +1174,47 @@ const LESSONS = [
       },
     ],
     explorer: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'],
-    ear: { exercise: 'triads', level: 'mmd' },
   },
   {
     id: 'w2l2', week: 2, n: 2,
     title: 'Motion Types & Parallel Perfects',
     goal: 'Hear and avoid parallel 5ths and octaves; use contrary motion to get out of them.',
-    ideas: [
-      'Parallel perfect 5ths and octaves make two voices sound like one. Contrary 5ths/octaves count too.',
-      'Parallel 3rds and 6ths are good: they keep voices independent while moving together.',
-      'When the bass moves by step (I–ii, IV–V), move the upper voices the other way.',
-      'First species: one note against one, consonances only, start and end on perfect intervals.',
+    explain: [
+      {
+        h: 'Why parallels are avoided',
+        p: [
+          'Perfect 5ths and octaves blend so completely that two voices moving in parallel 5ths or octaves sound like one voice doubled, and four-part writing loses a part. Moving from one 5th or octave to another in contrary motion counts as the same fault.',
+          'In the mistake, all four voices rise a step from I to ii: the soprano and tenor make parallel 5ths, and so do the soprano and bass, while the tenor and bass make parallel octaves. In the fix the bass still rises C→D, but the upper voices fall against it.',
+        ],
+        hear: ['w2l2-err', 'w2l2-fix'],
+      },
+      {
+        h: 'Perfect and imperfect consonances',
+        p: [
+          '3rds and 6ths are imperfect consonances: warm, and fine to move in parallel. Unisons, 5ths and octaves are perfect consonances: hollow and stable. Approach them by contrary or oblique motion.',
+        ],
+        hear: [chords('Played together: P5, P8, then M3, M6', [['C4', 'G4'], ['C4', 'C5'], ['C4', 'E4'], ['C4', 'A4']], 1.0)],
+      },
+      {
+        h: 'First species',
+        p: [
+          'Species counterpoint drills this in two voices: one note against one, consonances only, starting on a perfect interval and ending on a unison or octave, moving mostly by step, with one high point in each line.',
+        ],
+      },
+    ],
+    practice: [
+      drill('intervals', 'Perfect or imperfect? Played together: 3rds, 6ths, 5ths and octaves.', { items: [3, 4, 7, 8, 9, 12], direction: 'harmonic' }),
+      drill('intervals', 'All of the major-scale intervals, mixed directions.', { level: 'berklee', direction: 'mixed' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Introduction to Species Counterpoint; First-Species Counterpoint', detail: 'Rules for melodic and harmonic writing; then first species.', links: [omt('Introduction to Species Counterpoint', 227, 'species-counterpoint'), omt('First-Species Counterpoint', 235, 'first-species-counterpoint')] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Cantus firmus and first species', detail: 'Critique and write a cantus firmus, then a first-species line against it. Play both lines on the keyboard.', links: [worksheet('Cantus Firmus A', '2019/05/WK-Cantus-Firmus-A.pdf'), worksheet('First Species Counterpoint A', '2020/01/WK-First-species-Counterpoint-A.pdf')] },
-      { id: 'spot', kind: 'play', minutes: 5, title: 'Find the parallels, then hear the fix', detail: 'Compare the faulty I–ii with the version in contrary motion.', action: { progression: 'w2l2-err' } },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: harmonic intervals', detail: 'Switch direction to “together”: perfect intervals sound hollow, 3rds and 6ths sweet.', action: { ear: 'intervals', level: 'berklee', direction: 'harmonic' }, links: [berklee(3, 'Major 6th and Major 7th Intervals')] },
+      { id: 'berklee', kind: 'watch', minutes: 10, title: 'Berklee: major 6ths and 7ths', detail: 'Module 3 “Major 6th and Major 7th Intervals”.', links: [berklee(3, 'Major 6th and Major 7th Intervals')] },
     ],
     progressions: [
       {
-        id: 'w2l2-err', title: 'Find the errors: I – ii in parallel', key: C, faulty: ['parallel'],
-        note: 'All four voices rise a step. Which pairs make parallel perfects?',
+        id: 'w2l2-err', title: 'The mistake: I – ii in parallel', key: C, faulty: ['parallel'],
+        note: 'All four voices rise a step together.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['G4', 'E4', 'C4', 'C3'] },
           { rn: 'ii', fn: 'PD', voices: ['A4', 'F4', 'D4', 'D3'] },
@@ -1158,23 +1231,46 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'intervals', level: 'berklee', direction: 'harmonic' },
   },
   {
     id: 'w2l3', week: 2, n: 3,
     title: 'Minor Keys & the Raised Leading Tone',
     goal: 'Write i–iv–V–i in minor with the raised ^7, and avoid the augmented 2nd.',
-    ideas: [
-      'Minor-key V and vii° use harmonic minor: raise ^7 (G♯ in A minor) so it leads to ^1.',
-      'That raised ^7 sits an augmented 2nd above ^6 (F–G♯). Never move a voice F→G♯ directly.',
-      'In iv–V, move ^6 down to ^5 (F→E) and let another voice take the G♯.',
+    explain: [
+      {
+        h: 'Three forms of minor',
+        p: [
+          'Natural minor follows the key signature: A minor is A–B–C–D–E–F–G. Its ^7 (G) sits a whole step below the tonic, too far away to lead into it.',
+          'Harmonic minor raises ^7 to G♯ for the V and vii° chords. That is why V is a major chord in minor keys, just as in major. Melodic minor also raises ^6 on the way up, to smooth out the melody.',
+        ],
+        hear: [
+          melody('A natural minor', ['A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'], 0.35),
+          melody('A harmonic minor (G♯)', ['A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G#4', 'A4'], 0.35),
+        ],
+      },
+      {
+        h: 'i – V – i',
+        p: ['The raised leading tone G♯ appears in V and resolves up to A. Without it, the cadence loses its pull.'],
+        hear: ['w2l3-ivi'],
+      },
+      {
+        h: 'The augmented 2nd',
+        p: [
+          'Raising ^7 opens a gap of three half steps between ^6 (F) and ^7 (G♯): an augmented 2nd, awkward to sing. When iv moves to V, let F step down to E and bring in G♯ from A in another voice.',
+          'The mistake has two problems: the alto leaps F→G♯, and the tenor and bass rise in parallel 5ths.',
+        ],
+        hear: ['w2l3-err', 'w2l3-iv'],
+      },
+    ],
+    practice: [
+      drill('triads', 'Minor keys use all three qualities: i and iv minor, V major, ii° and vii° diminished.', { level: 'mmd' }),
+      drill('intervals', 'Half step, whole step or minor 3rd? The augmented 2nd F–G♯ sounds like a minor 3rd.', { items: [1, 2, 3], direction: 'up' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Minor Keys', detail: 'M2 “Minor Keys” and the reading “Minor Keys and Minor Scales”.', links: [edinburgh(2, 'Minor Keys')] },
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Minor Scales, Scale Degrees, and Key Signatures', detail: 'Natural, harmonic and melodic minor; why harmony uses harmonic minor.', links: [omt('Minor Scales, Scale Degrees, and Key Signatures', 136)] },
       { id: 'sheet', kind: 'write', minutes: 15, title: 'Minor scales worksheet', detail: 'Write the three forms of minor.', links: [worksheet('Minor Scales 1', '2021/10/WK-Minor-Scales-1.pdf')] },
-      { id: 'spot', kind: 'play', minutes: 10, title: 'Find the two errors in iv – V', detail: 'One melodic, one harmonic.', action: { progression: 'w2l3-err' } },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: major, minor or diminished?', detail: 'vii° and ii° in minor are diminished: tense and narrow.', action: { ear: 'triads', level: 'mmd' } },
+      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: i – iv – V – i in A minor and D minor', detail: 'Copy the fix above, then transpose it to D minor (C♯ is the leading tone).' },
     ],
     progressions: [
       {
@@ -1187,7 +1283,7 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w2l3-iv', title: 'i – iv – V – i in A minor', key: Am,
+        id: 'w2l3-iv', title: 'The fix: i – iv – V – i in A minor', key: Am,
         note: 'F (^6) falls to E; the G♯ appears in the soprano, approached from A.',
         steps: [
           { rn: 'i', fn: 'T', voices: ['A4', 'E4', 'C4', 'A2'] },
@@ -1197,8 +1293,8 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w2l3-err', title: 'Find the errors: iv – V in A minor', key: Am, faulty: ['melodic', 'parallel'],
-        note: 'Two problems: one voice makes the forbidden leap, and two voices move in parallel perfects.',
+        id: 'w2l3-err', title: 'The mistake: iv – V with an augmented 2nd', key: Am, faulty: ['melodic', 'parallel'],
+        note: 'The alto leaps F→G♯, and the tenor and bass move in parallel 5ths.',
         steps: [
           { rn: 'iv', fn: 'PD', voices: ['D5', 'F4', 'A3', 'D3'] },
           { rn: 'V', fn: 'D', voices: ['B4', 'G#4', 'B3', 'E3'] },
@@ -1207,7 +1303,6 @@ const LESSONS = [
     ],
     explorer: ['i', 'ii°', 'III', 'iv', 'V', 'VI', 'vii°'],
     explorerKey: Am,
-    ear: { exercise: 'triads', level: 'mmd' },
   },
 
   // ---------------------------------------------------------------- week 3
@@ -1215,34 +1310,72 @@ const LESSONS = [
     id: 'w3l1', week: 3, n: 1,
     title: 'Seventh Chords',
     goal: 'Spell and hear the five common seventh-chord qualities.',
-    ideas: [
-      'Add a 7th above the root of a triad: MM7 (I7, IV7), Mm7 (V7 only, in both major and minor), mm7 (ii7, iii7, vi7), ø7 (vii in major), °7 (vii in minor).',
-      'The dominant seventh (Mm7) contains a tritone between ^7 and ^4: that is the tension that drives V7 to I.',
-      'Seventh chords have four notes, so in four voices nothing is doubled.',
+    explain: [
+      {
+        h: 'Adding a 7th',
+        p: [
+          'Stack one more 3rd on a triad and you get a seventh chord. Five qualities matter in tonal music. Major 7th (MM7): I7 and IV7 in major. Dominant 7th (Mm7): only on V, in major and minor alike. Minor 7th (mm7): ii7, iii7 and vi7 in major. Half-diminished (ø7): vii in major, ii in minor. Fully diminished (°7): vii in minor.',
+        ],
+        hear: [chords('On C: major 7, dominant 7, minor 7, half-diminished, fully diminished', [
+          ['C4', 'E4', 'G4', 'B4'], ['C4', 'E4', 'G4', 'Bb4'], ['C4', 'Eb4', 'G4', 'Bb4'], ['C4', 'Eb4', 'Gb4', 'Bb4'], ['C4', 'Eb4', 'Gb4', 'Bbb4'],
+        ], 1.3)],
+      },
+      {
+        h: 'Why V7 matters',
+        p: [
+          'V7 contains a tritone between ^7 and ^4, B and F in C major. The tritone resolves inward: B up to C, F down to E. That double pull toward the tonic chord is the strongest motion in the key.',
+        ],
+        hear: [chords('Tritone B–F resolving to C–E', [['B3', 'F4'], ['C4', 'E4']], 1.2)],
+      },
+      {
+        h: 'In four voices',
+        p: ['A seventh chord already has four different notes, so a complete one doubles nothing: one note per voice.'],
+      },
+    ],
+    practice: [
+      drill('sevenths', 'Start with the three common ones: dominant, major and minor 7th.', { level: 'basic' }),
+      drill('sevenths', 'Add half-diminished and fully diminished.', { level: 'all' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh and Berklee: seventh chords', detail: 'Edinburgh M4 “Seventh Chords”; Berklee M4 “7th Chords” and “7th Chords Practice”.', links: [edinburgh(4, 'Seventh Chords'), berklee(4, '7th Chords; 7th Chords Practice')] },
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Seventh Chords', detail: 'Qualities, nomenclature, and the listening section.', links: [omt('Seventh Chords', 186)] },
       { id: 'sheet', kind: 'write', minutes: 15, title: 'Seventh chords worksheet #1', links: [worksheet('Seventh Chords 1', '2021/10/WK-Seventh-Chords-1.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: seventh-chord quality', detail: 'Start with dominant vs. major 7th; add the others when you pass 80%.', action: { ear: 'sevenths', level: 'basic' } },
     ],
     explorer: ['I7', 'ii7', 'iii7', 'IV7', 'V7', 'vi7', 'viiø7'],
-    ear: { exercise: 'sevenths', level: 'basic' },
   },
   {
     id: 'w3l2', week: 3, n: 2,
     title: 'Resolving V7 → I',
     goal: 'Resolve the dominant seventh: 7th down by step, leading tone up.',
-    ideas: [
-      'The chordal 7th (F in C major) resolves down by step to E.',
-      'The leading tone (B) resolves up to C, at least when it is in the soprano.',
-      'A complete V7 in root position resolves to an incomplete I (three roots and a third). An incomplete V7 (no 5th, doubled root) resolves to a complete I.',
-      'Approach the 7th by step or as a common tone.',
+    explain: [
+      {
+        h: 'The default resolution',
+        p: [
+          'In C major: the chordal 7th, F, steps down to E. The leading tone, B, steps up to C. ^2, D, moves to C, and the bass leaps G→C. Approach the 7th by step or hold it over from the chord before.',
+        ],
+        hear: ['w3l2-complete'],
+      },
+      {
+        h: 'Complete or incomplete',
+        p: [
+          'With both chords in root position, the arithmetic forces a choice. A complete V7 resolves to an incomplete I: three Cs and an E, with no G. Or leave the 5th (D) out of V7 and double its root, G, and the I comes out complete.',
+        ],
+        hear: ['w3l2-incomplete'],
+      },
+      {
+        h: 'The 7th must fall',
+        p: ['In the mistake every voice moves by step and there are no parallels, but the 7th, F, goes up to G. It sounds unfinished.'],
+        hear: ['w3l2-err'],
+      },
+    ],
+    practice: [
+      drill('intervals', 'The tritone at the heart of V7, against its neighbours, the perfect 4th and 5th. Played together.', { items: [5, 6, 7], direction: 'harmonic' }),
+      drill('cadences', 'Authentic or half: listen for whether the 7th resolves.', { level: 'basic' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Strengthening Endings with V7', detail: 'The default resolution, then the alternatives.', links: [omt('Strengthening Endings with V7', 410, 'strengthening-endings-with-v7')] },
-      { id: 'sheet', kind: 'write', minutes: 25, title: 'V7 worksheet', detail: 'Write and resolve V7 chords. Check each answer in the workbench.', links: [worksheet('Strengthening Endings with V7', '2021/07/WK-Strengthening-Endings-with-V7.pdf')] },
-      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard drill: both V7 resolutions', detail: 'Play the complete and the incomplete version in C, then in G and F.', action: { progression: 'w3l2-complete' } },
+      { id: 'sheet', kind: 'write', minutes: 25, title: 'V7 worksheet', detail: 'Write and resolve V7 chords. Play every answer and listen for the 7th falling.', links: [worksheet('Strengthening Endings with V7', '2021/07/WK-Strengthening-Endings-with-V7.pdf')] },
+      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: both V7 resolutions', detail: 'Play the complete and the incomplete version in C, then in G and F.' },
     ],
     progressions: [
       {
@@ -1263,30 +1396,47 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w3l2-err', title: 'Find the error: V7 → I', key: C, faulty: ['tendency'],
-        note: 'Everything moves by step and there are no parallels. One note still goes the wrong way.',
+        id: 'w3l2-err', title: 'The mistake: the 7th rises', key: C, faulty: ['tendency'],
+        note: 'F goes up to G instead of down to E.',
         steps: [
           { rn: 'V7', fn: 'D', voices: ['F4', 'D4', 'B3', 'G2'] },
           { rn: 'I', fn: 'T', voices: ['G4', 'E4', 'C4', 'C3'] },
         ],
       },
     ],
-    ear: { exercise: 'cadences', level: 'basic' },
   },
   {
     id: 'w3l3', week: 3, n: 3,
     title: 'Figured Bass & Inverted V7',
     goal: 'Read figures for every triad and seventh-chord inversion and realize them at the keyboard.',
-    ideas: [
-      'Seventh-chord inversions: 7 (root), 6/5 (3rd in bass), 4/3 (5th in bass), 4/2 (7th in bass).',
-      'Figures are intervals above the bass; accidentals in figures apply to that interval above the bass.',
-      'Inverted dominants keep the same tendencies: the 7th still falls, the leading tone still rises.',
+    explain: [
+      {
+        h: 'Seventh-chord inversions',
+        p: [
+          'A seventh chord has four positions. Root in the bass: 7. The 3rd in the bass: 6/5. The 5th in the bass: 4/3. The 7th in the bass: 4/2, sometimes just 2. As with triads, the figures are intervals above the bass.',
+        ],
+        hear: [chords('G7 in C: V7, V6/5, V4/3, V4/2', [['G2', 'B3', 'D4', 'F4'], ['B2', 'D4', 'F4', 'G4'], ['D3', 'G3', 'B3', 'F4'], ['F3', 'G3', 'B3', 'D4']], 1.3)],
+      },
+      {
+        h: 'Reading figured bass',
+        p: [
+          'A figured bass gives you the bass line and some numbers, and you supply the upper voices. No figure means a root-position triad; 6 means first inversion; 6/4 second inversion. An accidental on its own applies to the 3rd above the bass, which is how a ♯ under V raises the leading tone in minor.',
+        ],
+      },
+      {
+        h: 'Same tendencies when inverted',
+        p: ['Inverting V7 changes the bass, not the rules: the leading tone still rises and the 7th still falls. In V6/5 the leading tone is in the bass and steps up to the tonic.'],
+        hear: ['w3l3-v65'],
+      },
+    ],
+    practice: [
+      drill('inversions', 'Triads first: root, 6 or 6/4, by the bass note.', { level: 'triads' }),
+      drill('inversions', 'Dominant 7th in all four positions.', { level: 'sevenths' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Chord Inversions, Chord Names', detail: 'M5. Rewatch Chord Inversions now that you know seventh chords.', links: [edinburgh(5, 'Chord Inversions, Chord Names')] },
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Inversion and Figured Bass (seventh chords)', detail: 'Seventh Chord Inversion and Figures; Other Figured Bass Symbols.', links: [omt('Inversion and Figured Bass', 201, 'figured-bass')] },
       { id: 'sheet', kind: 'write', minutes: 15, title: 'Seventh chord inversions worksheet', links: [worksheet('Inversion and Figured Bass 2', '2021/10/WK-Inversion-and-Figured-Bass-2.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: which inversion?', detail: 'Listen to the bass only: is it the root, the 3rd, or the 5th?', action: { ear: 'inversions', level: 'triads' } },
     ],
     progressions: [
       {
@@ -1300,7 +1450,6 @@ const LESSONS = [
       },
     ],
     explorer: ['V7', 'V6/5', 'V4/3', 'V4/2', 'I', 'I6', 'I6/4'],
-    ear: { exercise: 'inversions', level: 'triads' },
   },
 
   // ---------------------------------------------------------------- week 4
@@ -1308,16 +1457,36 @@ const LESSONS = [
     id: 'w4l1', week: 4, n: 1,
     title: 'Strong Predominants: IV and ii6',
     goal: 'Approach V from IV or ii6 without parallels.',
-    ideas: [
-      'Predominants (PD) lead away from tonic and toward dominant. IV and ii(6) are the strong ones.',
-      'ii6 has ^4 in the bass, like IV. Double the bass (F) in ii6.',
-      'IV–V is the classic parallel trap: the bass steps up, so move the upper voices down.',
+    explain: [
+      {
+        h: 'Tonic, predominant, dominant',
+        p: [
+          'Chords group by what they do. Tonic (I) is home. Dominant (V, vii°) is tension that wants home. Predominant chords lead from tonic to dominant, and IV and ii are the strong ones: both contain ^4, which leads naturally to ^5 under V.',
+        ],
+      },
+      {
+        h: 'ii6',
+        p: [
+          'ii in first inversion has the same bass note as IV (F in C) but a lighter, more urgent colour. Double its bass, F. The example also shows the leading tone in an inner voice dropping to G, which is allowed there and gives a complete final chord.',
+        ],
+        hear: ['w4l1-ii6'],
+      },
+      {
+        h: 'The IV–V trap',
+        p: [
+          'IV and V are a step apart. Move the upper voices up with the bass and you get parallel 5ths and octaves, as in the mistake. Move them down, against the bass, as in the version from week 2.',
+        ],
+        hear: ['w4l1-err', 'w2l1-iivi'],
+      },
+    ],
+    practice: [
+      drill('degrees', 'All seven degrees. ^4 (fa) and ^6 (la) are the predominant notes; learn to spot them.', { level: 'all' }),
+      drill('cadences', 'Authentic or half, now with predominants before V.', { level: 'basic' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh and Berklee: primary chords and I–IV–V', detail: 'Edinburgh M1 “Primary Chords”, M5 “Common Chord Progressions”; Berklee M2 “I IV V Chord Progression”.', links: [edinburgh(5, 'Common Chord Progressions'), berklee(2, 'I IV V Chord Progression')] },
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Strong Predominants', links: [omt('Strengthening Endings with Strong Predominants', 415, 'strong-predominants')] },
-      { id: 'sheet', kind: 'write', minutes: 25, title: 'Strong predominants worksheet', detail: 'Part writing from Roman numerals and figures. Check every answer in the workbench.', links: [worksheet('Strengthening Endings with Strong Predominants', '2021/07/WK-Strengthening-Endings-with-Strong-Predominants.pdf')] },
-      { id: 'spot', kind: 'play', minutes: 5, title: 'Find the errors in IV – V', action: { progression: 'w4l1-err' } },
+      { id: 'sheet', kind: 'write', minutes: 25, title: 'Strong predominants worksheet', detail: 'Part writing from Roman numerals and figures. Play every answer.', links: [worksheet('Strengthening Endings with Strong Predominants', '2021/07/WK-Strengthening-Endings-with-Strong-Predominants.pdf')] },
     ],
     progressions: [
       {
@@ -1331,8 +1500,8 @@ const LESSONS = [
         ],
       },
       {
-        id: 'w4l1-err', title: 'Find the errors: IV – V', key: C, faulty: ['parallel'],
-        note: 'All four voices rise by step. Two pairs are in trouble.',
+        id: 'w4l1-err', title: 'The mistake: IV – V in parallel', key: C, faulty: ['parallel'],
+        note: 'All four voices rise by step: parallel 5ths and octaves.',
         steps: [
           { rn: 'IV', fn: 'PD', voices: ['C5', 'A4', 'F4', 'F3'] },
           { rn: 'V', fn: 'D', voices: ['D5', 'B4', 'G4', 'G3'] },
@@ -1340,26 +1509,45 @@ const LESSONS = [
       },
     ],
     explorer: ['IV', 'ii', 'ii6', 'V', 'I'],
-    ear: { exercise: 'degrees', level: 'do-sol' },
   },
   {
     id: 'w4l2', week: 4, n: 2,
     title: 'The Phrase Model: T – PD – D – T',
     goal: 'Label harmonic function in a phrase and hear where the cadence lands.',
-    ideas: [
-      'Functions flow left to right: tonic → predominant → dominant → tonic. Going backward (V–IV) is rare in classical style.',
-      'vi and iii are weak predominants: they move away from tonic toward a strong predominant.',
-      'Analysis order: find the cadences first, then label functions, then Roman numerals.',
+    explain: [
+      {
+        h: 'T – PD – D – T',
+        p: [
+          'Most classical phrases move through the functions in order: start on tonic, move to a predominant, arrive on the dominant, and usually return to tonic at the cadence. Going backward, from V to IV, is rare in this style.',
+        ],
+        hear: ['w4l2-circle'],
+      },
+      {
+        h: 'Weak predominants',
+        p: [
+          'vi and iii move away from tonic and toward the strong predominants. In I–vi–ii–V–I the bass falls by 3rds and 5ths, and each chord shares notes with the next, so the upper voices barely move.',
+        ],
+      },
+      {
+        h: 'How to analyze a phrase',
+        p: [
+          'Find the cadence first: it tells you where the phrase ends and what key it is in. Then label each chord’s function, and only then the Roman numerals. A phrase that stops on V is a question waiting for an answer.',
+        ],
+        hear: ['w4l2-hc'],
+      },
+    ],
+    practice: [
+      drill('cadences', 'All four endings, now including deceptive: V going somewhere other than I.', { level: 'full' }),
+      drill('degrees', 'All seven degrees after the cadence.', { level: 'all' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Performing Harmonic Analysis Using the Phrase Model', links: [omt('Performing Harmonic Analysis Using the Phrase Model', 436, 'performing-harmonic-analysis-using-the-phrase-model')] },
       { id: 'analyze', kind: 'write', minutes: 30, title: 'Analyze the Bach Prelude in C (BWV 846)', detail: 'Edinburgh M6 reading. Roman numerals for mm. 1–11, then mark T/PD/D. Play each bar as a block chord.', links: [edinburgh(6, 'Harmonic Analysis: Bach Prelude in C Major')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: cadence type', action: { ear: 'cadences', level: 'full' } },
     ],
     progressions: [
       {
         id: 'w4l2-circle', title: 'I – vi – ii – V – I', key: C,
-        note: 'Bass falls in thirds and fifths. Common tones carry the upper voices from chord to chord.',
+        note: 'Bass falls in 3rds and 5ths. Common tones carry the upper voices from chord to chord.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['C5', 'G4', 'E4', 'C3'] },
           { rn: 'vi', fn: 'PD', voices: ['C5', 'A4', 'E4', 'A2'] },
@@ -1378,21 +1566,34 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'cadences', level: 'full' },
   },
   {
     id: 'w4l3', week: 4, n: 3,
     title: 'The Cadential 6/4',
     goal: 'Write and hear the cadential 6/4 as a decoration of V.',
-    ideas: [
-      'Cadential 6/4 looks like I6/4 but functions as V: the 6th and 4th above the bass are embellishing tones that fall to the 5th and 3rd.',
-      'Label it V6/4–5/3 (or V8–7 6–5 4–3 when it goes to V7). It falls on a stronger beat than its resolution.',
-      'Double the bass (^5) and approach it from a predominant.',
+    explain: [
+      {
+        h: 'A tonic chord that is really V',
+        p: [
+          'Just before many cadences you hear a I6/4 over ^5 in the bass. It sounds like I, but it works as a decoration of V: the 6th and 4th above the bass (E and C over G) fall to the 5th and 3rd (D and B), while the bass stays on G. That is why it is labelled V6/4–5/3.',
+        ],
+        hear: ['w4l3-cad64'],
+      },
+      {
+        h: 'How to write it',
+        p: [
+          'Approach it from a predominant, IV or ii6. Double the bass. Put the 6/4 on the stronger beat and its resolution after it. Resolve the upper voices down by step: 6 to 5 and 4 to 3.',
+        ],
+      },
+    ],
+    practice: [
+      drill('inversions', 'Is the bass the root, 3rd or 5th? The cadential 6/4 has the 5th in the bass.', { level: 'triads' }),
+      drill('cadences', 'All four endings.', { level: 'full' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Cadential 6/4', links: [omt('Strengthening Endings with Cadential 6/4', 426, 'cadential-64')] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Cadential 6/4 worksheet', detail: 'Includes unfigured bass exercises.', links: [worksheet('Strengthening Endings with Cadential 6/4', '2021/07/WK-Strengthening-Endings-with-Cadential-64.pdf')] },
-      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard drill: I – IV – V6/4–5/3 – I', detail: 'In C, G and D. The upper voices step down 6–5 and 4–3 over a held G.', action: { progression: 'w4l3-cad64' } },
+      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: I – IV – V6/4–5/3 – I', detail: 'In C, G and D. The upper voices step down 6–5 and 4–3 over a held bass.' },
     ],
     progressions: [
       {
@@ -1407,7 +1608,6 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'cadences', level: 'full' },
   },
 
   // ---------------------------------------------------------------- week 5
@@ -1415,15 +1615,44 @@ const LESSONS = [
     id: 'w5l1', week: 5, n: 1,
     title: 'Embellishing Tones',
     goal: 'Name passing tones, neighbors, suspensions and appoggiaturas, and write a 4–3 suspension.',
-    ideas: [
-      'Stepwise: passing tone (step–step, same direction), neighbor (step away and back).',
-      'With a leap: appoggiatura (leap in, step out), escape tone (step in, leap out).',
-      'Static: suspension (prepared, held over the chord change, resolves down by step), anticipation, pedal.',
+    explain: [
+      {
+        h: 'Notes outside the chord',
+        p: [
+          'Melodies decorate the harmony with notes that are not in the chord. Name them by how they are approached and how they are left.',
+        ],
+      },
+      {
+        h: 'Step in, step out',
+        p: [
+          'A passing tone steps in and keeps going in the same direction, filling the gap of a 3rd: C–D–E over a C chord. A neighbor steps away and comes back: E–F–E.',
+        ],
+        hear: [
+          chords('Passing tone: C–D–E over C', [['C3', 'G3', 'C5'], ['C3', 'G3', 'D5'], ['C3', 'G3', 'E5']], 0.6),
+          chords('Neighbor: E–F–E over C', [['C3', 'G3', 'E5'], ['C3', 'G3', 'F5'], ['C3', 'G3', 'E5']], 0.6),
+        ],
+      },
+      {
+        h: 'Leaps',
+        p: [
+          'An appoggiatura arrives by leap and resolves by step, usually down and on a strong beat. An escape tone does the reverse: it steps away and then leaps.',
+        ],
+      },
+      {
+        h: 'Suspensions',
+        p: [
+          'A suspension has three stages. Preparation: the note is a chord tone. Suspension: it is held while the harmony changes under it, and becomes a dissonance. Resolution: it steps down into the new chord. The 4–3 suspension over V is the most common.',
+        ],
+        hear: ['w5l1-sus'],
+      },
+    ],
+    practice: [
+      drill('intervals', 'Half step or whole step, up and down. Passing tones and neighbors move by these.', { items: [1, 2], direction: 'mixed' }),
+      drill('degrees', 'All seven degrees.', { level: 'all' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Embellishing Tones', links: [omt('Embellishing Tones', 420)] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Embellishing tones worksheet', detail: 'Write embellishing tones in two voices; label them in an excerpt.', links: [worksheet('Embellishing Tones', '2021/07/WK-Embellishing-Tones.pdf')] },
-      { id: 'play', kind: 'play', minutes: 10, title: 'Hear the 4–3 suspension', detail: 'C is prepared in IV, held into V, then falls to B.', action: { progression: 'w5l1-sus' } },
     ],
     progressions: [
       {
@@ -1438,21 +1667,38 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'degrees', level: 'all' },
   },
   {
     id: 'w5l2', week: 5, n: 2,
     title: 'Prolonging Tonic: V6, V4/3, V4/2',
     goal: 'Extend the opening tonic with inverted dominants that move by step in the bass.',
-    ideas: [
-      'Inverted dominants give the bass a melody: I–V6–I (do–ti–do), I–V4/3–I6 (do–re–mi), V–V4/2–I6 (sol–fa–mi).',
-      'These are prolongations, not cadences: the phrase is still at its beginning.',
-      'In V4/2 the 7th is in the bass, so the bass must fall by step to the 3rd of I6.',
+    explain: [
+      {
+        h: 'Staying on tonic, with motion',
+        p: [
+          'At the start of a phrase, composers stretch out the tonic with quick dominant chords in inversion. Because the bass only moves by step, these sound like decorations of I rather than real arrivals on V.',
+        ],
+      },
+      {
+        h: 'Three bass patterns',
+        p: [
+          'do–ti–do: I–V6–I. do–re–mi: I–V4/3–I6. sol–fa–mi: V–V4/2–I6. In each one, the leading tone goes up and the 7th, when there is one, goes down.',
+        ],
+        hear: ['w5l2-v6', 'w5l2-v43', 'w5l2-v42'],
+      },
+      {
+        h: 'V4/2 needs I6',
+        p: ['In V4/2 the 7th is in the bass, so the bass has to fall a step to the 3rd of the tonic chord. It goes to I6, never to root-position I.'],
+      },
+    ],
+    practice: [
+      drill('inversions', 'Dominant 7th in all four positions. Listen to the bass.', { level: 'sevenths' }),
+      drill('degrees', 'All seven degrees. The bass lines here are do–ti–do, do–re–mi and sol–fa–mi.', { level: 'all' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', links: [omt('Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', 431, 'inverted-v7s')] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Tonic prolongation worksheet', links: [worksheet('Prolonging Tonic at Phrase Beginnings Using V6 and Inverted V7', '2021/07/WK-Prolonging-Tonic-at-Phrase-Beginnings-Using-V6-and-Inverted-V7.pdf')] },
-      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard drill: the three bass patterns', detail: 'do–ti–do, do–re–mi, sol–fa–mi. Say the bass solfège aloud as you play.', action: { progression: 'w5l2-v6' } },
+      { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: the three bass patterns', detail: 'do–ti–do, do–re–mi, sol–fa–mi. Say the bass solfège aloud as you play.' },
     ],
     progressions: [
       {
@@ -1484,22 +1730,34 @@ const LESSONS = [
       },
     ],
     explorer: ['V6', 'V6/5', 'V4/3', 'V4/2', 'I6'],
-    ear: { exercise: 'inversions', level: 'sevenths' },
   },
   {
     id: 'w5l3', week: 5, n: 3,
     title: 'The Leading-Tone Chord & 6/4 Types',
-    goal: 'Use vii°6 and passing/pedal 6/4 chords to connect tonic chords.',
-    ideas: [
-      'vii°6 substitutes for V4/3 between I and I6. Double the bass (^2), the chord’s 3rd.',
-      'Passing 6/4: bass moves by step through it (I – V6/4 – I6).',
-      'Pedal (neighbor) 6/4: the bass holds while upper voices step up and back (I – IV6/4 – I).',
-      'Cadential, passing, pedal and arpeggiated: 6/4 chords appear only in these four roles.',
+    goal: 'Use vii°6 and passing and pedal 6/4 chords to connect tonic chords.',
+    explain: [
+      {
+        h: 'vii°6, a dominant without its root',
+        p: [
+          'The diminished triad on ^7 (B–D–F) is V7 without its G, and it works as a dominant. Use it in first inversion between I and I6, with the bass climbing do–re–mi, and double its bass, D.',
+        ],
+        hear: ['w5l3-vii6'],
+      },
+      {
+        h: 'Four jobs for a 6/4 chord',
+        p: [
+          'Second-inversion triads appear in only four roles. Cadential: decorating V before a cadence. Passing: between two positions of one chord, with the bass moving by step. Pedal, or neighbor: over a held bass while the upper voices step away and back. Arpeggiated: the bass outlining a single chord.',
+        ],
+        hear: ['w5l3-p64', 'w5l3-n64'],
+      },
+    ],
+    practice: [
+      drill('triads', 'Major, minor or diminished. vii° is the diminished one.', { level: 'mmd' }),
+      drill('inversions', 'Root, 6 or 6/4.', { level: 'triads' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: the leading-tone chord; 6/4 chords as prolongation', links: [omt('Prolongation at Phrase Beginnings using the Leading-Tone Chord', 439), omt('6/4 Chords as Forms of Prolongation', 443)] },
       { id: 'sheet', kind: 'write', minutes: 20, title: 'Leading-tone chord worksheet', links: [worksheet('Prolongation Using the Leading-Tone Chord', '2021/07/WK-Prolongation-at-Phrase-Endings-Using-the-Leading-Tone-Chord.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: inversions with sevenths', action: { ear: 'inversions', level: 'sevenths' } },
     ],
     progressions: [
       {
@@ -1513,7 +1771,7 @@ const LESSONS = [
       },
       {
         id: 'w5l3-p64', title: 'Passing 6/4: I – V6/4 – I6', key: C,
-        note: 'Same bass line as the last example; V6/4 passes, doubling its bass.',
+        note: 'Same bass line as vii°6; V6/4 passes, doubling its bass.',
         steps: [
           { rn: 'I', fn: 'T', voices: ['C5', 'G4', 'E4', 'C3'] },
           { rn: 'V6/4', fn: 'D', label: 'V6/4 (passing)', voices: ['B4', 'G4', 'D4', 'D3'] },
@@ -1531,7 +1789,6 @@ const LESSONS = [
       },
     ],
     explorer: ['vii°', 'vii°6', 'I6/4', 'IV6/4', 'V6/4'],
-    ear: { exercise: 'inversions', level: 'sevenths' },
   },
 
   // ---------------------------------------------------------------- week 6
@@ -1539,15 +1796,32 @@ const LESSONS = [
     id: 'w6l1', week: 6, n: 1,
     title: 'Deceptive Motion & La in the Bass',
     goal: 'Write V–vi with the doubled third, and hear it as a cadence that dodges.',
-    ideas: [
-      'Deceptive motion: V goes to vi instead of I. The bass rises sol–la; the leading tone still rises to do.',
-      'In V–vi, double the third of vi (^1) so the leading tone can resolve and the other voices avoid parallels.',
-      'After a deceptive move, the phrase usually tries again and ends with a PAC.',
+    explain: [
+      {
+        h: 'The deceptive cadence',
+        p: [
+          'V goes to vi instead of I. The bass rises sol–la, the leading tone still rises to do, and the ear expects home but lands somewhere softer. In V–vi, double the 3rd of vi, which is ^1: it lets the leading tone resolve and keeps the other voices clear of parallels.',
+        ],
+      },
+      {
+        h: 'Trying again',
+        p: [
+          'After a deceptive move, the phrase usually goes back through a predominant and tries again, this time ending with a PAC. The example does exactly that after vi.',
+        ],
+        hear: ['w6l1-dc'],
+      },
+      {
+        h: 'La in the bass',
+        p: ['^6 in the bass, under vi or IV6, shows up at the start, in the middle and at the end of phrases. At the end, it is usually this deceptive move.'],
+      },
+    ],
+    practice: [
+      drill('cadences', 'All four endings. Deceptive: V that lands on a minor chord.', { level: 'full' }),
+      drill('triads', 'I or vi? Major or minor.', { level: 'mm' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: La (Scale Degree 6) in the Bass', links: [omt('La (Scale Degree 6) in the Bass at Beginnings, Middles, and Endings', 451)] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'La in the bass worksheet', links: [worksheet('La in the bass', '2021/07/WK-La-in-the-bass.pdf')] },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: cadences with deceptive', action: { ear: 'cadences', level: 'full' } },
     ],
     progressions: [
       {
@@ -1564,40 +1838,84 @@ const LESSONS = [
         ],
       },
     ],
-    ear: { exercise: 'cadences', level: 'full' },
   },
   {
     id: 'w6l2', week: 6, n: 2,
     title: 'Harmonizing a Melody',
     goal: 'Harmonize a soprano line in four parts using everything from weeks 1–5.',
-    ideas: [
-      'Start from the cadence and work backward: which chords contain each melody note, and which fit the phrase model?',
-      'Write the bass next, against the soprano: aim for contrary motion and avoid parallel perfects between them.',
-      'Fill in alto and tenor last, by shortest path.',
+    explain: [
+      {
+        h: 'Start from the end',
+        p: [
+          'Decide the cadence first. Then, for each melody note, list the chords that contain it and pick the ones that keep the phrase model in order: tonic, predominant, dominant, tonic.',
+        ],
+      },
+      {
+        h: 'Bass second',
+        p: [
+          'Write the bass against the melody before anything else. Aim for contrary motion, avoid parallel 5ths and octaves between the two, and give the bass its own shape. Inversions help here: V6 and I6 let the bass move by step.',
+        ],
+      },
+      {
+        h: 'Inner voices last',
+        p: [
+          'Fill in alto and tenor by the shortest path, then check spacing, doubling and the leading tone. Try the exercise below on paper first, then hear one possible answer.',
+        ],
+        hear: ['w6l2-model'],
+      },
+    ],
+    practice: [
+      drill('degrees', 'All seven degrees: the melody notes you are harmonizing.', { level: 'all' }),
+      drill('intervals', 'Every interval, every direction.', { level: 'all', direction: 'mixed' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh: Harmonising a Melody', detail: 'M4, the longest video in the course (12:53).', links: [edinburgh(4, 'Harmonising a Melody')] },
-      { id: 'write', kind: 'write', minutes: 35, title: 'Harmonize do–re–mi–fa–mi–re–do', detail: 'Soprano C5 D5 E5 F5 E5 D5 C5 in C major, one chord per note, ending with a PAC. Type it into the workbench and fix everything it flags. Then try it in A minor (A–B–C–D–C–B–A).', action: { workbench: true } },
-      { id: 'ear', kind: 'ear', minutes: 10, title: 'Ear: scale degrees ^1–^7', action: { ear: 'degrees', level: 'all' } },
+      { id: 'write', kind: 'write', minutes: 35, title: 'Harmonize do–re–mi–fa–mi–re–do', detail: 'Soprano C5 D5 E5 F5 E5 D5 C5 in C major, one chord per note, ending with a PAC. Write it on paper and play it, then compare with “one possible answer” above. Then try A minor (A–B–C–D–C–B–A).' },
     ],
-    ear: { exercise: 'degrees', level: 'all' },
+    progressions: [
+      {
+        id: 'w6l2-model', title: 'One possible answer: do–re–mi–fa–mi–re–do', key: C,
+        note: 'I – V6 – I – IV – V6/4 – V – I. The bass moves by step at the start and the 6/4 leads into the cadence.',
+        steps: [
+          { rn: 'I', fn: 'T', voices: ['C5', 'G4', 'E4', 'C3'] },
+          { rn: 'V6', fn: 'D', voices: ['D5', 'G4', 'D4', 'B2'] },
+          { rn: 'I', fn: 'T', voices: ['E5', 'G4', 'C4', 'C3'] },
+          { rn: 'IV', fn: 'PD', voices: ['F5', 'A4', 'C4', 'F3'] },
+          { rn: 'I6/4', fn: 'D', label: 'V6/4', voices: ['E5', 'G4', 'C4', 'G3'] },
+          { rn: 'V', fn: 'D', label: 'V5/3', voices: ['D5', 'G4', 'B3', 'G3'] },
+          { rn: 'I', fn: 'T', voices: ['C5', 'E4', 'C4', 'C3'] },
+        ],
+      },
+    ],
   },
   {
     id: 'w6l3', week: 6, n: 3,
     title: 'Phase 1 Checkpoint',
     goal: 'Show you can write, play and hear everything in Phase 1 without help.',
-    ideas: [
-      'Write: I – ii6 – V7 – I and I – IV – V6/4–5/3 – I in C, G, F, D and B♭, checked in the workbench.',
-      'Play: every progression in this course, from memory, in C and one other key.',
-      'Hear: 80% or better on cadences, inversions and seventh-chord quality.',
+    explain: [
+      {
+        h: 'Write',
+        p: ['I – ii6 – V7 – I and I – IV – V6/4–5/3 – I, in C, G, F, D and B♭ major. Check each against the rules from weeks 1–5: ranges, spacing, doubling, no parallels, leading tone up, 7th down.'],
+      },
+      {
+        h: 'Play',
+        p: ['Every example in this course, from memory, in C and in one other key. Use the Hear buttons in each lesson to check yourself.'],
+      },
+      {
+        h: 'Hear',
+        p: ['80% or better on cadences, inversions and seventh-chord qualities, the three drills below.'],
+      },
+    ],
+    practice: [
+      drill('cadences', 'All four endings.', { level: 'full' }),
+      drill('inversions', 'Dominant 7th inversions.', { level: 'sevenths' }),
+      drill('sevenths', 'All five seventh-chord qualities.', { level: 'all' }),
     ],
     tasks: [
-      { id: 'write', kind: 'write', minutes: 30, title: 'Two progressions in five keys', detail: 'Use the workbench’s key menu for each key; no flags allowed.', action: { workbench: true } },
-      { id: 'play', kind: 'play', minutes: 15, title: 'Keyboard: replay the course from memory', detail: 'Drill mode on any progression; aim for every chord right the first time.' },
-      { id: 'ear', kind: 'ear', minutes: 15, title: 'Ear: mixed review', detail: 'Cadences, inversions and seventh chords at their hardest level.', action: { ear: 'cadences', level: 'full' } },
+      { id: 'write', kind: 'write', minutes: 30, title: 'Two progressions in five keys', detail: 'On paper, then at the keyboard.' },
+      { id: 'play', kind: 'play', minutes: 15, title: 'Keyboard: replay the course from memory', detail: 'Every example, then check each one with its Hear button.' },
       { id: 'exam', kind: 'watch', minutes: 30, title: 'Optional: Edinburgh final exam', detail: 'M6 Final Exam parts 1 and 2. Then preview M5 “Modulation”, the start of Phase 2.', links: [edinburgh(6, 'Final Exam'), edinburgh(5, 'Modulation')] },
     ],
-    ear: { exercise: 'cadences', level: 'full' },
   },
 ];
 
@@ -1899,14 +2217,18 @@ const INVERSION_SHAPES = {
   7: [0, 4, 7, 10], '6/5': [4, 7, 10, 12], '4/3': [7, 10, 12, 16], '4/2': [10, 12, 16, 19],
 };
 
+/** Every item an exercise can ask about, across all its levels. */
+const allItems = (exercise) => [...new Set(Object.values(EXERCISES[exercise].levels).flatMap((lv) => lv.items.map(String)))];
+
 /**
  * Build a question. Returns { exercise, answer, choices, events, reveal } where
  * events are [{ at (s), notes: [midi…] ascending, dur (s) }].
  */
-function makeQuestion(exercise, level, { direction = 'up', stats = {}, rand = Math.random } = {}) {
+function makeQuestion(exercise, level, { direction = 'up', items = null, stats = {}, rand = Math.random } = {}) {
   const ex = EXERCISES[exercise];
   const lv = ex.levels[level] || Object.values(ex.levels)[0];
-  const ids = lv.items.map(String);
+  // A lesson drill may name its own items, e.g. only M3, P5 and P8.
+  const ids = (items || lv.items).map(String);
   const answer = weightedPick(ids, stats.items, rand);
   const choices = ids.map((id) => ({ id, label: ex.label(id) }));
   const events = [];
@@ -1961,7 +2283,7 @@ function makeQuestion(exercise, level, { direction = 'up', stats = {}, rand = Ma
   return { exercise, level, answer, choices, events, reveal };
 }
 
-return { weightedPick, INTERVAL_SONGS, CADENCE_PHRASES, KEY_SETTER_RNS, EXERCISES, makeQuestion, KEY_SETTER };
+return { weightedPick, INTERVAL_SONGS, CADENCE_PHRASES, KEY_SETTER_RNS, EXERCISES, allItems, makeQuestion, KEY_SETTER };
 })();
 
 __m.cloud = (() => {
@@ -2038,8 +2360,8 @@ __m.app = (() => {
 'use strict';
 const { LESSONS, WEEKS, SOURCES, lessonById, progressionById } = __m.curriculum;
 const {
-  parsePitch, parseRoman, romanLabel, makeKey, voiceChord, analyzeProgression, interval,
-  degreePc, pitchAtOrAbove, prettyPitch, prettyName, pcName, triadQuality, VOICES,
+  parsePitch, parseRoman, romanLabel, makeKey, voiceChord, interval,
+  degreePc, pitchAtOrAbove, prettyPitch, prettyName, pcName, triadQuality,
 } = __m.theory;
 const audio = __m.audio;
 const { EXERCISES, makeQuestion } = __m.ear;
@@ -2052,18 +2374,20 @@ const narrow = window.matchMedia('(max-width: 1023px)');
 // ================================================================ state
 
 const STORE = 'harmony-academy:v1';
-const TOOLS = ['lab', 'workbench', 'ear', 'explore'];
+const TOOLS = ['ear', 'explore'];
+const HISTORY_MAX = 500;
 
 function freshState() {
   return {
     version: 1,
     current: 'w1l1',
     lessons: {},
+    drills: {},
+    history: [],
     ear: {},
     earSettings: {},
     practice: {},
-    workbench: { key: 'C-major', text: '' },
-    tab: 'lab',
+    tab: 'ear',
   };
 }
 
@@ -2071,7 +2395,7 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
     if (saved && saved.version === 1) {
-      delete saved.lessonCollapsed; // retired setting
+      ['lessonCollapsed', 'workbench'].forEach((k) => delete saved[k]); // retired features
       return { ...freshState(), ...saved };
     }
   } catch { /* storage blocked or corrupt: start fresh */ }
@@ -2100,9 +2424,22 @@ function save() {
   }
   try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* private mode */ }
 }
+
 const lessonRec = (id) => (state.lessons[id] ||= { tasks: {}, journal: '' });
-const lessonDone = (l) => l.tasks.filter((t) => lessonRec(l.id).tasks[t.id]).length;
 const current = () => lessonById(state.current) || LESSONS[0];
+const drillKey = (lessonId, i) => `${lessonId}:${i}`;
+const drillPassed = (lessonId, i) => !!state.drills[drillKey(lessonId, i)]?.passed;
+
+// A lesson is done when its tasks are ticked and its drills passed.
+const lessonTotal = (l) => l.tasks.length + (l.practice || []).length;
+const lessonDone = (l) => l.tasks.filter((t) => lessonRec(l.id).tasks[t.id]).length
+  + (l.practice || []).filter((_, i) => drillPassed(l.id, i)).length;
+const lessonComplete = (l) => lessonDone(l) === lessonTotal(l);
+
+/** Add an entry to the timeline. */
+function logEvent(type, text, lesson = state.current) {
+  state.history = [...(state.history || []), { t: Date.now(), type, text, lesson }].slice(-HISTORY_MAX);
+}
 
 // ================================================================ keys
 
@@ -2117,19 +2454,15 @@ function fillKeySelect(sel, value) {
   sel.value = value;
 }
 
-// ================================================================ roman numeral display
-
-/** "V6/5 (passing)" → serif numeral with stacked figure, plus a small label. */
+/** "V6/5" → numeral with a stacked figure. */
 function rnHtml(text) {
-  if (!text) return '';
   const m = /^(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)([°oø+M]?)([0-9/–]*)(.*)$/.exec(text);
   if (!m) return `<span class="rn">${esc(text)}</span>`;
-  const [, num, sym, fig, rest] = m;
+  const [, num, sym, fig] = m;
   let figHtml = '';
   if (fig.includes('/')) figHtml = `<span class="fig">${fig.split('/').map((f) => `<span>${esc(f)}</span>`).join('')}</span>`;
   else if (fig) figHtml = `<sup>${esc(fig)}</sup>`;
-  const label = rest.trim().replace(/^\((.*)\)$/, '$1');
-  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>${label ? `<span class="lbl">${esc(label)}</span>` : ''}`;
+  return `<span class="rn">${esc(num)}${sym === 'o' ? '°' : esc(sym)}${figHtml}</span>`;
 }
 
 // ================================================================ tabs and layout
@@ -2149,7 +2482,7 @@ function showTab(tab) {
 }
 
 function renderTabs() {
-  if (!TOOLS.includes(state.tab)) state.tab = 'lab';
+  if (!TOOLS.includes(state.tab)) state.tab = 'ear';
   const lessonView = narrow.matches && phoneView === 'lesson';
   $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
   document.querySelectorAll('#tabs .tab').forEach((b) => {
@@ -2161,22 +2494,21 @@ function renderTabs() {
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
 }
-// On phones the header shows where you are; tapping it goes back to the lesson.
-$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
+// On phones the header shows where you are; tapping it goes back to the lesson.
+$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
 
 // ================================================================ popovers and dialogs
 
 function togglePopover(btn, pop) {
   const open = pop.hidden;
   document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
-  document.querySelectorAll('[aria-expanded][aria-haspopup], #helpBtn').forEach((b) => b.setAttribute('aria-expanded', 'false'));
   pop.hidden = !open;
   btn.setAttribute('aria-expanded', String(open));
 }
-$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
+$('#menuBtn').addEventListener('click', (e) => { e.stopPropagation(); renderAccount(); renderTimer(); togglePopover($('#menuBtn'), $('#menu')); });
 $('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePopover($('#helpBtn'), $('#help')); });
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.popover')) document.querySelectorAll('.popover').forEach((p) => { p.hidden = true; });
@@ -2191,8 +2523,8 @@ function openDialog(id) {
   d.showModal();
   d.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => d.close(); });
 }
-// Clicking the backdrop closes a dialog.
-document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => {
+// Clicking the backdrop closes a dialog (except the one that must be answered).
+document.querySelectorAll('dialog:not(#chooseDialog)').forEach((d) => d.addEventListener('click', (e) => {
   if (e.target !== d) return;
   const r = d.getBoundingClientRect();
   if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
@@ -2235,7 +2567,6 @@ function buildPiano() {
     e.preventDefault();
     userNote(Number(el.dataset.midi));
   });
-  centerPiano();
 }
 
 // Show the middle of the keyboard when it is wider than the screen.
@@ -2257,15 +2588,14 @@ audio.onNote((midi, on, kind) => {
   }
 });
 
+const SHARP_SPELL = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) - 1}`);
+
 /** A note the user played (click, computer key or MIDI). */
 function userNote(midi, vel = 0.22) {
   audio.note(midi, { dur: 1.1, vel, kind: 'user' });
   $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
-  if (drill) drillToggle(midi);
 }
-
-const SHARP_SPELL = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const midiPitch = (m) => parsePitch(`${SHARP_SPELL[m % 12]}${Math.floor(m / 12) - 1}`);
 
 // Computer keyboard: A row is the white keys from C, W row the black keys.
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
@@ -2290,7 +2620,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Web MIDI, where the browser has it (Chrome, Edge; not Safari).
-const held = new Set();
 function setupMidi() {
   if (!navigator.requestMIDIAccess) return;
   const btn = $('#midiBtn');
@@ -2312,14 +2641,9 @@ function setupMidi() {
   });
 }
 function onMidi({ data: [status, midi, vel] }) {
-  const cmd = status & 0xf0;
-  if (cmd === 0x90 && vel > 0) {
-    held.add(midi);
+  if ((status & 0xf0) === 0x90 && vel > 0) {
     audio.note(midi, { dur: 1.2, vel: 0.08 + (vel / 127) * 0.25, kind: 'user' });
     $('#dockStatus').textContent = `${prettyPitch(midiPitch(midi))} · MIDI ${midi}`;
-    if (drill) drillFromMidi();
-  } else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) {
-    held.delete(midi);
   }
 }
 
@@ -2333,14 +2657,14 @@ function setDock(open) {
 $('#dockToggle').addEventListener('click', () => { setDock(!state.dockOpen); save(); });
 $('#stopBtn').addEventListener('click', () => stopAll());
 
-// ================================================================ playback helpers
+// ================================================================ playback
 
 let playTimers = [];
 function stopAll() {
   audio.stopAll();
   playTimers.forEach(clearTimeout);
   playTimers = [];
-  document.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
+  document.querySelectorAll('.hear.playing').forEach((el) => el.classList.remove('playing'));
 }
 
 function playEvents(events, { light = true } = {}) {
@@ -2350,11 +2674,26 @@ function playEvents(events, { light = true } = {}) {
   })));
 }
 
+/** A "hear it" example as note events: a progression id, or a { seq, step } sequence. */
+function hearEvents(spec) {
+  if (typeof spec === 'string') {
+    const prog = progressionById(spec);
+    return prog.steps.map((s, k) => ({ at: k * 1.1, dur: 1.05, notes: s.voices.map((n) => parsePitch(n).midi).sort((a, b) => a - b) }));
+  }
+  return spec.seq.map((group, k) => ({ at: k * spec.step, dur: Math.max(spec.step * 0.95, 0.4), notes: group.map((n) => parsePitch(n).midi).sort((a, b) => a - b) }));
+}
+
+function hearLabel(spec) {
+  if (typeof spec !== 'string') return { title: spec.label, note: '', faulty: false };
+  const prog = progressionById(spec);
+  return { title: prog.title, note: prog.note, faulty: !!prog.faulty };
+}
+
 // ================================================================ week navigator
 
 const statusClass = (l) => {
   const done = lessonDone(l);
-  return done === l.tasks.length ? 'status done' : done > 0 ? 'status partial' : 'status';
+  return done === lessonTotal(l) ? 'status done' : done > 0 ? 'status partial' : 'status';
 };
 
 /** The current lesson's week: its lessons as rows, with the open one's details under its row. */
@@ -2370,7 +2709,7 @@ function renderWeek() {
           <span class="${statusClass(x)}"></span>
           <span class="lesson-row-text">
             <span class="lesson-row-title"${open ? ' id="lessonTitle"' : ''}>${esc(x.title)}</span>
-            <span class="lesson-row-meta">Lesson ${x.n} · ${lessonDone(x)} of ${x.tasks.length} done</span>
+            <span class="lesson-row-meta">Lesson ${x.n} · ${lessonDone(x)} of ${lessonTotal(x)} done</span>
           </span>
         </button>
       </li>`;
@@ -2381,22 +2720,33 @@ function renderWeek() {
 
 function renderWeekHead() {
   $('#weekSelect').innerHTML = WEEKS.map((w) => {
-    const lessons = LESSONS.filter((x) => x.week === w.n);
-    const complete = lessons.every((x) => lessonDone(x) === x.tasks.length);
+    const complete = LESSONS.filter((x) => x.week === w.n).every(lessonComplete);
     return `<option value="${w.n}">Week ${w.n} · ${esc(w.title)}${complete ? ' ✓' : ''}</option>`;
   }).join('');
   $('#weekSelect').value = String(current().week);
+  const i = LESSONS.indexOf(current());
+  $('#prevLesson').disabled = i === 0;
+  $('#nextLesson').disabled = i === LESSONS.length - 1;
   renderPace();
 }
 
-// Refresh the open lesson's row after a task is ticked.
+// Refresh the open lesson's row after a task or drill changes.
 function renderOpenRow() {
   const l = current();
   const row = $('#weekLessons .lesson.open .lesson-row');
   if (!row) return;
   row.querySelector('.status').className = statusClass(l);
-  row.querySelector('.lesson-row-meta').textContent = `Lesson ${l.n} · ${lessonDone(l)} of ${l.tasks.length} done`;
+  row.querySelector('.lesson-row-meta').textContent = `Lesson ${l.n} · ${lessonDone(l)} of ${lessonTotal(l)} done`;
   renderWeekHead();
+}
+
+/** Record a lesson as finished on the timeline the first time everything in it is done. */
+function checkLessonComplete(l) {
+  const rec = lessonRec(l.id);
+  if (lessonComplete(l) && !rec.completedAt) {
+    rec.completedAt = Date.now();
+    logEvent('lesson', `Finished W${l.week} L${l.n}: ${l.title}`, l.id);
+  }
 }
 
 $('#weekLessons').addEventListener('click', (e) => {
@@ -2405,74 +2755,58 @@ $('#weekLessons').addEventListener('click', (e) => {
 });
 $('#weekSelect').addEventListener('change', (e) => {
   const lessons = LESSONS.filter((x) => x.week === Number(e.target.value));
-  const target = lessons.find((x) => lessonDone(x) < x.tasks.length) || lessons[0];
-  openLesson(target.id);
+  openLesson((lessons.find((x) => !lessonComplete(x)) || lessons[0]).id);
 });
+$('#prevLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i > 0) openLesson(LESSONS[i - 1].id); });
+$('#nextLesson').addEventListener('click', () => { const i = LESSONS.indexOf(current()); if (i < LESSONS.length - 1) openLesson(LESSONS[i + 1].id); });
 
 // ---------------------------------------------------------------- start date and pace
 
 const DAY = 86400000;
 const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const shortDate = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) });
 
-/** Record the start date once: the earliest practice day, or today. */
+/**
+ * The start date is the day of the first sign-in (set when the account is
+ * created); before anyone signs in, it is the first day the app was used.
+ */
 function ensureStart() {
   if (state.startedAt) return;
   state.startedAt = Object.keys(state.practice).sort()[0] || today();
   save();
 }
 
-function renderPace() {
+/** Calendar weeks since starting, against the week of the first unfinished lesson. */
+function paceInfo() {
   const start = new Date(`${state.startedAt}T00:00:00`);
-  const days = Math.round((midnight(new Date()) - start) / DAY);
-  const opts = { day: 'numeric', month: 'short', ...(start.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) };
-  const started = start.toLocaleDateString('en-GB', opts);
-  if (days < 0) {
-    $('#paceLine').textContent = `Starts ${started}`;
-    return;
-  }
-  // Calendar weeks since starting, against the week of the first unfinished lesson.
+  const days = Math.max(0, Math.round((midnight(new Date()) - start) / DAY));
   const calWeek = Math.floor(days / 7) + 1;
-  const next = LESSONS.find((x) => lessonDone(x) < x.tasks.length);
+  const next = LESSONS.find((x) => !lessonComplete(x));
   let pace;
-  if (!next) pace = '<span class="done">Phase 1 complete</span>';
-  else {
+  let cls = '';
+  if (!next) { pace = 'Phase 1 complete'; cls = 'done'; } else {
     const diff = calWeek - next.week;
     const weeks = (n) => `${n} week${n > 1 ? 's' : ''}`;
-    pace = diff === 0 ? 'on pace' : diff > 0 ? `<span class="behind">${weeks(diff)} behind</span>` : `<span class="ahead">${weeks(-diff)} ahead</span>`;
+    if (diff === 0) pace = 'on pace';
+    else if (diff > 0) { pace = `${weeks(diff)} behind`; cls = 'behind'; } else { pace = `${weeks(-diff)} ahead`; cls = 'ahead'; }
   }
-  $('#paceLine').innerHTML = `Started ${esc(started)} · week ${calWeek} · ${pace}`;
+  const head = `Started ${shortDate(start)} · week ${calWeek} · `;
+  return { text: head + pace, html: esc(head) + (cls ? `<span class="${cls}">${esc(pace)}</span>` : esc(pace)) };
 }
 
-$('#startEdit').addEventListener('click', () => {
-  const input = $('#startDate');
-  input.value = state.startedAt;
-  input.max = today();
-  input.hidden = !input.hidden;
-  if (!input.hidden) input.focus();
-});
-$('#startDate').addEventListener('change', (e) => {
-  if (!e.target.value) return;
-  state.startedAt = e.target.value;
-  save();
-  e.target.hidden = true;
-  renderPace();
-});
+function renderPace() {
+  $('#paceLine').innerHTML = paceInfo().html;
+}
 
-// ================================================================ lesson pane
+// ================================================================ lesson
 
 let openTasks = new Set();
 
 function openLesson(id) {
   state.current = id;
   save();
-  drillExit();
+  endSession();
   const l = current();
-  vlIndex = 0;
-  if (l.ear) {
-    earExercise = l.ear.exercise;
-    earSettings(earExercise).level = l.ear.level;
-    if (l.ear.direction) earSettings(earExercise).direction = l.ear.direction;
-  }
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
   const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
   openTasks = new Set(firstOpen ? [firstOpen.id] : []);
@@ -2485,13 +2819,77 @@ function renderLesson() {
   const l = current();
   renderWeek();
   $('#lessonGoal').textContent = l.goal;
-  $('#ideas').innerHTML = l.ideas.map((x) => `<li>${esc(x)}</li>`).join('');
-  $('#journal').value = lessonRec(l.id).journal || '';
+  const journal = lessonRec(l.id).journal || '';
+  $('#journal').value = journal;
+  $('#notesBox').hidden = true;
+  $('#notesBtn').setAttribute('aria-expanded', 'false');
+  $('#notesDot').hidden = !journal.trim();
+  renderExplain();
+  renderDrills();
   renderTasks();
 }
 
-const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard', ear: 'Ear', spot: 'Analyze' };
-const ACTION_LABEL = (a) => (a.ear ? 'Open in Ear →' : a.progression ? 'Open in Lab →' : a.explorer ? 'Open in Explore →' : 'Open the Workbench →');
+function renderExplain() {
+  const l = current();
+  $('#explain').innerHTML = (l.explain || []).map((sec, s) => `
+    <section class="explain">
+      <h3 class="section-title">${esc(sec.h)}</h3>
+      ${sec.p.map((p) => `<p>${esc(p)}</p>`).join('')}
+      ${sec.hear ? `<ul class="hears">${sec.hear.map((h, i) => {
+        const lab = hearLabel(h);
+        return `<li><button class="hear${lab.faulty ? ' faulty' : ''}" data-hear="${s}:${i}"><span class="play-icon" aria-hidden="true">▶</span><span><span class="hear-title">${esc(lab.title)}</span>${lab.note ? `<span class="hear-note">${esc(lab.note)}</span>` : ''}</span></button></li>`;
+      }).join('')}</ul>` : ''}
+    </section>`).join('');
+}
+
+$('#explain').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-hear]');
+  if (!b) return;
+  const [s, i] = b.dataset.hear.split(':').map(Number);
+  const events = hearEvents(current().explain[s].hear[i]);
+  playEvents(events);
+  b.classList.add('playing');
+  const end = Math.max(...events.map((ev) => ev.at + ev.dur));
+  playTimers.push(setTimeout(() => b.classList.remove('playing'), end * 1000 + 100));
+});
+
+// ---------------------------------------------------------------- ear-training plan
+
+function drillLabel(d) {
+  const ex = EXERCISES[d.exercise];
+  const items = d.items ? d.items.map((id) => ex.label(String(id))).join(', ') : ex.levels[d.level].label;
+  const dir = d.direction && ex.directions ? ` · ${ex.directions[d.direction].toLowerCase()}` : '';
+  return `${ex.title}: ${items}${dir}`;
+}
+
+function renderDrills() {
+  const l = current();
+  const plan = l.practice || [];
+  $('#drills').innerHTML = plan.map((d, i) => {
+    const rec = state.drills[drillKey(l.id, i)];
+    const result = rec ? `${rec.passed ? '✓ ' : ''}Best ${rec.best}%` : `Not tried · aim for ${d.target}%`;
+    return `
+      <li class="drill${rec?.passed ? ' passed' : ''}">
+        <div class="drill-text">
+          <span class="drill-title">${esc(drillLabel(d))}</span>
+          <span class="drill-why">${esc(d.why)}</span>
+          <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
+        </div>
+        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${rec ? 'Again' : 'Start'}</button>
+      </li>`;
+  }).join('');
+  const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
+  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} passed` : '';
+}
+
+$('#drills').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-drill]');
+  if (b) startSession(current().id, Number(b.dataset.drill));
+});
+
+// ---------------------------------------------------------------- tasks
+
+const KIND_LABEL = { watch: 'Watch', read: 'Read', write: 'Write', play: 'Keyboard' };
 
 function renderTasks() {
   const l = current();
@@ -2510,28 +2908,31 @@ function renderTasks() {
         <div class="task-body">
           ${t.detail ? `<p>${esc(t.detail)}</p>` : ''}
           ${links ? `<ul class="task-links">${links}</ul>` : ''}
-          ${t.action ? `<button class="btn quiet" data-action='${esc(JSON.stringify(t.action))}'>${ACTION_LABEL(t.action)}</button>` : ''}
+          ${t.action?.explorer ? '<button class="btn quiet" data-explore>Open Explore →</button>' : ''}
         </div>
       </li>`;
   }).join('');
-  const done = lessonDone(l);
+  const done = l.tasks.filter((t) => rec.tasks[t.id]).length;
   const minutes = l.tasks.reduce((a, t) => a + t.minutes, 0);
   $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
   $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
   const next = LESSONS[LESSONS.indexOf(l) + 1];
-  $('#nextUp').innerHTML = done === l.tasks.length && next
+  $('#nextUp').innerHTML = lessonComplete(l) && next
     ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {
   const id = e.target.dataset.task;
   if (!id) return;
-  lessonRec(state.current).tasks[id] = e.target.checked;
+  const l = current();
+  lessonRec(l.id).tasks[id] = e.target.checked;
   if (e.target.checked) {
+    logEvent('task', l.tasks.find((t) => t.id === id).title);
     // Close the finished task and open the next unfinished one.
     openTasks.delete(id);
-    const nextTask = current().tasks.find((t) => !lessonRec(state.current).tasks[t.id]);
+    const nextTask = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
     if (nextTask) openTasks.add(nextTask.id);
+    checkLessonComplete(l);
   }
   save();
   renderTasks();
@@ -2543,31 +2944,19 @@ $('#tasks').addEventListener('click', (e) => {
     const id = toggle.dataset.toggle;
     if (openTasks.has(id)) openTasks.delete(id); else openTasks.add(id);
     renderTasks();
-    return;
   }
-  const b = e.target.closest('[data-action]');
-  if (!b) return;
-  const a = JSON.parse(b.dataset.action);
-  if (a.ear) {
-    earExercise = a.ear;
-    if (a.level) earSettings(a.ear).level = a.level;
-    if (a.direction) earSettings(a.ear).direction = a.direction;
-    save();
-    renderEar();
-    showTab('ear');
-  } else if (a.progression) {
-    const progs = current().progressions || [];
-    vlIndex = Math.max(0, progs.findIndex((p) => p.id === a.progression));
-    drillExit();
-    renderVl();
-    showTab('lab');
-  } else if (a.explorer) {
-    showTab('explore');
-  } else if (a.workbench) {
-    showTab('workbench');
-  }
+  if (e.target.closest('[data-explore]')) showTab('explore');
 });
 $('#nextUp').addEventListener('click', (e) => { const b = e.target.closest('[data-lesson]'); if (b) openLesson(b.dataset.lesson); });
+
+// ---------------------------------------------------------------- notes
+
+$('#notesBtn').addEventListener('click', () => {
+  const box = $('#notesBox');
+  box.hidden = !box.hidden;
+  $('#notesBtn').setAttribute('aria-expanded', String(!box.hidden));
+  if (!box.hidden) $('#journal').focus();
+});
 
 let journalTimer = null;
 $('#journal').addEventListener('input', () => {
@@ -2575,307 +2964,18 @@ $('#journal').addEventListener('input', () => {
   $('#journalSaved').textContent = 'Saving…';
   journalTimer = setTimeout(() => {
     lessonRec(state.current).journal = $('#journal').value;
+    $('#notesDot').hidden = !$('#journal').value.trim();
     save();
-    $('#journalSaved').textContent = 'Saved in this browser';
+    $('#journalSaved').textContent = 'Saved';
   }, 400);
 });
 
-// ================================================================ progression view (lab + workbench)
-
-let tempo = 1.1; // seconds per chord
-let outerOnly = false;
-const CHECKED = 'Ranges, spacing, voice crossing, doubling, parallel and direct 5ths and octaves, overlaps, augmented and diminished leaps, and the leading tone and chordal 7th.';
-
-/**
- * Render a progression with its analysis into `root`. A "find the error"
- * progression keeps its issues hidden until revealed; in drill mode the chords
- * still to play are hidden and the drill panel replaces the controls.
- */
-function renderProgression(root, prog, { reveal = !prog.faulty, drillState = null } = {}) {
-  const key = prog.keyObj || makeKey(prog.key.tonic, prog.key.mode);
-  const r = analyzeProgression(prog.steps, key, { standalone: prog.standalone });
-  const steps = r.chords;
-  const cols = [];
-  steps.forEach((c, k) => {
-    if (k > 0 && !prog.standalone) cols.push({ type: 'motion', k });
-    cols.push({ type: 'chord', k });
-  });
-  const hidden = (k) => drillState && k > drillState.idx;
-  const head = cols.map((c) => (c.type === 'chord'
-    ? `<th class="chord-head" data-col="${c.k}" title="Play this chord">${rnHtml(steps[c.k].label || steps[c.k].rn || '—')}${steps[c.k].fn ? `<span class="fn">${steps[c.k].fn}</span>` : ''}</th>`
-    : '<th></th>')).join('');
-  const rows = VOICES.map((v, i) => `<tr><th class="voice"><span class="long">${v}</span><span class="short">${v[0]}</span></th>${cols.map((c) => {
-    if (c.type === 'chord') {
-      const cls = hidden(c.k) ? 'note hidden-note' : drillState && c.k > 0 ? 'note drill-ok' : 'note';
-      return `<td class="${cls}" data-col="${c.k}">${hidden(c.k) ? '?' : prettyPitch(steps[c.k].voices[i])}</td>`;
-    }
-    if (hidden(c.k)) return '<td class="motion"></td>';
-    const mo = r.transitions[c.k - 1].motions[i];
-    return `<td class="motion${mo.dir === 0 ? ' held' : mo.leap ? ' leap' : ''}">${esc(mo.label)}</td>`;
-  }).join('')}</tr>`).join('');
-  const outer = prog.standalone ? '' : `<tr class="outer"><th class="voice">S–B</th>${cols.map((c) => (c.type === 'motion' && !hidden(c.k) ? `<td>${r.transitions[c.k - 1].outer}</td>` : '<td></td>')).join('')}</tr>`;
-
-  const issues = [
-    ...steps.flatMap((c, k) => c.issues.map((x) => ({ where: `Chord ${k + 1}`, ...x }))),
-    ...r.transitions.flatMap((t, k) => t.issues.map((x) => ({ where: `${k + 1} → ${k + 2}`, ...x }))),
-  ];
-  let result;
-  if (!reveal) result = '<button class="btn" data-reveal>Reveal the errors</button>';
-  else if (issues.length) result = `<div class="callout bad"><strong>${issues.length} problem${issues.length > 1 ? 's' : ''}</strong><ul>${issues.map((x) => `<li><span class="where">${x.where}</span>${esc(x.msg)}</li>`).join('')}</ul></div>`;
-  else result = `<details class="callout ok"><summary>✓ No voice-leading problems</summary><p>Checked: ${CHECKED}</p></details>`;
-
-  const isLab = root.id === 'vlView';
-  const controls = drillState ? '<div class="callout drill" id="drillBox"></div>' : `
-    <div class="vl-controls">
-      <div class="row">
-        <button class="btn primary" data-play>▶ Play</button>
-        <label><input type="checkbox" data-outer ${outerOnly ? 'checked' : ''}> Outer voices</label>
-        <label>Speed <input type="range" min="0.5" max="2" step="0.1" value="${2.5 - tempo}" data-tempo></label>
-      </div>
-      ${isLab ? '<div class="row"><button class="btn quiet" data-drill>Drill at the keyboard</button><button class="btn quiet" data-edit>Edit in Workbench</button></div>' : ''}
-    </div>`;
-
-  root.innerHTML = `
-    <div class="vl-scroll"><table class="vl"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}${outer}</tbody></table></div>
-    ${controls}
-    ${drillState ? '' : result}`;
-
-  const midisOf = (k) => steps[k].voices.map((p) => p.midi);
-  root.onclick = (e) => {
-    if (e.target.closest('[data-play]')) {
-      stopAll();
-      steps.forEach((_, k) => {
-        const m = midisOf(k);
-        const notes = (outerOnly ? [m[0], m[3]] : m).sort((a, b) => a - b);
-        notes.forEach((n, i) => audio.note(n, { at: k * tempo, dur: tempo * 0.95, kind: i === 0 ? 'bass' : 'upper' }));
-        playTimers.push(setTimeout(() => markCol(root, k), k * tempo * 1000 + 30));
-      });
-      playTimers.push(setTimeout(() => markCol(root, -1), steps.length * tempo * 1000 + 100));
-    }
-    const headCell = e.target.closest('.chord-head');
-    if (headCell && !hidden(Number(headCell.dataset.col))) {
-      stopAll();
-      const k = Number(headCell.dataset.col);
-      audio.chord(midisOf(k).sort((a, b) => a - b), { dur: 1.4 });
-      markCol(root, k);
-      playTimers.push(setTimeout(() => markCol(root, -1), 1400));
-    }
-    if (e.target.closest('[data-reveal]')) renderProgression(root, prog, { reveal: true });
-    if (e.target.closest('[data-drill]')) drillStart(prog);
-    if (e.target.closest('[data-edit]')) {
-      $('#wbKey').value = keyValue(key);
-      $('#wbText').value = progressionToText(prog);
-      wbCheck();
-      showTab('workbench');
-    }
-  };
-  root.oninput = (e) => {
-    if (e.target.matches('[data-tempo]')) tempo = 2.5 - Number(e.target.value);
-    if (e.target.matches('[data-outer]')) outerOnly = e.target.checked;
-  };
-}
-
-function markCol(root, k) {
-  root.querySelectorAll('.playing').forEach((el) => el.classList.remove('playing'));
-  if (k >= 0) root.querySelectorAll(`[data-col="${k}"]`).forEach((el) => el.classList.add('playing'));
-}
-
-const progressionToText = (prog) => prog.steps.map((s) => `${s.rn ? `${s.rn}:` : ''}`.padEnd(7) + s.voices.join(' ')).join('\n');
-
-// ================================================================ lab
-
-let vlIndex = 0;
-
-function renderVl() {
-  const progs = current().progressions || [];
-  const has = progs.length > 0;
-  $('#vlPrev').parentElement.hidden = !has;
-  if (!has) {
-    $('#vlKey').textContent = '';
-    $('#vlTitle').textContent = 'No worked examples in this lesson';
-    $('#vlNote').textContent = 'Write your own progression in the Workbench and it gets the same checks.';
-    $('#vlView').innerHTML = '<button class="btn" data-go-wb>Open the Workbench</button>';
-    $('#vlView').onclick = (e) => { if (e.target.closest('[data-go-wb]')) showTab('workbench'); };
-    return;
-  }
-  vlIndex = Math.min(Math.max(vlIndex, 0), progs.length - 1);
-  const prog = progs[vlIndex];
-  $('#vlCount').textContent = `${vlIndex + 1} / ${progs.length}`;
-  $('#vlPrev').disabled = vlIndex === 0;
-  $('#vlNext').disabled = vlIndex === progs.length - 1;
-  $('#vlKey').textContent = makeKey(prog.key.tonic, prog.key.mode).name;
-  const m = /^Find the errors?:\s*(.*)$/.exec(prog.title);
-  $('#vlTitle').innerHTML = m
-    ? `<span class="flag">Find the error${prog.faulty.length > 1 || /errors/.test(prog.title) ? 's' : ''}</span>${esc(m[1][0].toUpperCase() + m[1].slice(1))}`
-    : esc(prog.title);
-  $('#vlNote').textContent = prog.note || '';
-  renderProgression($('#vlView'), prog, drill && drill.prog.id === prog.id ? { drillState: drill } : {});
-  if (drill) renderDrillBox();
-}
-
-$('#vlPrev').addEventListener('click', () => { drillExit(); vlIndex -= 1; renderVl(); });
-$('#vlNext').addEventListener('click', () => { drillExit(); vlIndex += 1; renderVl(); });
-
-// ---------------------------------------------------------------- drill
-
-let drill = null; // { prog, idx (last chord shown), selected:Set, misses }
-
-function drillStart(prog) {
-  drill = { prog, idx: 0, selected: new Set(), misses: 0 };
-  setDock(true);
-  renderVl();
-  const first = prog.steps[0].voices.map((n) => parsePitch(n).midi);
-  audio.chord(first.sort((a, b) => a - b), { dur: 1.4 });
-}
-
-function drillExit() {
-  if (!drill) return;
-  drill = null;
-  document.querySelectorAll('.key.sel, .key.miss').forEach((el) => el.classList.remove('sel', 'miss'));
-}
-
-function drillTarget() {
-  const step = drill.prog.steps[drill.idx + 1];
-  return step ? step.voices.map((n) => parsePitch(n).midi) : null;
-}
-
-function renderDrillBox() {
-  const box = $('#drillBox');
-  if (!box) return;
-  const target = drillTarget();
-  const step = drill.prog.steps[drill.idx + 1];
-  if (!target) {
-    box.innerHTML = `<strong>Done. ${drill.misses === 0 ? 'Every chord right first time.' : `${drill.misses} wrong attempt${drill.misses > 1 ? 's' : ''}.`}</strong>
-      <div class="row"><button class="btn primary" data-drill-again>Again</button><button class="btn quiet" data-drill-exit>Exit drill</button></div>`;
-  } else {
-    const sel = [...drill.selected].sort((a, b) => a - b).map((m) => prettyPitch(midiPitch(m))).join(' ');
-    box.innerHTML = `<span>Play chord ${drill.idx + 2} of ${drill.prog.steps.length}, <strong>${esc(step.label || step.rn || '')}</strong>. Tap its four notes on the keyboard, or hold them on a MIDI keyboard.</span>
-      <span class="sm muted" data-drill-msg>${sel ? `Selected: ${sel}` : 'Nothing selected yet.'}</span>
-      <div class="row">
-        <button class="btn primary" data-drill-check>Check</button>
-        <button class="btn" data-drill-clear>Clear</button>
-        <button class="btn quiet" data-drill-show>Show answer</button>
-        <button class="btn quiet" data-drill-exit>Exit</button>
-      </div>`;
-  }
-  box.onclick = (e) => {
-    if (e.target.closest('[data-drill-check]')) drillCheck();
-    if (e.target.closest('[data-drill-clear]')) { drill.selected.clear(); syncSelection(); renderDrillBox(); }
-    if (e.target.closest('[data-drill-show]')) { drill.misses += 1; drillAdvance(); }
-    if (e.target.closest('[data-drill-exit]')) { drillExit(); renderVl(); }
-    if (e.target.closest('[data-drill-again]')) drillStart(drill.prog);
-  };
-}
-
-function syncSelection() {
-  keyEls.forEach((el, m) => {
-    el.classList.toggle('sel', !!drill && drill.selected.has(m));
-    el.classList.remove('miss');
-  });
-}
-
-function drillToggle(midi) {
-  if (!drillTarget()) return;
-  if (drill.selected.has(midi)) drill.selected.delete(midi);
-  else drill.selected.add(midi);
-  syncSelection();
-  renderDrillBox();
-}
-
-function drillFromMidi() {
-  if (!drillTarget()) return;
-  drill.selected = new Set(held);
-  syncSelection();
-  renderDrillBox();
-  if (held.size === drillTarget().length) drillCheck();
-}
-
-function drillCheck() {
-  const target = drillTarget();
-  if (!target) return;
-  const want = new Set(target);
-  const right = [...drill.selected].filter((m) => want.has(m));
-  const wrong = [...drill.selected].filter((m) => !want.has(m));
-  if (right.length === want.size && wrong.length === 0) {
-    drillAdvance();
-    return;
-  }
-  drill.misses += 1;
-  wrong.forEach((m) => keyEls.get(m)?.classList.add('miss'));
-  const msg = $('#drillBox [data-drill-msg]');
-  if (msg) msg.textContent = `${right.length} of ${want.size} right${wrong.length ? '; the outlined keys are not in the chord' : ''}. Move each voice the shortest way from the last chord.`;
-}
-
-function drillAdvance() {
-  drill.idx += 1;
-  drill.selected.clear();
-  syncSelection();
-  const step = drill.prog.steps[drill.idx];
-  audio.chord(step.voices.map((n) => parsePitch(n).midi).sort((a, b) => a - b), { dur: 1.3 });
-  renderVl();
-}
-
-// ================================================================ workbench
-
-const WB_EXAMPLE = 'I:    E5 C5 G4 C3\nii6:  D5 A4 F4 F3\nV7:   D5 B4 F4 G3\nI:    C5 C5 E4 C3';
-
-function normalizeRn(rn) {
-  return rn.trim().replace(/^([ivIV]+)o/, '$1°').replace(/(65|43|42|64)$/, (f) => `${f[0]}/${f[1]}`);
-}
-
-function parseWorkbench(text, key) {
-  const lines = text.split(/\n|\|/).map((s) => s.trim()).filter(Boolean);
-  const steps = [];
-  const errors = [];
-  const notes = [];
-  lines.forEach((line, i) => {
-    let rn = null;
-    let rest = line;
-    const m = /^([^:\s]+)\s*:\s*(.*)$/.exec(line);
-    if (m) { rn = normalizeRn(m[1]); rest = m[2]; }
-    const voices = rest.split(/[\s,]+/).filter(Boolean)
-      .map((n) => n.replace(/♯/g, '#').replace(/♭/g, 'b').replace(/^[a-g]/, (c) => c.toUpperCase()));
-    if (voices.length !== 4) errors.push(`Line ${i + 1}: expected 4 notes (soprano alto tenor bass), found ${voices.length}.`);
-    voices.forEach((n) => { try { parsePitch(n); } catch { errors.push(`Line ${i + 1}: “${n}” is not a note. Write it like C4, F#3 or Bb2.`); } });
-    if (rn) {
-      try {
-        const ch = parseRoman(rn, key);
-        const typed = /^[ivIV]+/.exec(rn)[0];
-        const proper = romanLabel(key, ch.degree, { seventh: ch.seventh, inversion: ch.inversion }).numeral;
-        if (typed !== proper) notes.push(`Line ${i + 1}: in ${key.name} this chord is ${proper}${ch.figure}, not ${typed}${ch.figure}. Checked as ${proper}.`);
-      } catch { errors.push(`Line ${i + 1}: can’t read the Roman numeral “${rn}”. Try I, ii6, V7, V6/5, vii°6.`); rn = null; }
-    }
-    steps.push({ rn: rn || undefined, voices });
-  });
-  return { steps, errors, notes };
-}
-
-function wbCheck() {
-  const key = keyFromValue($('#wbKey').value);
-  const text = $('#wbText').value;
-  state.workbench = { key: $('#wbKey').value, text };
-  save();
-  const view = $('#wbView');
-  if (!text.trim()) { view.innerHTML = ''; return; }
-  const { steps, errors, notes } = parseWorkbench(text, key);
-  if (errors.length) {
-    view.innerHTML = `<div class="callout bad"><strong>Can’t read this yet</strong><ul>${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`;
-    return;
-  }
-  renderProgression(view, { keyObj: key, steps, title: 'Workbench' });
-  if (notes.length) view.insertAdjacentHTML('afterbegin', `<p class="callout info">${notes.map(esc).join('<br>')}</p>`);
-}
-
-$('#wbCheck').addEventListener('click', () => { wbCheck(); $('#wbView [data-play]')?.click(); });
-$('#wbExample').addEventListener('click', () => { $('#wbKey').value = 'C-major'; $('#wbText').value = WB_EXAMPLE; wbCheck(); });
-$('#wbText').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); $('#wbCheck').click(); } });
-$('#wbKey').addEventListener('change', wbCheck);
-
-// ================================================================ ear lab
+// ================================================================ ear training
 
 let earExercise = 'intervals';
 let question = null;
 let answered = false;
+let session = null; // a lesson drill in progress: { lessonId, index, spec, asked, correct }
 
 function earSettings(ex) {
   const def = EXERCISES[ex];
@@ -2883,26 +2983,95 @@ function earSettings(ex) {
 }
 const earStat = (ex) => (state.ear[ex] ||= { attempts: 0, correct: 0, items: {}, recent: [] });
 
-function renderEar() {
-  const ex = EXERCISES[earExercise];
-  const s = earSettings(earExercise);
-  if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
-  $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
-  $('#earEx').value = earExercise;
-  $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
-  $('#earLevel').value = s.level;
-  $('#earDir').hidden = !ex.directions;
-  if (ex.directions) {
-    $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
-    $('#earDir').value = s.direction;
+/** The items and direction the next question uses: the drill's, or the free-practice settings. */
+function activeConfig() {
+  if (session) {
+    const d = session.spec;
+    return { exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' };
   }
+  const s = earSettings(earExercise);
+  return { exercise: earExercise, level: s.level, items: null, direction: s.direction };
+}
+
+function renderEar() {
+  const cfg = activeConfig();
+  const ex = EXERCISES[cfg.exercise];
+  if (!session) {
+    const s = earSettings(earExercise);
+    if (!ex.levels[s.level]) s.level = Object.keys(ex.levels)[0];
+    $('#earEx').innerHTML = Object.entries(EXERCISES).map(([id, e]) => `<option value="${id}">${esc(e.title)}</option>`).join('');
+    $('#earEx').value = earExercise;
+    $('#earLevel').innerHTML = Object.entries(ex.levels).map(([id, lv]) => `<option value="${id}">${esc(lv.label)}</option>`).join('');
+    $('#earLevel').value = s.level;
+    $('#earDir').hidden = !ex.directions;
+    if (ex.directions) {
+      $('#earDir').innerHTML = Object.entries(ex.directions).map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join('');
+      $('#earDir').value = s.direction;
+    }
+  }
+  $('#earHead').hidden = !!session;
+  renderSession();
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
-  const items = ex.levels[s.level].items.map(String);
+  const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
   $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
-  setFeedback('', 'Press New, sing it back, then answer.');
+  setFeedback('', session ? 'Press New for the first question.' : 'Press New, sing it back, then answer.');
   renderEarStats();
+}
+
+function renderSession() {
+  const box = $('#session');
+  box.hidden = !session;
+  if (!session) return;
+  const l = lessonById(session.lessonId);
+  const d = session.spec;
+  const pct = session.asked ? Math.round((100 * session.correct) / session.asked) : 0;
+  const finished = session.asked >= d.count;
+  box.innerHTML = `
+    <div class="session-head">
+      <span class="sm muted">Lesson drill · W${l.week} L${l.n}</span>
+      <button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>
+    </div>
+    <div class="session-title">${esc(drillLabel(d))}</div>
+    <p class="sm muted">${esc(d.why)}</p>
+    <div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>
+    <p class="sm">${finished
+      ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
+      : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`}</p>
+    ${finished ? '<div class="row"><button class="btn primary" data-again>Again</button><button class="btn" data-back>Back to the lesson</button></div>' : ''}`;
+}
+
+$('#session').addEventListener('click', (e) => {
+  if (e.target.closest('[data-end]')) { endSession(); renderEar(); }
+  if (e.target.closest('[data-again]')) startSession(session.lessonId, session.index);
+  if (e.target.closest('[data-back]')) { endSession(); renderEar(); showTab('lesson'); }
+});
+
+function startSession(lessonId, index) {
+  const spec = lessonById(lessonId).practice[index];
+  session = { lessonId, index, spec, asked: 0, correct: 0 };
+  earExercise = spec.exercise;
+  showTab('ear');
+  renderEar();
+}
+
+function endSession() {
+  session = null;
+  question = null;
+}
+
+function finishSession() {
+  const { lessonId, index, spec } = session;
+  const pct = Math.round((100 * session.correct) / spec.count);
+  const key = drillKey(lessonId, index);
+  const prev = state.drills[key];
+  const passed = pct >= spec.target;
+  state.drills[key] = { best: Math.max(prev?.best || 0, pct), last: pct, passed: !!prev?.passed || passed, at: Date.now() };
+  logEvent('drill', `${drillLabel(spec)}: ${session.correct}/${spec.count} (${pct}%)${passed ? ' ✓' : ''}`, lessonId);
+  checkLessonComplete(lessonById(lessonId));
+  save();
+  if (lessonId === state.current) { renderDrills(); renderOpenRow(); renderTasks(); }
 }
 
 function setFeedback(cls, text) {
@@ -2912,10 +3081,10 @@ function setFeedback(cls, text) {
 }
 
 function renderEarStats() {
-  const st = earStat(earExercise);
+  const ex = activeConfig().exercise;
+  const st = earStat(ex);
   const pct = st.attempts ? Math.round((100 * st.correct) / st.attempts) : 0;
   $('#earStats').textContent = st.attempts ? `${pct}% · ${st.correct} of ${st.attempts}` : 'No answers yet';
-  const ex = EXERCISES[earExercise];
   const recent = st.recent || [];
   const weak = Object.entries(st.items || {})
     .filter(([, [att]]) => att >= 3)
@@ -2924,13 +3093,14 @@ function renderEarStats() {
     .slice(0, 3);
   const parts = [];
   if (recent.length) parts.push(`Last ${recent.length}: ${Math.round((100 * recent.filter(Boolean).length) / recent.length)}%`);
-  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${ex.label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
-  $('#earWeak').textContent = parts.join(' · ');
+  if (weak.length) parts.push(`Weakest: ${weak.map((w) => `${EXERCISES[ex].label(w.id)} ${Math.round(w.acc * 100)}%`).join(', ')}`);
+  $('#earWeak').textContent = session ? '' : parts.join(' · ');
 }
 
 function earNew() {
-  const s = earSettings(earExercise);
-  question = makeQuestion(earExercise, s.level, { direction: s.direction, stats: earStat(earExercise) });
+  if (session && session.asked >= session.spec.count) return;
+  const cfg = activeConfig();
+  question = makeQuestion(cfg.exercise, cfg.level, { direction: cfg.direction, items: cfg.items, stats: earStat(cfg.exercise) });
   answered = false;
   document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
   setFeedback('', 'Listen, sing it back, then answer.');
@@ -2948,17 +3118,23 @@ function earAnswer(id) {
   if (answered) return;
   answered = true;
   const ok = id === question.answer;
-  const st = earStat(earExercise);
+  const st = earStat(question.exercise);
   st.attempts += 1;
   if (ok) st.correct += 1;
   const item = (st.items[question.answer] ||= [0, 0]);
   item[0] += 1;
   if (ok) item[1] += 1;
   st.recent = [...(st.recent || []), ok].slice(-20);
-  save();
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
   setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
+  if (session) {
+    session.asked += 1;
+    if (ok) session.correct += 1;
+    if (session.asked >= session.spec.count) finishSession();
+    renderSession();
+  }
+  save();
   renderEarStats();
 }
 
@@ -2992,6 +3168,13 @@ function renderExplorer() {
   $('#exView').textContent = 'Pick a chord to hear it and see how it is built.';
 }
 
+// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
+function stackThirds(members) {
+  const out = [];
+  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
+  return out;
+}
+
 function showChord(rn, btn) {
   const key = keyFromValue(exKey);
   const { chord, voices } = voiceChord(key, rn);
@@ -3020,13 +3203,6 @@ function showChord(rn, btn) {
   document.querySelectorAll('#exChords .tile').forEach((el) => el.classList.toggle('active', el === btn));
   stopAll();
   audio.chord(voices.map((p) => p.midi).sort((x, y) => x - y), { dur: 1.6 });
-}
-
-// Chord members as pitches stacked upward from octave 4, so root–3rd–5th–7th ascend.
-function stackThirds(members) {
-  const out = [];
-  members.forEach((pc) => out.push(pitchAtOrAbove(pc, out.length ? out[out.length - 1].midi + 1 : 60)));
-  return out;
 }
 
 $('#exChords').addEventListener('click', (e) => { const b = e.target.closest('[data-rn]'); if (b) showChord(b.dataset.rn, b); });
@@ -3118,90 +3294,37 @@ $('#timerToggle').addEventListener('click', () => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-// ================================================================ progress log, save, load
+// ================================================================ timeline
 
-function progressLog() {
-  const l = current();
+function renderTimeline() {
   const t = practiceTotals();
-  const lines = [
-    'HARMONY & EAR ACADEMY: PROGRESS LOG',
-    `Date: ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`,
-    `Started: ${state.startedAt} (${$('#paceLine').textContent.replace(/^Started [^·]+· /, '')})`,
-    `Current: Week ${l.week} Lesson ${l.n}: ${l.title}`,
-    `Practice: today ${hm(t.today)}, last 7 days ${hm(t.week)}, total ${hm(t.total)}`,
-    '',
-    'LESSONS',
-    ...LESSONS.map((x) => {
-      const d = lessonDone(x);
-      return `[${d === x.tasks.length ? 'x' : d ? '~' : ' '}] W${x.week} L${x.n} ${x.title} (${d}/${x.tasks.length})`;
-    }),
-    '',
-    'EAR TRAINING',
-    ...Object.entries(EXERCISES).filter(([id]) => state.ear[id]?.attempts).map(([id, ex]) => {
-      const st = state.ear[id];
-      const weak = Object.entries(st.items || {}).filter(([, [a]]) => a >= 3).sort(([, [a1, c1]], [, [a2, c2]]) => c1 / a1 - c2 / a2).slice(0, 2)
-        .map(([item, [a, c]]) => `${ex.label(item)} ${Math.round((100 * c) / a)}%`);
-      return `${ex.title}: ${Math.round((100 * st.correct) / st.attempts)}% (${st.correct}/${st.attempts})${weak.length ? `; weakest ${weak.join(', ')}` : ''}`;
-    }),
-    '',
-    `NOTES (W${l.week} L${l.n})`,
-    lessonRec(l.id).journal || 'No notes yet.',
-  ];
-  return lines.join('\n');
+  const done = LESSONS.filter(lessonComplete).length;
+  $('#timelineSummary').textContent = `${paceInfo().text} · ${done} of ${LESSONS.length} lessons finished · ${hm(t.total)} practised`;
+  // One group per day that has events or practice time, newest first.
+  const days = new Map();
+  const day = (key) => {
+    if (!days.has(key)) days.set(key, { events: [], secs: 0 });
+    return days.get(key);
+  };
+  (state.history || []).forEach((ev) => day(new Date(ev.t).toLocaleDateString('en-CA')).events.push(ev));
+  Object.entries(state.practice).forEach(([key, secs]) => { day(key).secs = secs; });
+  const ICON = { task: '✓', drill: '♪', lesson: '★' };
+  const keys = [...days.keys()].sort().reverse();
+  $('#timeline').innerHTML = keys.length ? keys.map((key) => {
+    const d = days.get(key);
+    const label = new Date(`${key}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    return `
+      <section class="tl-day">
+        <h3><span>${esc(label)}</span>${d.secs ? `<span class="sm muted">${hm(d.secs)} practice</span>` : ''}</h3>
+        <ul>${d.events.slice().reverse().map((ev) => `
+          <li class="tl-${ev.type}"><span class="tl-icon" aria-hidden="true">${ICON[ev.type] || '·'}</span><span class="tl-text">${esc(ev.text)}</span>
+          <span class="xs muted">${new Date(ev.t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span></li>`).join('')}</ul>
+      </section>`;
+  }).join('') : '<p class="muted">Nothing yet. Tick a task or finish a drill and it shows up here.</p>';
 }
 
-$('#copyLogBtn').addEventListener('click', async () => {
-  const text = progressLog();
-  $('#logText').value = text;
-  try {
-    await navigator.clipboard.writeText(text);
-    $('#logNote').textContent = 'Copied to the clipboard. Paste it into a chat to pick up where you left off.';
-  } catch {
-    $('#logNote').textContent = 'Select the text below and copy it.';
-  }
-  openDialog('#logDialog');
-});
-
-// The saved file leads with the readable progress log, so it makes sense opened
-// in a text editor; the rest is the full state that "Load progress" reads back.
-$('#backupBtn').addEventListener('click', () => {
-  save();
-  const file = { summary: progressLog().split('\n'), savedAt: new Date().toISOString(), ...state };
-  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `harmony-academy-progress-${today()}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  $('#menu').hidden = true;
-});
-
-$('#restoreBtn').addEventListener('click', () => {
-  $('#restoreError').textContent = '';
-  $('#restoreText').value = '';
-  $('#restoreFile').value = '';
-  $('#restoreFileName').textContent = '';
-  openDialog('#restoreDialog');
-});
-$('#restoreChoose').addEventListener('click', () => $('#restoreFile').click());
-$('#restoreFile').addEventListener('change', async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  $('#restoreFileName').textContent = f.name;
-  $('#restoreText').value = await f.text();
-});
-$('#restoreApply').addEventListener('click', () => {
-  let data;
-  try { data = JSON.parse($('#restoreText').value); } catch { $('#restoreError').textContent = 'That is not valid JSON. Use a file from “Save progress”.'; return; }
-  if (!data || data.version !== 1 || typeof data.lessons !== 'object') { $('#restoreError').textContent = 'This does not look like a Harmony Academy progress file.'; return; }
-  ['summary', 'savedAt', 'exportedAt'].forEach((k) => delete data[k]);
-  state = { ...freshState(), ...data };
-  ensureStart();
-  save();
-  $('#restoreDialog').close();
-  openLesson(state.current);
-  renderTimer();
-});
+$('#timelineBtn').addEventListener('click', () => { renderTimeline(); openDialog('#timelineDialog'); });
+$('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
 
 // ================================================================ account and sync
 
@@ -3213,6 +3336,7 @@ const saveMeta = (m) => { try { localStorage.setItem(SYNC_META, JSON.stringify(m
 
 const tasksDone = (st) => Object.values(st.lessons || {}).reduce((n, r) => n + Object.values(r.tasks || {}).filter(Boolean).length, 0);
 const hasProgress = (st) => tasksDone(st) > 0
+  || Object.keys(st.drills || {}).length > 0
   || Object.values(st.lessons || {}).some((r) => (r.journal || '').trim())
   || Object.values(st.ear || {}).some((e) => e.attempts > 0)
   || Object.values(st.practice || {}).some((sec) => sec > 0);
@@ -3266,6 +3390,14 @@ function applyRemote(remote) {
   renderTimer();
 }
 
+/** A new account starts its clock today: the start date is the day of the first sign-in. */
+async function createAccountCopy() {
+  state.startedAt = today();
+  save();
+  await pushCloud();
+  renderPace();
+}
+
 async function onUser(user) {
   cloud.user = user;
   if (!user) { setSync(''); return; }
@@ -3276,9 +3408,9 @@ async function onUser(user) {
     if (meta.uid && meta.uid !== user.uid) {
       // Someone else used this browser before: never hand them that progress.
       applyRemote(remote || { state: freshState(), updatedAt: Date.now() });
-      if (!remote) await pushCloud();
+      if (!remote) await createAccountCopy();
     } else if (!remote) {
-      await pushCloud(); // first device for this account
+      await createAccountCopy(); // first device for this account
     } else if (JSON.stringify(portable(state)) === JSON.stringify(remote.state)) {
       // already identical
     } else if (!hasProgress(state)) {
@@ -3323,10 +3455,13 @@ function setSync(status, error = '') {
 
 const SIGN_IN_ERRORS = {
   'auth/operation-not-allowed': 'Google sign-in isn’t switched on for this app yet.',
-  'auth/unauthorized-domain': 'This address isn’t allowed to sign in yet.',
+  'auth/configuration-not-found': 'Sign-in isn’t set up for this app yet (Firebase Authentication is off).',
+  'auth/unauthorized-domain': 'This address isn’t on the app’s allowed sign-in list yet.',
   'auth/network-request-failed': 'No connection. Try again when you’re online.',
   'permission-denied': 'The server refused to save. Try signing out and in again.',
 };
+// Unknown errors show their code, so a failure can be traced.
+const errorText = (code) => SIGN_IN_ERRORS[code] || `Sign-in failed (${code}).`;
 
 function renderAccount() {
   const show = cloudAvailable() && cloud.ready;
@@ -3344,12 +3479,12 @@ function renderAccount() {
        <button class="menu-item" id="signOutBtn">Sign out</button>`
     : `<p class="sm muted">Sign in to keep your progress on every device.</p>
        <button class="menu-item" id="signInBtn">Sign in with Google</button>
-       ${cloud.error ? `<p class="sm bad">${esc(SIGN_IN_ERRORS[cloud.error] || 'Sign-in failed. Try again.')}</p>` : ''}`;
+       ${cloud.error ? `<p class="sm bad">${esc(errorText(cloud.error))}</p>` : ''}`;
 }
 
 function syncText() {
   if (cloud.status === 'saving') return 'Syncing…';
-  if (cloud.status === 'error') return SIGN_IN_ERRORS[cloud.error] || 'Couldn’t sync. Will retry.';
+  if (cloud.status === 'error') return SIGN_IN_ERRORS[cloud.error] || `Couldn’t sync (${cloud.error}). Will retry.`;
   if (!cloud.at) return 'Synced';
   const mins = Math.round((Date.now() - cloud.at) / 60000);
   return mins < 1 ? 'Synced just now' : `Synced ${mins} min ago`;
@@ -3360,7 +3495,7 @@ async function doSignIn() {
   try { await signIn(); } catch (err) { cloud.error = err.code || err.message; renderAccount(); $('#menu').hidden = false; }
 }
 
-$('#signInTop').addEventListener('click', doSignIn);
+$('#signInTop').addEventListener('click', (e) => { e.stopPropagation(); doSignIn(); });
 $('#avatarBtn').addEventListener('click', (e) => { e.stopPropagation(); renderAccount(); renderTimer(); togglePopover($('#avatarBtn'), $('#menu')); });
 $('#account').addEventListener('click', async (e) => {
   if (e.target.closest('#signInBtn')) doSignIn();
@@ -3376,8 +3511,6 @@ document.addEventListener('visibilitychange', () => {
 
 // ================================================================ boot
 
-$('#sourcesBtn').addEventListener('click', () => openDialog('#sourcesDialog'));
-
 function renderSources() {
   $('#sources').innerHTML = SOURCES.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a><br><span class="muted">${esc(s.note)}</span></li>`).join('');
 }
@@ -3385,7 +3518,6 @@ function renderSources() {
 function renderAll() {
   renderLesson();
   renderTabs();
-  renderVl();
   renderEar();
   renderExplorer();
 }
@@ -3395,16 +3527,12 @@ function boot() {
   navigator.storage?.persist?.().catch(() => {});
   buildPiano();
   setupMidi();
-  fillKeySelect($('#wbKey'), state.workbench.key || 'C-major');
-  $('#wbText').value = state.workbench.text || '';
   fillKeySelect($('#droneKey'), 'C-major');
   renderDegrees();
   renderSources();
   ensureStart();
-  // Keyboard open by default on desktop, folded away on phones.
-  setDock(state.dockOpen ?? !narrow.matches);
+  setDock(state.dockOpen ?? false); // folded away until asked for
   openLesson(state.current);
-  if (state.workbench.text) wbCheck();
   renderTimer();
   startCloud();
 }
