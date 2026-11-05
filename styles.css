@@ -251,6 +251,9 @@ main {
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill.passed .drill-meta { color: var(--ok); }
+.text-link { align-self: flex-start; border: none; background: none; padding: 0; color: var(--accent); font: inherit; font-size: var(--fs-sm); line-height: var(--lh-sm); cursor: pointer; }
+.text-link:hover { text-decoration: underline; }
+#earHow { font-size: inherit; line-height: inherit; }
 .progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
 
@@ -324,6 +327,13 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .modal { margin: auto; width: min(560px, calc(100% - 2 * var(--s4))); padding: var(--s5); border-radius: var(--r-lg); }
 .modal > * + * { margin-top: var(--s4); }
 .dialog-title { font-size: var(--fs-lg); line-height: var(--lh-lg); }
+.learn { max-height: calc(100vh - 200px); overflow-y: auto; }
+.learn-h { font-size: var(--fs-base); line-height: var(--lh-base); margin: var(--s4) 0 var(--s1); }
+.learn-steps { padding-left: 1.25em; display: flex; flex-direction: column; gap: var(--s1); }
+.learn-answers { display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.learn-answers div { display: grid; grid-template-columns: 9em minmax(0, 1fr); column-gap: var(--s3); }
+.learn-answers dt { font-weight: 600; }
+.learn-answers dd { margin: 0; color: var(--muted); }
 .status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
 .status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
 .status.done { border-color: var(--accent); background: var(--accent); }
@@ -352,5 +362,6 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   .lesson-body { padding-left: 0; }
   .drill { grid-template-columns: 28px minmax(0, 1fr); }
   .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
+  .learn-answers div { grid-template-columns: minmax(0, 1fr); }
   .piano { height: 96px; }
 }

@@ -90,8 +90,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'The three anchors, rising. Sing the bottom note, then the top, then answer.', { level: 'anchor', direction: 'up' }),
-      drill('degrees', 'After the cadence sets the key, name the note as do, re, mi, fa or sol.', { level: 'do-sol' }),
+      drill('intervals', 'The three anchors, rising. Sing the bottom note, then the top, then answer.', { level: 'anchor', direction: 'up',
+        more: 'These three outline the major chord: do–mi, do–sol and do–do. Later intervals are easiest to hear as a bit more or less than one of them.' }),
+      drill('degrees', 'Do, mi or sol: the three notes of the home chord, in a new key each time.', { items: [1, 3, 5],
+        more: 'A key is a home note and the notes around it. Do, mi and sol are the most stable, so they are the easiest to place; the rest come in lesson 3 and week 4.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 30, title: 'Edinburgh: scales, keys and intervals', detail: 'M1 “More on Scales”; M2 “Keys and Key Signatures” and “Intervals”.', links: [edinburgh(1, 'More on Scales'), edinburgh(2, 'Keys and Key Signatures, Intervals')] },
@@ -129,8 +131,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm' }),
-      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads' }),
+      drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm',
+        more: 'I and V are both major. The 3rd decides major or minor, which is why it is the note you never leave out of a chord.' }),
+      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads',
+        more: 'An inversion changes only the bass, and the bass shapes the progression: I → V → I sounds smoothest when the bass moves by step.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh: building triads and inversions', detail: 'M4 “Listening to Triads” and “Building Triads”; M5 “Chord Inversions”.', links: [edinburgh(4, 'Listening to Triads, Building Triads'), edinburgh(5, 'Chord Inversions')] },
@@ -197,8 +201,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'Does it end on the tonic? If so, is the soprano on do (PAC) or mi (IAC)? If not, it is a half cadence.', { level: 'basic' }),
-      drill('degrees', 'The soprano’s last note decides PAC vs IAC. Practise hearing do, mi and sol against the key.', { items: [1, 3, 5] }),
+      drill('cadences', 'Does it end on the tonic? If so, is the soprano on do (PAC) or mi (IAC)? If not, it is a half cadence.', { level: 'basic',
+        more: 'All the phrases sound alike until the end, so the whole question is in the last chord or two.' }),
+      drill('degrees', 'Now do to sol: re and fa join do, mi and sol. Name the note after the chords.', { level: 'do-sol',
+        more: 'The soprano’s last note decides PAC (do) or IAC (mi), and re and fa are the notes that lead into them.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: cadences', detail: 'M5 “Cadences”; the M4 reading “Perfect and Imperfect Cadences”.', links: [edinburgh(5, 'Cadences'), edinburgh(4, 'Perfect and Imperfect Cadences (reading)')] },
@@ -271,8 +277,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Add the diminished triad: tight and unstable, like vii°.', { level: 'mmd' }),
-      drill('intervals', 'Berklee’s next step: major 2nd, 3rd, 6th and 7th, perfect 4th, 5th and octave, rising.', { level: 'berklee', direction: 'up' }),
+      drill('triads', 'Add the diminished triad: tight and unstable, like vii°.', { level: 'mmd',
+        more: 'vii° needs care in four parts: its root is the leading tone, which is never doubled. Its sound makes it easy to spot.' }),
+      drill('intervals', 'Berklee’s next step: every interval from do up the major scale, rising.', { level: 'berklee', direction: 'up',
+        more: 'These are the intervals inside the chords you are voicing, and the spacing rules (no more than an octave between upper voices) are interval rules.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 12, title: 'Edinburgh: triads in a key', detail: 'M4 “Elaborating Key: Triads and Scales”; M5 “Chord Names”.', links: [edinburgh(4, 'Elaborating Key: Triads and Scales'), edinburgh(5, 'Chord Names')] },
@@ -331,8 +339,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'Perfect or imperfect? Played together: 3rds, 6ths, 5ths and octaves.', { items: [3, 4, 7, 8, 9, 12], direction: 'harmonic' }),
-      drill('intervals', 'All of the major-scale intervals, mixed directions.', { level: 'berklee', direction: 'mixed' }),
+      drill('intervals', 'Played together: 3rds and 6ths (sweet) against 5ths and octaves (hollow).', { items: [3, 4, 7, 8, 9, 12], direction: 'harmonic',
+        more: 'Parallel 5ths and octaves are banned because those intervals blend so well that two voices stop sounding independent. Hearing hollow against sweet is how you catch them.' }),
+      drill('intervals', 'All of the major-scale intervals: rising, falling or together.', { level: 'berklee', direction: 'mixed',
+        more: 'Motion types are about two voices moving at once, so you need intervals in every direction, not just rising.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Introduction to Species Counterpoint; First-Species Counterpoint', detail: 'Rules for melodic and harmonic writing; then first species.', links: [omt('Introduction to Species Counterpoint', 227, 'species-counterpoint'), omt('First-Species Counterpoint', 235, 'first-species-counterpoint')] },
@@ -391,8 +401,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Minor keys use all three qualities: i and iv minor, V major, ii° and vii° diminished.', { level: 'mmd' }),
-      drill('intervals', 'Half step, whole step or minor 3rd? The augmented 2nd F–G♯ sounds like a minor 3rd.', { items: [1, 2, 3], direction: 'up' }),
+      drill('triads', 'Minor keys use all three qualities: i and iv minor, V major, ii° and vii° diminished.', { level: 'mmd',
+        more: 'Raising the leading tone turns minor v into major V and VII into diminished vii°, so a minor key mixes all three qualities.' }),
+      drill('intervals', 'Half step, whole step or minor 3rd, rising.', { items: [1, 2, 3], direction: 'up',
+        more: 'In harmonic minor, the step from the 6th degree to the raised 7th (F to G♯ in A minor) is an augmented 2nd. It sounds like a minor 3rd, which is why melodies avoid it.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Minor Keys', detail: 'M2 “Minor Keys” and the reading “Minor Keys and Minor Scales”.', links: [edinburgh(2, 'Minor Keys')] },
@@ -461,8 +473,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('sevenths', 'Start with the three common ones: dominant, major and minor 7th.', { level: 'basic' }),
-      drill('sevenths', 'Add half-diminished and fully diminished.', { level: 'all' }),
+      drill('sevenths', 'Start with the three common ones: dominant, major and minor 7th.', { level: 'basic',
+        more: 'These three are built on major and minor triads you already hear well; only the added 7th is new.' }),
+      drill('sevenths', 'Add half-diminished and fully diminished.', { level: 'all',
+        more: 'Both sit on a diminished triad; only the 7th differs. In minor keys you meet both on the leading tone.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh and Berklee: seventh chords', detail: 'Edinburgh M4 “Seventh Chords”; Berklee M4 “7th Chords” and “7th Chords Practice”.', links: [edinburgh(4, 'Seventh Chords'), berklee(4, '7th Chords; 7th Chords Practice')] },
@@ -497,8 +511,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'The tritone at the heart of V7, against its neighbours, the perfect 4th and 5th. Played together.', { items: [5, 6, 7], direction: 'harmonic' }),
-      drill('cadences', 'Authentic or half: listen for whether the 7th resolves.', { level: 'basic' }),
+      drill('intervals', 'The tritone inside V7, against its neighbours the perfect 4th and 5th. Played together.', { items: [5, 6, 7], direction: 'harmonic',
+        more: 'V7 holds a tritone between ti and fa. Resolving V7 means resolving it: ti up to do, fa down to mi. That tension is the pull you are learning to hear.' }),
+      drill('cadences', 'Authentic or half. Some phrases now use V7: hear fa fall to mi as it resolves.', { level: 'basic',
+        more: 'In an authentic cadence with V7, ti rises to do and fa falls to mi at the same moment. A half cadence stops on V and resolves nothing.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Strengthening Endings with V7', detail: 'The default resolution, then the alternatives.', links: [omt('Strengthening Endings with V7', 410, 'strengthening-endings-with-v7')] },
@@ -558,8 +574,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Triads first: root, 6 or 6/4, by the bass note.', { level: 'triads' }),
-      drill('inversions', 'Dominant 7th in all four positions.', { level: 'sevenths' }),
+      drill('inversions', 'Triads first: root, 6 or 6/4, by the bass note.', { level: 'triads',
+        more: 'Figures are intervals above the bass: 6 means a 6th above it, 6/4 a 6th and a 4th. Hearing which chord member is in the bass is reading the figure by ear.' }),
+      drill('inversions', 'Dominant 7th in all four positions.', { level: 'sevenths',
+        more: '7, 6/5, 4/3 and 4/2 put sol, ti, re and fa in the bass. Each bass note has its own pull: ti rises, fa falls.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Chord Inversions, Chord Names', detail: 'M5. Rewatch Chord Inversions now that you know seventh chords.', links: [edinburgh(5, 'Chord Inversions, Chord Names')] },
@@ -608,8 +626,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('degrees', 'All seven degrees. ^4 (fa) and ^6 (la) are the predominant notes; learn to spot them.', { level: 'all' }),
-      drill('cadences', 'Authentic or half, now with predominants before V.', { level: 'basic' }),
+      drill('degrees', 'All seven degrees. ^4 (fa) and ^6 (la) are the predominant notes; learn to spot them.', { level: 'all',
+        more: 'IV (fa–la–do) and ii (re–fa–la) share fa and la. When the melody has fa or la, a predominant chord is likely underneath.' }),
+      drill('cadences', 'Authentic or half. The second chord of every phrase is ii6, the predominant you are studying.', { level: 'basic',
+        more: 'Every phrase here runs tonic, predominant, dominant. By the time V arrives you should expect the cadence; listen for where it goes.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh and Berklee: primary chords and I–IV–V', detail: 'Edinburgh M1 “Primary Chords”, M5 “Common Chord Progressions”; Berklee M2 “I IV V Chord Progression”.', links: [edinburgh(5, 'Common Chord Progressions'), berklee(2, 'I IV V Chord Progression')] },
@@ -665,8 +685,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings, now including deceptive: V going somewhere other than I.', { level: 'full' }),
-      drill('degrees', 'All seven degrees after the cadence.', { level: 'all' }),
+      drill('cadences', 'All four endings, now including deceptive: V going somewhere other than I.', { level: 'full',
+        more: 'The phrase model is T – PD – D – T. A deceptive cadence swaps the last T for vi, so the phrase has to keep going.' }),
+      drill('degrees', 'All seven degrees after the chords.', { level: 'all',
+        more: 'Melody notes suggest functions: do, mi and sol the tonic, fa and la the predominant, ti and re the dominant.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Performing Harmonic Analysis Using the Phrase Model', links: [omt('Performing Harmonic Analysis Using the Phrase Model', 436, 'performing-harmonic-analysis-using-the-phrase-model')] },
@@ -715,8 +737,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Is the bass the root, 3rd or 5th? The cadential 6/4 has the 5th in the bass.', { level: 'triads' }),
-      drill('cadences', 'All four endings.', { level: 'full' }),
+      drill('inversions', 'Is the bass the root, 3rd or 5th? The cadential 6/4 has the 5th in the bass.', { level: 'triads',
+        more: 'The cadential 6/4 looks like I with sol in the bass but acts like V. Spotting a 6/4 by its unsettled sound comes first.' }),
+      drill('cadences', 'All four endings. Some phrases now pause on a cadential 6/4 before V.', { level: 'full',
+        more: 'The cadential 6/4 delays V: over the same bass, do and mi lean down to ti and re. It does not change the answer; where V goes does.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Cadential 6/4', links: [omt('Strengthening Endings with Cadential 6/4', 426, 'cadential-64')] },
@@ -775,8 +799,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'Half step or whole step, up and down. Passing tones and neighbors move by these.', { items: [1, 2], direction: 'mixed' }),
-      drill('degrees', 'All seven degrees.', { level: 'all' }),
+      drill('intervals', 'Half step or whole step: rising, falling or together.', { items: [1, 2], direction: 'mixed',
+        more: 'Passing and neighbor tones move by step, and suspensions resolve by step. Played together, a 2nd is the clash an embellishing tone makes.' }),
+      drill('degrees', 'All seven degrees.', { level: 'all',
+        more: 'Passing tones fill in a 3rd (do–re–mi) and neighbors step away and back (sol–la–sol). Knowing each note’s degree shows which notes decorate the chord.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Embellishing Tones', links: [omt('Embellishing Tones', 420)] },
@@ -820,8 +846,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Dominant 7th in all four positions. Listen to the bass.', { level: 'sevenths' }),
-      drill('degrees', 'All seven degrees. The bass lines here are do–ti–do, do–re–mi and sol–fa–mi.', { level: 'all' }),
+      drill('inversions', 'Dominant 7th in all four positions. Listen to the bass.', { level: 'sevenths',
+        more: 'This lesson keeps I going with inverted dominants: I – V6/5 – I (do–ti–do), I – V4/3 – I6 (do–re–mi) and V4/2 – I6 (fa–mi).' }),
+      drill('degrees', 'All seven degrees. The bass lines here are do–ti–do, do–re–mi and sol–fa–mi.', { level: 'all',
+        more: 'Prolonging the tonic is mostly a bass-line idea. Hear the degrees in the bass and you can name the chords.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', links: [omt('Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', 431, 'inverted-v7s')] },
@@ -880,8 +908,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Major, minor or diminished. vii° is the diminished one.', { level: 'mmd' }),
-      drill('inversions', 'Root, 6 or 6/4.', { level: 'triads' }),
+      drill('triads', 'Major, minor or diminished. vii° is the diminished one.', { level: 'mmd',
+        more: 'vii°6 often stands in for V4/3 between I and I6: it shares three notes with V7. Its diminished sound tells them apart.' }),
+      drill('inversions', 'Root, 6 or 6/4.', { level: 'triads',
+        more: 'Cadential, passing, pedal and arpeggiated 6/4s all have the 5th in the bass. Hearing that a chord is a 6/4 always comes first.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: the leading-tone chord; 6/4 chords as prolongation', links: [omt('Prolongation at Phrase Beginnings using the Leading-Tone Chord', 439), omt('6/4 Chords as Forms of Prolongation', 443)] },
@@ -944,8 +974,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings. Deceptive: V that lands on a minor chord.', { level: 'full' }),
-      drill('triads', 'I or vi? Major or minor.', { level: 'mm' }),
+      drill('cadences', 'All four endings. Deceptive: V that lands on a minor chord.', { level: 'full',
+        more: 'In a deceptive cadence the bass goes sol–la instead of sol–do, and the chord on la is minor. The ear expects home and hears something darker.' }),
+      drill('triads', 'I or vi? Major or minor.', { level: 'mm',
+        more: 'I and vi share do and mi, so they sound close. Quality is the difference, and the difference between an authentic and a deceptive ending.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: La (Scale Degree 6) in the Bass', links: [omt('La (Scale Degree 6) in the Bass at Beginnings, Middles, and Endings', 451)] },
@@ -993,8 +1025,10 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('degrees', 'All seven degrees: the melody notes you are harmonizing.', { level: 'all' }),
-      drill('intervals', 'Every interval, every direction.', { level: 'all', direction: 'mixed' }),
+      drill('degrees', 'All seven degrees: the melody notes you are harmonizing.', { level: 'all',
+        more: 'Harmonizing starts from each melody note’s degree: do, mi and sol fit I; fa and la fit IV or ii; ti and re fit V.' }),
+      drill('intervals', 'Every interval, every direction.', { level: 'all', direction: 'mixed',
+        more: 'Melodies use every interval. By now the tunes should be a backup, not the method.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh: Harmonising a Melody', detail: 'M4, the longest video in the course (12:53).', links: [edinburgh(4, 'Harmonising a Melody')] },
@@ -1035,9 +1069,12 @@ export const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings.', { level: 'full' }),
-      drill('inversions', 'Dominant 7th inversions.', { level: 'sevenths' }),
-      drill('sevenths', 'All five seventh-chord qualities.', { level: 'all' }),
+      drill('cadences', 'All four endings.', { level: 'full',
+        more: 'Checkpoint: every cadence, with V, V7 and cadential 6/4 versions, in a new key each time.' }),
+      drill('inversions', 'Dominant 7th inversions.', { level: 'sevenths',
+        more: 'Checkpoint: name V7’s position from its bass. These are the chords that prolonged the tonic in week 5.' }),
+      drill('sevenths', 'All five seventh-chord qualities.', { level: 'all',
+        more: 'Checkpoint: all five qualities. Hear the triad first, then the 7th.' }),
     ],
     tasks: [
       { id: 'write', kind: 'write', minutes: 30, title: 'Two progressions in five keys', detail: 'On paper, then at the keyboard.' },

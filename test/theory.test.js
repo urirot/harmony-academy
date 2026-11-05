@@ -135,6 +135,8 @@ test('ear questions: every level yields valid answers and playable notes', async
           const notes = q.events.flatMap((e) => e.notes);
           assert.ok(notes.length > 0 && notes.every((m) => Number.isInteger(m) && m >= 36 && m <= 84), `${ex}/${level}: notes ${notes}`);
           assert.ok(q.reveal.length > 0);
+          const extra = [...(q.after || []), ...(q.reference?.events || [])].flatMap((e) => e.notes);
+          assert.ok(extra.every((m) => Number.isInteger(m) && m >= 36 && m <= 84), `${ex}/${level}: extra notes ${extra}`);
         }
       }
     }
@@ -169,9 +171,38 @@ test('every lesson explains itself and has a valid ear-training plan', async () 
       if (d.level) assert.ok(ex.levels[d.level], `${lesson.id}: unknown level ${d.level}`);
       if (d.items) d.items.forEach((id) => assert.ok(allItems(d.exercise).includes(String(id)), `${lesson.id}: unknown item ${id}`));
       if (d.direction) assert.ok(ex.directions?.[d.direction], `${lesson.id}: unknown direction ${d.direction}`);
-      assert.ok(d.why && d.count > 0 && d.target > 0 && d.target <= 100);
+      assert.ok(d.why && d.more && d.count > 0 && d.target > 0 && d.target <= 100, `${lesson.id}: drill needs why and more`);
       const q = makeQuestion(d.exercise, d.level, { items: d.items?.map(String), direction: d.direction });
       if (d.items) assert.ok(d.items.map(String).includes(q.answer), `${lesson.id}: drill asked outside its items`);
     }
+  }
+});
+
+test('Learn more: every exercise explains itself and every answer has a tip', async () => {
+  const { EXERCISES, allItems } = await import('../js/ear.js');
+  for (const [id, ex] of Object.entries(EXERCISES)) {
+    for (const lv of Object.values(ex.levels)) {
+      for (const direction of Object.keys(ex.directions || { up: 1 })) {
+        const opts = { items: lv.items.map(String), direction };
+        assert.ok(ex.hears(opts).length > 0, `${id}: hears`);
+        const steps = ex.how(opts);
+        assert.ok(steps.length >= 2 && steps.length <= 4 && steps.every(Boolean), `${id}: how`);
+      }
+    }
+    for (const item of allItems(id)) assert.ok(ex.tips[item], `${id}: no tip for ${item}`);
+    assert.ok(ex.why, `${id}: why`);
+  }
+});
+
+test('scale degrees walk home to do after the answer', async () => {
+  const { makeQuestion } = await import('../js/ear.js');
+  for (const deg of [1, 2, 3, 4, 5, 6, 7]) {
+    const q = makeQuestion('degrees', 'all', { items: [String(deg)] });
+    const tonic = q.reference.events[0].notes[0];
+    const path = q.after.map((e) => e.notes[0]);
+    const target = q.events.at(-1).notes[0];
+    assert.equal(path[0], target, `^${deg} starts on the note`);
+    assert.equal((path.at(-1) - tonic) % 12, 0, `^${deg} ends on do`);
+    assert.ok(path.slice(1).every((m, i) => Math.abs(m - path[i]) <= 2), `^${deg} moves by step`);
   }
 });

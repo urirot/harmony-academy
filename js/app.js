@@ -521,6 +521,7 @@ function renderDrills() {
           <span class="drill-title">${esc(drillLabel(d))}</span>
           <span class="drill-why">${esc(d.why)}</span>
           <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
+          <button class="text-link" data-learn="${i}">Learn more</button>
         </div>
         <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${tried ? 'Again' : 'Start'}</button>
       </li>`;
@@ -532,7 +533,32 @@ function renderDrills() {
 $('#drills').addEventListener('click', (e) => {
   const b = e.target.closest('[data-drill]');
   if (b) startSession(current().id, Number(b.dataset.drill));
+  const learn = e.target.closest('[data-learn]');
+  if (learn) {
+    const d = current().practice[Number(learn.dataset.learn)];
+    openLearn(drillLabel(d), drillConfig(d), d.more);
+  }
 });
+
+/** A drill's question settings, in the shape activeConfig() returns. */
+const drillConfig = (d) => ({ exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' });
+
+/** Learn more: what you hear, how to work it out, the answers and why it matters. Short, in a dialog. */
+function openLearn(title, cfg, more) {
+  const ex = EXERCISES[cfg.exercise];
+  const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
+  const opts = { ...cfg, items };
+  $('#learnTitle').textContent = title;
+  $('#learnBody').innerHTML = `
+    <p>${esc(ex.hears(opts))}</p>
+    <h3 class="learn-h">How to work it out</h3>
+    <ol class="learn-steps">${ex.how(opts).map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+    <h3 class="learn-h">The answers</h3>
+    <dl class="learn-answers">${items.map((id) => `<div><dt>${esc(ex.label(id))}</dt><dd>${esc(ex.tips[id])}</dd></div>`).join('')}</dl>
+    <h3 class="learn-h">Why it matters</h3>
+    <p>${esc(more || ex.why)}</p>`;
+  openDialog('#learnDialog');
+}
 // Tick a drill off by hand, e.g. after practising it away from the app.
 $('#drills').addEventListener('change', (e) => {
   const i = e.target.dataset.drillDone;
@@ -651,10 +677,7 @@ const earStat = (ex) => (state.ear[ex] ||= { attempts: 0, correct: 0, items: {},
 
 /** The items and direction the next question uses: the drill's, or the free-practice settings. */
 function activeConfig() {
-  if (session) {
-    const d = session.spec;
-    return { exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' };
-  }
+  if (session) return drillConfig(session.spec);
   const s = earSettings(earExercise);
   return { exercise: earExercise, level: s.level, items: null, direction: s.direction };
 }
@@ -680,6 +703,7 @@ function renderEar() {
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
+  $('#earRef').hidden = true;
   const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
   $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
   setFeedback('', session ? 'Press New for the first question.' : 'Press New, sing it back, then answer.');
@@ -770,6 +794,8 @@ function earNew() {
   answered = false;
   document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
   setFeedback('', 'Listen, sing it back, then answer.');
+  $('#earRef').hidden = !question.reference;
+  if (question.reference) $('#earRef').textContent = question.reference.label;
   // Keys stay dark while a question plays, or the keyboard would give the answer away.
   playEvents(question.events, { light: false });
 }
@@ -778,6 +804,15 @@ function earReplay() {
   if (!question) { earNew(); return; }
   playEvents(question.events, { light: answered });
 }
+
+$('#earRef').addEventListener('click', () => { if (question?.reference) playEvents(question.reference.events, { light: answered }); });
+$('#earHow').addEventListener('click', () => {
+  const cfg = activeConfig();
+  const ex = EXERCISES[cfg.exercise];
+  const title = session ? drillLabel(session.spec)
+    : `${ex.title}: ${ex.levels[cfg.level].label}${ex.directions ? ` · ${ex.directions[cfg.direction].toLowerCase()}` : ''}`;
+  openLearn(title, cfg, session?.spec.more);
+});
 
 function earAnswer(id) {
   if (!question) { earNew(); return; }
@@ -794,6 +829,7 @@ function earAnswer(id) {
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
   setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
+  if (question.after) playEvents(question.after);
   if (session) {
     session.asked += 1;
     if (ok) session.correct += 1;

@@ -86,10 +86,11 @@
           </div>
           <span class="sm muted" id="earStats"></span>
         </div>
-        <p class="muted" id="earHint"></p>
+        <p class="muted"><span id="earHint"></span> <button class="text-link" id="earHow">How it works</button></p>
         <div class="row">
           <button class="btn primary" id="earNew">▶ New</button>
           <button class="btn" id="earReplay">↻ Replay</button>
+          <button class="btn" id="earRef" hidden></button>
           <span class="xs muted key-hint">Space · R · 1–9</span>
         </div>
         <p class="feedback" id="earFeedback">Press New, sing it back, then answer.</p>
@@ -140,6 +141,12 @@
     <h2 class="dialog-title">Timeline</h2>
     <p class="sm muted" id="timelineSummary"></p>
     <div class="timeline" id="timeline"></div>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog class="modal" id="learnDialog">
+    <h2 class="dialog-title" id="learnTitle"></h2>
+    <div class="learn" id="learnBody"></div>
     <div class="row end"><button class="btn primary" data-close>Done</button></div>
   </dialog>
 

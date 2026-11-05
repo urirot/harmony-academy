@@ -261,6 +261,9 @@ main {
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill.passed .drill-meta { color: var(--ok); }
+.text-link { align-self: flex-start; border: none; background: none; padding: 0; color: var(--accent); font: inherit; font-size: var(--fs-sm); line-height: var(--lh-sm); cursor: pointer; }
+.text-link:hover { text-decoration: underline; }
+#earHow { font-size: inherit; line-height: inherit; }
 .progress { height: 4px; border-radius: 2px; background: var(--subtle); overflow: hidden; margin-bottom: var(--s2); }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.25s; }
 
@@ -334,6 +337,13 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .modal { margin: auto; width: min(560px, calc(100% - 2 * var(--s4))); padding: var(--s5); border-radius: var(--r-lg); }
 .modal > * + * { margin-top: var(--s4); }
 .dialog-title { font-size: var(--fs-lg); line-height: var(--lh-lg); }
+.learn { max-height: calc(100vh - 200px); overflow-y: auto; }
+.learn-h { font-size: var(--fs-base); line-height: var(--lh-base); margin: var(--s4) 0 var(--s1); }
+.learn-steps { padding-left: 1.25em; display: flex; flex-direction: column; gap: var(--s1); }
+.learn-answers { display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.learn-answers div { display: grid; grid-template-columns: 9em minmax(0, 1fr); column-gap: var(--s3); }
+.learn-answers dt { font-weight: 600; }
+.learn-answers dd { margin: 0; color: var(--muted); }
 .status { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
 .status.partial { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
 .status.done { border-color: var(--accent); background: var(--accent); }
@@ -362,6 +372,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   .lesson-body { padding-left: 0; }
   .drill { grid-template-columns: 28px minmax(0, 1fr); }
   .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
+  .learn-answers div { grid-template-columns: minmax(0, 1fr); }
   .piano { height: 96px; }
 }
 </style>
@@ -442,10 +453,11 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
           </div>
           <span class="sm muted" id="earStats"></span>
         </div>
-        <p class="muted" id="earHint"></p>
+        <p class="muted"><span id="earHint"></span> <button class="text-link" id="earHow">How it works</button></p>
         <div class="row">
           <button class="btn primary" id="earNew">▶ New</button>
           <button class="btn" id="earReplay">↻ Replay</button>
+          <button class="btn" id="earRef" hidden></button>
           <span class="xs muted key-hint">Space · R · 1–9</span>
         </div>
         <p class="feedback" id="earFeedback">Press New, sing it back, then answer.</p>
@@ -496,6 +508,12 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
     <h2 class="dialog-title">Timeline</h2>
     <p class="sm muted" id="timelineSummary"></p>
     <div class="timeline" id="timeline"></div>
+    <div class="row end"><button class="btn primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog class="modal" id="learnDialog">
+    <h2 class="dialog-title" id="learnTitle"></h2>
+    <div class="learn" id="learnBody"></div>
     <div class="row end"><button class="btn primary" data-close>Done</button></div>
   </dialog>
 
@@ -973,8 +991,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'The three anchors, rising. Sing the bottom note, then the top, then answer.', { level: 'anchor', direction: 'up' }),
-      drill('degrees', 'After the cadence sets the key, name the note as do, re, mi, fa or sol.', { level: 'do-sol' }),
+      drill('intervals', 'The three anchors, rising. Sing the bottom note, then the top, then answer.', { level: 'anchor', direction: 'up',
+        more: 'These three outline the major chord: do–mi, do–sol and do–do. Later intervals are easiest to hear as a bit more or less than one of them.' }),
+      drill('degrees', 'Do, mi or sol: the three notes of the home chord, in a new key each time.', { items: [1, 3, 5],
+        more: 'A key is a home note and the notes around it. Do, mi and sol are the most stable, so they are the easiest to place; the rest come in lesson 3 and week 4.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 30, title: 'Edinburgh: scales, keys and intervals', detail: 'M1 “More on Scales”; M2 “Keys and Key Signatures” and “Intervals”.', links: [edinburgh(1, 'More on Scales'), edinburgh(2, 'Keys and Key Signatures, Intervals')] },
@@ -1012,8 +1032,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm' }),
-      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads' }),
+      drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm',
+        more: 'I and V are both major. The 3rd decides major or minor, which is why it is the note you never leave out of a chord.' }),
+      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads',
+        more: 'An inversion changes only the bass, and the bass shapes the progression: I → V → I sounds smoothest when the bass moves by step.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh: building triads and inversions', detail: 'M4 “Listening to Triads” and “Building Triads”; M5 “Chord Inversions”.', links: [edinburgh(4, 'Listening to Triads, Building Triads'), edinburgh(5, 'Chord Inversions')] },
@@ -1080,8 +1102,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'Does it end on the tonic? If so, is the soprano on do (PAC) or mi (IAC)? If not, it is a half cadence.', { level: 'basic' }),
-      drill('degrees', 'The soprano’s last note decides PAC vs IAC. Practise hearing do, mi and sol against the key.', { items: [1, 3, 5] }),
+      drill('cadences', 'Does it end on the tonic? If so, is the soprano on do (PAC) or mi (IAC)? If not, it is a half cadence.', { level: 'basic',
+        more: 'All the phrases sound alike until the end, so the whole question is in the last chord or two.' }),
+      drill('degrees', 'Now do to sol: re and fa join do, mi and sol. Name the note after the chords.', { level: 'do-sol',
+        more: 'The soprano’s last note decides PAC (do) or IAC (mi), and re and fa are the notes that lead into them.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: cadences', detail: 'M5 “Cadences”; the M4 reading “Perfect and Imperfect Cadences”.', links: [edinburgh(5, 'Cadences'), edinburgh(4, 'Perfect and Imperfect Cadences (reading)')] },
@@ -1154,8 +1178,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Add the diminished triad: tight and unstable, like vii°.', { level: 'mmd' }),
-      drill('intervals', 'Berklee’s next step: major 2nd, 3rd, 6th and 7th, perfect 4th, 5th and octave, rising.', { level: 'berklee', direction: 'up' }),
+      drill('triads', 'Add the diminished triad: tight and unstable, like vii°.', { level: 'mmd',
+        more: 'vii° needs care in four parts: its root is the leading tone, which is never doubled. Its sound makes it easy to spot.' }),
+      drill('intervals', 'Berklee’s next step: every interval from do up the major scale, rising.', { level: 'berklee', direction: 'up',
+        more: 'These are the intervals inside the chords you are voicing, and the spacing rules (no more than an octave between upper voices) are interval rules.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 12, title: 'Edinburgh: triads in a key', detail: 'M4 “Elaborating Key: Triads and Scales”; M5 “Chord Names”.', links: [edinburgh(4, 'Elaborating Key: Triads and Scales'), edinburgh(5, 'Chord Names')] },
@@ -1214,8 +1240,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'Perfect or imperfect? Played together: 3rds, 6ths, 5ths and octaves.', { items: [3, 4, 7, 8, 9, 12], direction: 'harmonic' }),
-      drill('intervals', 'All of the major-scale intervals, mixed directions.', { level: 'berklee', direction: 'mixed' }),
+      drill('intervals', 'Played together: 3rds and 6ths (sweet) against 5ths and octaves (hollow).', { items: [3, 4, 7, 8, 9, 12], direction: 'harmonic',
+        more: 'Parallel 5ths and octaves are banned because those intervals blend so well that two voices stop sounding independent. Hearing hollow against sweet is how you catch them.' }),
+      drill('intervals', 'All of the major-scale intervals: rising, falling or together.', { level: 'berklee', direction: 'mixed',
+        more: 'Motion types are about two voices moving at once, so you need intervals in every direction, not just rising.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Introduction to Species Counterpoint; First-Species Counterpoint', detail: 'Rules for melodic and harmonic writing; then first species.', links: [omt('Introduction to Species Counterpoint', 227, 'species-counterpoint'), omt('First-Species Counterpoint', 235, 'first-species-counterpoint')] },
@@ -1274,8 +1302,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Minor keys use all three qualities: i and iv minor, V major, ii° and vii° diminished.', { level: 'mmd' }),
-      drill('intervals', 'Half step, whole step or minor 3rd? The augmented 2nd F–G♯ sounds like a minor 3rd.', { items: [1, 2, 3], direction: 'up' }),
+      drill('triads', 'Minor keys use all three qualities: i and iv minor, V major, ii° and vii° diminished.', { level: 'mmd',
+        more: 'Raising the leading tone turns minor v into major V and VII into diminished vii°, so a minor key mixes all three qualities.' }),
+      drill('intervals', 'Half step, whole step or minor 3rd, rising.', { items: [1, 2, 3], direction: 'up',
+        more: 'In harmonic minor, the step from the 6th degree to the raised 7th (F to G♯ in A minor) is an augmented 2nd. It sounds like a minor 3rd, which is why melodies avoid it.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Minor Keys', detail: 'M2 “Minor Keys” and the reading “Minor Keys and Minor Scales”.', links: [edinburgh(2, 'Minor Keys')] },
@@ -1344,8 +1374,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('sevenths', 'Start with the three common ones: dominant, major and minor 7th.', { level: 'basic' }),
-      drill('sevenths', 'Add half-diminished and fully diminished.', { level: 'all' }),
+      drill('sevenths', 'Start with the three common ones: dominant, major and minor 7th.', { level: 'basic',
+        more: 'These three are built on major and minor triads you already hear well; only the added 7th is new.' }),
+      drill('sevenths', 'Add half-diminished and fully diminished.', { level: 'all',
+        more: 'Both sit on a diminished triad; only the 7th differs. In minor keys you meet both on the leading tone.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh and Berklee: seventh chords', detail: 'Edinburgh M4 “Seventh Chords”; Berklee M4 “7th Chords” and “7th Chords Practice”.', links: [edinburgh(4, 'Seventh Chords'), berklee(4, '7th Chords; 7th Chords Practice')] },
@@ -1380,8 +1412,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'The tritone at the heart of V7, against its neighbours, the perfect 4th and 5th. Played together.', { items: [5, 6, 7], direction: 'harmonic' }),
-      drill('cadences', 'Authentic or half: listen for whether the 7th resolves.', { level: 'basic' }),
+      drill('intervals', 'The tritone inside V7, against its neighbours the perfect 4th and 5th. Played together.', { items: [5, 6, 7], direction: 'harmonic',
+        more: 'V7 holds a tritone between ti and fa. Resolving V7 means resolving it: ti up to do, fa down to mi. That tension is the pull you are learning to hear.' }),
+      drill('cadences', 'Authentic or half. Some phrases now use V7: hear fa fall to mi as it resolves.', { level: 'basic',
+        more: 'In an authentic cadence with V7, ti rises to do and fa falls to mi at the same moment. A half cadence stops on V and resolves nothing.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Strengthening Endings with V7', detail: 'The default resolution, then the alternatives.', links: [omt('Strengthening Endings with V7', 410, 'strengthening-endings-with-v7')] },
@@ -1441,8 +1475,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Triads first: root, 6 or 6/4, by the bass note.', { level: 'triads' }),
-      drill('inversions', 'Dominant 7th in all four positions.', { level: 'sevenths' }),
+      drill('inversions', 'Triads first: root, 6 or 6/4, by the bass note.', { level: 'triads',
+        more: 'Figures are intervals above the bass: 6 means a 6th above it, 6/4 a 6th and a 4th. Hearing which chord member is in the bass is reading the figure by ear.' }),
+      drill('inversions', 'Dominant 7th in all four positions.', { level: 'sevenths',
+        more: '7, 6/5, 4/3 and 4/2 put sol, ti, re and fa in the bass. Each bass note has its own pull: ti rises, fa falls.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Chord Inversions, Chord Names', detail: 'M5. Rewatch Chord Inversions now that you know seventh chords.', links: [edinburgh(5, 'Chord Inversions, Chord Names')] },
@@ -1491,8 +1527,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('degrees', 'All seven degrees. ^4 (fa) and ^6 (la) are the predominant notes; learn to spot them.', { level: 'all' }),
-      drill('cadences', 'Authentic or half, now with predominants before V.', { level: 'basic' }),
+      drill('degrees', 'All seven degrees. ^4 (fa) and ^6 (la) are the predominant notes; learn to spot them.', { level: 'all',
+        more: 'IV (fa–la–do) and ii (re–fa–la) share fa and la. When the melody has fa or la, a predominant chord is likely underneath.' }),
+      drill('cadences', 'Authentic or half. The second chord of every phrase is ii6, the predominant you are studying.', { level: 'basic',
+        more: 'Every phrase here runs tonic, predominant, dominant. By the time V arrives you should expect the cadence; listen for where it goes.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh and Berklee: primary chords and I–IV–V', detail: 'Edinburgh M1 “Primary Chords”, M5 “Common Chord Progressions”; Berklee M2 “I IV V Chord Progression”.', links: [edinburgh(5, 'Common Chord Progressions'), berklee(2, 'I IV V Chord Progression')] },
@@ -1548,8 +1586,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings, now including deceptive: V going somewhere other than I.', { level: 'full' }),
-      drill('degrees', 'All seven degrees after the cadence.', { level: 'all' }),
+      drill('cadences', 'All four endings, now including deceptive: V going somewhere other than I.', { level: 'full',
+        more: 'The phrase model is T – PD – D – T. A deceptive cadence swaps the last T for vi, so the phrase has to keep going.' }),
+      drill('degrees', 'All seven degrees after the chords.', { level: 'all',
+        more: 'Melody notes suggest functions: do, mi and sol the tonic, fa and la the predominant, ti and re the dominant.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Performing Harmonic Analysis Using the Phrase Model', links: [omt('Performing Harmonic Analysis Using the Phrase Model', 436, 'performing-harmonic-analysis-using-the-phrase-model')] },
@@ -1598,8 +1638,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Is the bass the root, 3rd or 5th? The cadential 6/4 has the 5th in the bass.', { level: 'triads' }),
-      drill('cadences', 'All four endings.', { level: 'full' }),
+      drill('inversions', 'Is the bass the root, 3rd or 5th? The cadential 6/4 has the 5th in the bass.', { level: 'triads',
+        more: 'The cadential 6/4 looks like I with sol in the bass but acts like V. Spotting a 6/4 by its unsettled sound comes first.' }),
+      drill('cadences', 'All four endings. Some phrases now pause on a cadential 6/4 before V.', { level: 'full',
+        more: 'The cadential 6/4 delays V: over the same bass, do and mi lean down to ti and re. It does not change the answer; where V goes does.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Cadential 6/4', links: [omt('Strengthening Endings with Cadential 6/4', 426, 'cadential-64')] },
@@ -1658,8 +1700,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('intervals', 'Half step or whole step, up and down. Passing tones and neighbors move by these.', { items: [1, 2], direction: 'mixed' }),
-      drill('degrees', 'All seven degrees.', { level: 'all' }),
+      drill('intervals', 'Half step or whole step: rising, falling or together.', { items: [1, 2], direction: 'mixed',
+        more: 'Passing and neighbor tones move by step, and suspensions resolve by step. Played together, a 2nd is the clash an embellishing tone makes.' }),
+      drill('degrees', 'All seven degrees.', { level: 'all',
+        more: 'Passing tones fill in a 3rd (do–re–mi) and neighbors step away and back (sol–la–sol). Knowing each note’s degree shows which notes decorate the chord.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Embellishing Tones', links: [omt('Embellishing Tones', 420)] },
@@ -1703,8 +1747,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('inversions', 'Dominant 7th in all four positions. Listen to the bass.', { level: 'sevenths' }),
-      drill('degrees', 'All seven degrees. The bass lines here are do–ti–do, do–re–mi and sol–fa–mi.', { level: 'all' }),
+      drill('inversions', 'Dominant 7th in all four positions. Listen to the bass.', { level: 'sevenths',
+        more: 'This lesson keeps I going with inverted dominants: I – V6/5 – I (do–ti–do), I – V4/3 – I6 (do–re–mi) and V4/2 – I6 (fa–mi).' }),
+      drill('degrees', 'All seven degrees. The bass lines here are do–ti–do, do–re–mi and sol–fa–mi.', { level: 'all',
+        more: 'Prolonging the tonic is mostly a bass-line idea. Hear the degrees in the bass and you can name the chords.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', links: [omt('Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', 431, 'inverted-v7s')] },
@@ -1763,8 +1809,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('triads', 'Major, minor or diminished. vii° is the diminished one.', { level: 'mmd' }),
-      drill('inversions', 'Root, 6 or 6/4.', { level: 'triads' }),
+      drill('triads', 'Major, minor or diminished. vii° is the diminished one.', { level: 'mmd',
+        more: 'vii°6 often stands in for V4/3 between I and I6: it shares three notes with V7. Its diminished sound tells them apart.' }),
+      drill('inversions', 'Root, 6 or 6/4.', { level: 'triads',
+        more: 'Cadential, passing, pedal and arpeggiated 6/4s all have the 5th in the bass. Hearing that a chord is a 6/4 always comes first.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 25, title: 'OMT: the leading-tone chord; 6/4 chords as prolongation', links: [omt('Prolongation at Phrase Beginnings using the Leading-Tone Chord', 439), omt('6/4 Chords as Forms of Prolongation', 443)] },
@@ -1827,8 +1875,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings. Deceptive: V that lands on a minor chord.', { level: 'full' }),
-      drill('triads', 'I or vi? Major or minor.', { level: 'mm' }),
+      drill('cadences', 'All four endings. Deceptive: V that lands on a minor chord.', { level: 'full',
+        more: 'In a deceptive cadence the bass goes sol–la instead of sol–do, and the chord on la is minor. The ear expects home and hears something darker.' }),
+      drill('triads', 'I or vi? Major or minor.', { level: 'mm',
+        more: 'I and vi share do and mi, so they sound close. Quality is the difference, and the difference between an authentic and a deceptive ending.' }),
     ],
     tasks: [
       { id: 'read', kind: 'read', minutes: 20, title: 'OMT: La (Scale Degree 6) in the Bass', links: [omt('La (Scale Degree 6) in the Bass at Beginnings, Middles, and Endings', 451)] },
@@ -1876,8 +1926,10 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('degrees', 'All seven degrees: the melody notes you are harmonizing.', { level: 'all' }),
-      drill('intervals', 'Every interval, every direction.', { level: 'all', direction: 'mixed' }),
+      drill('degrees', 'All seven degrees: the melody notes you are harmonizing.', { level: 'all',
+        more: 'Harmonizing starts from each melody note’s degree: do, mi and sol fit I; fa and la fit IV or ii; ti and re fit V.' }),
+      drill('intervals', 'Every interval, every direction.', { level: 'all', direction: 'mixed',
+        more: 'Melodies use every interval. By now the tunes should be a backup, not the method.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh: Harmonising a Melody', detail: 'M4, the longest video in the course (12:53).', links: [edinburgh(4, 'Harmonising a Melody')] },
@@ -1918,9 +1970,12 @@ const LESSONS = [
       },
     ],
     practice: [
-      drill('cadences', 'All four endings.', { level: 'full' }),
-      drill('inversions', 'Dominant 7th inversions.', { level: 'sevenths' }),
-      drill('sevenths', 'All five seventh-chord qualities.', { level: 'all' }),
+      drill('cadences', 'All four endings.', { level: 'full',
+        more: 'Checkpoint: every cadence, with V, V7 and cadential 6/4 versions, in a new key each time.' }),
+      drill('inversions', 'Dominant 7th inversions.', { level: 'sevenths',
+        more: 'Checkpoint: name V7’s position from its bass. These are the chords that prolonged the tonic in week 5.' }),
+      drill('sevenths', 'All five seventh-chord qualities.', { level: 'all',
+        more: 'Checkpoint: all five qualities. Hear the triad first, then the 7th.' }),
     ],
     tasks: [
       { id: 'write', kind: 'write', minutes: 30, title: 'Two progressions in five keys', detail: 'On paper, then at the keyboard.' },
@@ -2128,22 +2183,31 @@ const INTERVAL_SONGS = {
   9: 'My Bonnie (“My Bon-”)', 10: 'Somewhere (“There’s a place”)', 11: 'A half step short of the octave', 12: 'Somewhere Over the Rainbow (“Some-where”)',
 };
 
-// Cadence phrases in C. Every phrase opens I – ii6 – V; there are two V
-// voicings, so the soprano on V does not give the answer away.
+// Cadence phrases in C. Every phrase opens I – ii6 and reaches V; there are
+// several V voicings, so the soprano on V does not give the answer away. Some
+// use V7 or pause on a cadential 6/4 first, as the later lessons do.
 const OPEN = [['E5', 'C5', 'G4', 'C3'], ['D5', 'A4', 'F4', 'F3']];
 const V_LOW = ['B4', 'G4', 'D4', 'G3'];
 const V_HIGH = ['D5', 'B4', 'D4', 'G3'];
+const V7_LOW = ['B4', 'G4', 'F4', 'G3']; // the 7th is held over from ii6
+const V7_TOP = ['F5', 'B4', 'D4', 'G3']; // the 7th on top, falling to mi
+const CAD64 = ['C5', 'G4', 'E4', 'G3'];
+const I_FULL = ['C5', 'G4', 'E4', 'C3'];
 const CADENCE_PHRASES = {
   PAC: [
-    { rns: ['I', 'ii6', 'V', 'I'], voices: [...OPEN, V_LOW, ['C5', 'G4', 'E4', 'C3']] },
-    { rns: ['I', 'ii6', 'V', 'I'], voices: [...OPEN, V_HIGH, ['C5', 'G4', 'E4', 'C3']] },
+    { rns: ['I', 'ii6', 'V', 'I'], voices: [...OPEN, V_LOW, I_FULL] },
+    { rns: ['I', 'ii6', 'V', 'I'], voices: [...OPEN, V_HIGH, I_FULL] },
+    { rns: ['I', 'ii6', 'V7', 'I'], voices: [...OPEN, V7_LOW, I_FULL] },
+    { rns: ['I', 'ii6', 'I6/4', 'V', 'I'], voices: [...OPEN, CAD64, V_LOW, I_FULL] },
   ],
   IAC: [
     { rns: ['I', 'ii6', 'V', 'I'], voices: [...OPEN, V_HIGH, ['E5', 'C5', 'C4', 'C3']] },
+    { rns: ['I', 'ii6', 'V7', 'I'], voices: [...OPEN, V7_TOP, ['E5', 'C5', 'C4', 'C3']] },
   ],
   HC: [
     { rns: ['I', 'ii6', 'V'], voices: [...OPEN, V_LOW] },
     { rns: ['I', 'ii6', 'V'], voices: [...OPEN, V_HIGH] },
+    { rns: ['I', 'ii6', 'I6/4', 'V'], voices: [...OPEN, CAD64, V_LOW] },
   ],
   DC: [
     { rns: ['I', 'ii6', 'V', 'vi'], voices: [...OPEN, V_LOW, ['C5', 'E4', 'C4', 'A3']] },
@@ -2161,6 +2225,8 @@ const KEY_NAMES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A',
 
 const midis = (voices, shift) => voices.map((n) => parsePitch(n).midi + shift).sort((a, b) => a - b);
 
+// Each exercise also carries its Learn more text: what a question sounds like
+// (hears), the method (how), one line per answer (tips) and why it matters.
 const EXERCISES = {
   intervals: {
     title: 'Intervals',
@@ -2172,15 +2238,65 @@ const EXERCISES = {
     },
     directions: { up: 'Up', down: 'Down', harmonic: 'Together', mixed: 'Mixed' },
     label: (id) => ivName(Number(id)).name,
+    hears: ({ direction }) => `${{
+      up: 'Two notes, one after the other, rising.',
+      down: 'Two notes, one after the other, falling.',
+      harmonic: 'Two notes played at the same time.',
+      mixed: 'Two notes: rising, falling or together, at random.',
+    }[direction]} The low note moves every question.`,
+    how: ({ direction }) => [
+      {
+        up: 'Sing it back: the low note, then the high one.',
+        down: 'Sing it back, high then low. Then sing it rising: the name is the same either way.',
+        harmonic: 'Hum the lower note, then the upper one, to pull the pair apart.',
+        mixed: 'Sing it back as you heard it. If the notes came together, hum the lower one first.',
+      }[direction],
+      direction === 'harmonic' || direction === 'mixed'
+        ? 'Played together, 5ths and octaves sound hollow, 3rds and 6ths sweet, and 2nds and 7ths rub.'
+        : 'Judge the size first: a step, a skip, a 4th or 5th, or a wide leap. Then choose between the closest answers.',
+      'Stuck? Sing up the scale from the low note (do, re, mi…) and count notes until you reach the top one.',
+    ],
+    tips: {
+      1: 'The smallest step, a tight rub. Jaws.',
+      2: 'One whole step, do to re. Happy Birthday.',
+      3: 'Dark: the bottom of a minor chord. Greensleeves.',
+      4: 'Bright: the bottom of a major chord, do to mi. When the Saints.',
+      5: 'Open but restless, do to fa. Here Comes the Bride.',
+      6: 'Exactly half an octave and very unstable. Maria.',
+      7: 'Hollow and stable, do to sol. Twinkle Twinkle.',
+      8: 'Wide and bittersweet, mi up to do. The Entertainer.',
+      9: 'Wide and warm, do to la. My Bonnie.',
+      10: 'The frame of a dominant 7th, sol up to fa. Somewhere (West Side Story).',
+      11: 'A half step short of the octave, sharp and aching. Do to ti.',
+      12: 'The same note higher; the two blend into one. Over the Rainbow.',
+    },
+    why: 'Chords are stacks of 3rds, melodies move by steps and leaps, and the voice-leading rules are rules about the intervals between voices.',
   },
   degrees: {
     title: 'Scale degrees',
-    hint: 'After the cadence, hum do. Then sing up or down from do to the note and count.',
+    hint: 'After the chords, hum do (♪ do plays it again). Sing from do to the note: do, re, mi… After you answer, the note walks home.',
     levels: {
       'do-sol': { label: 'do – sol (^1–^5)', items: [1, 2, 3, 4, 5] },
       all: { label: 'All seven', items: [1, 2, 3, 4, 5, 6, 7] },
     },
     label: (id) => `^${id} ${DEGREE_SOLFEGE[id - 1]}`,
+    hears: () => 'Four chords (I – IV – V – I) set up a major key, then one note plays. The key changes every question, so you hear the note against home, not as a pitch.',
+    how: ({ items }) => [
+      'When the chords stop, hum the lowest note of the last chord. That is do, home. ♪ do plays it again.',
+      `Sing from do to the note by step: do, re, mi… The syllable you land on is the answer. Measured up from do: ${items.filter((d) => d !== '1')
+        .map((d, i) => `${DEGREE_SOLFEGE[d - 1]} ${i ? '' : 'is '}a ${['', '2nd', '3rd', '4th', '5th', '6th', '7th'][d - 1]}`).join(', ')}.`,
+      'After you answer, the note walks home to do. Listen to that pull: it is how you learn each degree without counting.',
+    ],
+    tips: {
+      1: 'Home. Nothing needs to happen next.',
+      2: 'One step above home; wants to fall to do.',
+      3: 'Bright and settled, the 3rd of the home chord.',
+      4: 'Leans down to mi, like a held breath.',
+      5: 'Strong and stable, the top of the home chord.',
+      6: 'Warm and wistful; leans down to sol.',
+      7: 'A half step under do, pulling hard upward.',
+    },
+    why: 'Harmony works with what a note does in its key, not its letter name: which chords fit it, and where it wants to go.',
   },
   triads: {
     title: 'Triad quality',
@@ -2191,6 +2307,19 @@ const EXERCISES = {
       all: { label: '+ augmented', items: ['major', 'minor', 'diminished', 'augmented'] },
     },
     label: (id) => id[0].toUpperCase() + id.slice(1),
+    hears: () => 'One triad in root position, played together and then one note at a time from the bottom. The root changes every question.',
+    how: () => [
+      'Take a first impression of the block chord: bright, dark, tight or stretched.',
+      'Check with the broken chord. A major 3rd at the bottom means major (or augmented); a minor 3rd means minor (or diminished).',
+      'Then the outer notes: a perfect 5th means major or minor. Narrower is diminished, wider is augmented.',
+    ],
+    tips: {
+      major: 'Bright and stable. I, IV and V in a major key.',
+      minor: 'Darker but stable. ii, iii and vi in a major key.',
+      diminished: 'Two minor 3rds: small and tense. vii° in a major key.',
+      augmented: 'Two major 3rds: stretched and unresolved. Rare.',
+    },
+    why: 'Quality narrows the chord down at once: in a major key, a diminished triad can only be vii°.',
   },
   inversions: {
     title: 'Inversions',
@@ -2200,6 +2329,28 @@ const EXERCISES = {
       sevenths: { label: 'V7 inversions', items: ['7', '6/5', '4/3', '4/2'] },
     },
     label: (id) => ({ '5/3': 'Root position', 6: '1st inv. (6)', '6/4': '2nd inv. (6/4)', 7: 'Root (7)', '6/5': '6/5', '4/3': '4/3', '4/2': '4/2' }[id]),
+    hears: ({ items }) => (items.includes('7')
+      ? 'A dominant 7th chord with the root, 3rd, 5th or 7th in the bass, then the bass note alone.'
+      : 'A major or minor triad with the root, 3rd or 5th in the bass, then the bass note alone.'),
+    how: ({ items }) => (items.includes('7') ? [
+      'Ignore the top of the chord. Sing the lowest note; it plays again on its own.',
+      'Hear the bass as a degree of the key the chord resolves to: sol is root position (7), ti is 6/5, re is 4/3 and fa is 4/2.',
+      'In 4/2 the bass and the note above it are only a step apart (fa and sol), so the bottom of the chord sounds thick.',
+    ] : [
+      'Ignore the top of the chord. Sing the lowest note; it plays again on its own.',
+      'Hum up through the chord from the bass. A 3rd then a 3rd is root position, a 3rd then a 4th is 6, a 4th then a 3rd is 6/4.',
+      'Root position sounds grounded, 6 lighter, and 6/4 unsettled because of the 4th above the bass.',
+    ]),
+    tips: {
+      '5/3': 'Root in the bass. Solid and complete.',
+      6: '3rd in the bass. Lighter; good for stepwise bass lines.',
+      '6/4': '5th in the bass. Unsettled; the 4th above the bass wants to move.',
+      7: 'Sol in the bass. The strongest pull to I.',
+      '6/5': 'Ti in the bass; it rises to do.',
+      '4/3': 'Re in the bass; it steps to do or mi.',
+      '4/2': 'Fa in the bass; it falls to mi, so I6 follows.',
+    },
+    why: 'Figured bass numbers are the intervals above the bass, so hearing the bass is hearing the figure.',
   },
   sevenths: {
     title: 'Seventh chords',
@@ -2209,6 +2360,20 @@ const EXERCISES = {
       all: { label: 'All five', items: ['Mm7', 'MM7', 'mm7', 'ø7', '°7'] },
     },
     label: (id) => ({ Mm7: 'Dominant 7 (Mm7)', MM7: 'Major 7 (MM7)', mm7: 'Minor 7 (mm7)', 'ø7': 'Half-dim. (ø7)', '°7': 'Fully dim. (°7)' }[id]),
+    hears: () => 'One seventh chord in root position, played together and then one note at a time. The root changes every question.',
+    how: () => [
+      'Hear the bottom three notes as a triad: major, minor or diminished?',
+      'Then the top note: a whole step under the octave (minor 7th, soft) or a half step under it (major 7th, a sharp rub)?',
+      'Put the two together, using the answers below.',
+    ],
+    tips: {
+      Mm7: 'Major triad + minor 7th. Bluesy and pulling: V7.',
+      MM7: 'Major triad + major 7th. Soft and dreamy: Imaj7, IVmaj7.',
+      mm7: 'Minor triad + minor 7th. Mellow: ii7, vi7.',
+      'ø7': 'Diminished triad + minor 7th. Dark: viiø7 in major.',
+      '°7': 'Diminished triad + diminished 7th. Very tense: vii°7 in minor.',
+    },
+    why: 'Each chord in a key has a fixed seventh-chord quality, so the quality tells you the function: in a major key, only V7 sounds dominant.',
   },
   cadences: {
     title: 'Cadences',
@@ -2218,6 +2383,19 @@ const EXERCISES = {
       full: { label: '+ deceptive', items: ['PAC', 'IAC', 'HC', 'DC'] },
     },
     label: (id) => ({ PAC: 'PAC', IAC: 'IAC', HC: 'Half', DC: 'Deceptive' }[id]),
+    hears: ({ items }) => `A short four-part phrase in a random major key: I – ii6 – V, then it stops on V or moves on to ${items.includes('DC') ? 'I or vi' : 'I'}. Sometimes V has a 7th, or a cadential 6/4 comes before it.`,
+    how: ({ items }) => [
+      'Does it sound finished? Stopping on V sounds open, like a comma: half cadence.',
+      ...(items.includes('DC') ? ['Did V move to a darker chord than home? That is vi: deceptive.'] : []),
+      'Landed home? Sing the last top note, then sing do. The same note means PAC; ending on mi means IAC.',
+    ],
+    tips: {
+      PAC: 'V → I, soprano ends on do. A full stop.',
+      IAC: 'V → I, soprano ends on mi. Closed, but softer.',
+      HC: 'Stops on V. A comma; the music has to go on.',
+      DC: 'V → vi instead of I. A surprise, darker turn.',
+    },
+    why: 'Cadences are music’s punctuation: they show where phrases end and which ending to write when you harmonize.',
   },
 };
 
@@ -2244,6 +2422,8 @@ function makeQuestion(exercise, level, { direction = 'up', items = null, stats =
   const choices = ids.map((id) => ({ id, label: ex.label(id) }));
   const events = [];
   let reveal = '';
+  let after = null; // notes to play once answered
+  let reference = null; // { label, events } the player can ask for while answering
 
   if (exercise === 'intervals') {
     const st = Number(answer);
@@ -2252,15 +2432,22 @@ function makeQuestion(exercise, level, { direction = 'up', items = null, stats =
     if (dir === 'up') events.push({ at: 0, notes: [low], dur: 0.9 }, { at: 0.8, notes: [low + st], dur: 1.2 });
     if (dir === 'down') events.push({ at: 0, notes: [low + st], dur: 0.9 }, { at: 0.8, notes: [low], dur: 1.2 });
     if (dir === 'harmonic') events.push({ at: 0, notes: [low, low + st], dur: 1.8 });
-    reveal = `${ivName(st).name}, ${st} semitone${st === 1 ? '' : 's'} (${dir === 'harmonic' ? 'together' : dir}). Tune: ${INTERVAL_SONGS[st]}.`;
+    // The tunes all start with the interval rising.
+    reveal = `${ivName(st).name}, ${st} semitone${st === 1 ? '' : 's'} (${dir === 'harmonic' ? 'together' : dir}). ${dir === 'up' ? 'Tune' : 'Rising, it starts'}: ${INTERVAL_SONGS[st]}.`;
   }
 
   if (exercise === 'degrees') {
-    const shift = Math.floor(rand() * 12) - 5; // keys G♭ … F
+    const shift = Math.floor(rand() * 12) - 5; // all 12 major keys, G up to F♯
     KEY_SETTER.forEach((v, i) => events.push({ at: i * 0.75, notes: midis(v, shift), dur: 0.8 }));
     const deg = Number(answer);
-    events.push({ at: 3 * 0.75 + 1.6, notes: [60 + shift + DEGREE_ST[deg - 1]], dur: 1.6 });
-    reveal = `^${deg} (${DEGREE_SOLFEGE[deg - 1]}) in ${KEY_NAMES[(shift + 12) % 12]} major.`;
+    const tonic = 60 + shift;
+    events.push({ at: 3 * 0.75 + 1.6, notes: [tonic + DEGREE_ST[deg - 1]], dur: 1.6 });
+    // After answering, the note walks home: do to fa fall to do, sol to ti rise to the do above.
+    const path = deg <= 4 ? DEGREE_ST.slice(0, deg).reverse() : [...DEGREE_ST.slice(deg - 1), 12];
+    const names = path.map((st) => DEGREE_SOLFEGE[DEGREE_ST.indexOf(st % 12)]);
+    after = path.map((st, i) => ({ at: 0.2 + i * 0.45, notes: [tonic + st], dur: i === path.length - 1 ? 1.2 : 0.45 }));
+    reference = { label: '♪ do', events: [{ at: 0, notes: [tonic], dur: 1.4 }] };
+    reveal = `^${deg} (${DEGREE_SOLFEGE[deg - 1]}) in ${KEY_NAMES[(shift + 12) % 12]} major.${deg > 1 ? ` Walking home: ${names.join(' – ')}.` : ''}`;
   }
 
   if (exercise === 'triads' || exercise === 'sevenths') {
@@ -2288,10 +2475,11 @@ function makeQuestion(exercise, level, { direction = 'up', items = null, stats =
     const phrase = pick(CADENCE_PHRASES[answer], rand);
     const shift = Math.floor(rand() * 9) - 4;
     phrase.voices.forEach((v, i) => events.push({ at: i * 0.9, notes: midis(v, shift), dur: i === phrase.voices.length - 1 ? 1.8 : 0.95 }));
-    reveal = `${ex.label(answer)}: ${phrase.rns.join(' – ')} in ${KEY_NAMES[(shift + 12) % 12]} major.`;
+    const rns = phrase.rns.map((rn) => (rn === 'I6/4' ? 'cadential 6/4' : rn));
+    reveal = `${ex.label(answer)}: ${rns.join(' – ')} in ${KEY_NAMES[(shift + 12) % 12]} major.`;
   }
 
-  return { exercise, level, answer, choices, events, reveal };
+  return { exercise, level, answer, choices, events, reveal, after, reference };
 }
 
 return { weightedPick, INTERVAL_SONGS, CADENCE_PHRASES, KEY_SETTER_RNS, EXERCISES, allItems, makeQuestion, KEY_SETTER };
@@ -2892,6 +3080,7 @@ function renderDrills() {
           <span class="drill-title">${esc(drillLabel(d))}</span>
           <span class="drill-why">${esc(d.why)}</span>
           <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
+          <button class="text-link" data-learn="${i}">Learn more</button>
         </div>
         <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${tried ? 'Again' : 'Start'}</button>
       </li>`;
@@ -2903,7 +3092,32 @@ function renderDrills() {
 $('#drills').addEventListener('click', (e) => {
   const b = e.target.closest('[data-drill]');
   if (b) startSession(current().id, Number(b.dataset.drill));
+  const learn = e.target.closest('[data-learn]');
+  if (learn) {
+    const d = current().practice[Number(learn.dataset.learn)];
+    openLearn(drillLabel(d), drillConfig(d), d.more);
+  }
 });
+
+/** A drill's question settings, in the shape activeConfig() returns. */
+const drillConfig = (d) => ({ exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' });
+
+/** Learn more: what you hear, how to work it out, the answers and why it matters. Short, in a dialog. */
+function openLearn(title, cfg, more) {
+  const ex = EXERCISES[cfg.exercise];
+  const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
+  const opts = { ...cfg, items };
+  $('#learnTitle').textContent = title;
+  $('#learnBody').innerHTML = `
+    <p>${esc(ex.hears(opts))}</p>
+    <h3 class="learn-h">How to work it out</h3>
+    <ol class="learn-steps">${ex.how(opts).map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+    <h3 class="learn-h">The answers</h3>
+    <dl class="learn-answers">${items.map((id) => `<div><dt>${esc(ex.label(id))}</dt><dd>${esc(ex.tips[id])}</dd></div>`).join('')}</dl>
+    <h3 class="learn-h">Why it matters</h3>
+    <p>${esc(more || ex.why)}</p>`;
+  openDialog('#learnDialog');
+}
 // Tick a drill off by hand, e.g. after practising it away from the app.
 $('#drills').addEventListener('change', (e) => {
   const i = e.target.dataset.drillDone;
@@ -3022,10 +3236,7 @@ const earStat = (ex) => (state.ear[ex] ||= { attempts: 0, correct: 0, items: {},
 
 /** The items and direction the next question uses: the drill's, or the free-practice settings. */
 function activeConfig() {
-  if (session) {
-    const d = session.spec;
-    return { exercise: d.exercise, level: d.level, items: d.items ? d.items.map(String) : null, direction: d.direction || 'up' };
-  }
+  if (session) return drillConfig(session.spec);
   const s = earSettings(earExercise);
   return { exercise: earExercise, level: s.level, items: null, direction: s.direction };
 }
@@ -3051,6 +3262,7 @@ function renderEar() {
   $('#earHint').textContent = ex.hint;
   question = null;
   answered = false;
+  $('#earRef').hidden = true;
   const items = cfg.items || ex.levels[cfg.level || Object.keys(ex.levels)[0]].items.map(String);
   $('#earAnswers').innerHTML = items.map((id, i) => `<button class="tile" data-answer="${id}">${i < 9 ? `<span class="k">${i + 1}</span>` : ''}${esc(ex.label(id))}</button>`).join('');
   setFeedback('', session ? 'Press New for the first question.' : 'Press New, sing it back, then answer.');
@@ -3141,6 +3353,8 @@ function earNew() {
   answered = false;
   document.querySelectorAll('#earAnswers .tile').forEach((b) => b.classList.remove('right', 'wrong'));
   setFeedback('', 'Listen, sing it back, then answer.');
+  $('#earRef').hidden = !question.reference;
+  if (question.reference) $('#earRef').textContent = question.reference.label;
   // Keys stay dark while a question plays, or the keyboard would give the answer away.
   playEvents(question.events, { light: false });
 }
@@ -3149,6 +3363,15 @@ function earReplay() {
   if (!question) { earNew(); return; }
   playEvents(question.events, { light: answered });
 }
+
+$('#earRef').addEventListener('click', () => { if (question?.reference) playEvents(question.reference.events, { light: answered }); });
+$('#earHow').addEventListener('click', () => {
+  const cfg = activeConfig();
+  const ex = EXERCISES[cfg.exercise];
+  const title = session ? drillLabel(session.spec)
+    : `${ex.title}: ${ex.levels[cfg.level].label}${ex.directions ? ` · ${ex.directions[cfg.direction].toLowerCase()}` : ''}`;
+  openLearn(title, cfg, session?.spec.more);
+});
 
 function earAnswer(id) {
   if (!question) { earNew(); return; }
@@ -3165,6 +3388,7 @@ function earAnswer(id) {
   document.querySelector(`#earAnswers [data-answer="${CSS.escape(question.answer)}"]`)?.classList.add('right');
   if (!ok) document.querySelector(`#earAnswers [data-answer="${CSS.escape(id)}"]`)?.classList.add('wrong');
   setFeedback(ok ? 'right' : 'wrong', `${ok ? '✓ Right.' : '✗ Not quite.'} ${question.reveal}`);
+  if (question.after) playEvents(question.after);
   if (session) {
     session.asked += 1;
     if (ok) session.correct += 1;
