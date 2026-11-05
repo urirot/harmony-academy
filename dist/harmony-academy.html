@@ -189,7 +189,8 @@ main {
   padding: 0 var(--s6);
 }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
+.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; scrollbar-width: none; }
+.lesson-pane::-webkit-scrollbar { display: none; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
 .tabs { grid-column: 2; grid-row: 1; display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
 .tab { position: relative; border: none; background: none; padding: 0 2px; font: 600 var(--fs-base)/1 var(--sans); color: var(--muted); cursor: pointer; }
@@ -218,6 +219,7 @@ main {
 .lesson-row-text { display: flex; flex-direction: column; min-width: 0; }
 .lesson-row-title { font-weight: 600; }
 .lesson-row-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.lesson.open { border-bottom: none; }
 .lesson.open .lesson-row { padding-top: var(--s4); cursor: default; }
 .lesson.open .lesson-row:hover .lesson-row-title { color: inherit; }
 .lesson.open .lesson-row-title { font: 600 24px/32px var(--serif); }
@@ -252,7 +254,8 @@ main {
 
 /* The lesson's ear-training plan. */
 .drills { list-style: none; border-top: 1px solid var(--line); }
-.drill { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; column-gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill .check { align-self: start; }
 .drill-text { display: flex; flex-direction: column; min-width: 0; }
 .drill-title { font-weight: 600; }
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
@@ -280,7 +283,14 @@ main {
 .task-links { list-style: none; display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 .task-links .note { color: var(--muted); }
 .task-body .btn { align-self: flex-start; margin-left: calc(-1 * var(--s2)); }
-#nextUp:not(:empty) { margin-top: var(--s5); }
+#nextUp:not(:empty) { margin-top: var(--s6); }
+.next-lesson { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); width: 100%; padding: var(--s3) var(--s4); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.next-lesson:hover { border-color: var(--accent); }
+.next-lesson:hover .next-arrow { transform: translateX(2px); }
+.next-lesson.ready { border-color: var(--accent); background: var(--accent-soft); }
+.next-label { display: block; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.next-title { display: block; font-weight: 600; }
+.next-arrow { color: var(--accent); font-size: var(--fs-lg); transition: transform 0.15s; }
 #journalSaved { margin-top: var(--s1); }
 
 /* ---------------------------------------------------------------- tool pane */
@@ -350,7 +360,8 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   .app-name { font-weight: 400; }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
   .lesson-body { padding-left: 0; }
-  .drill { flex-wrap: wrap; }
+  .drill { grid-template-columns: 28px minmax(0, 1fr); }
+  .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
   .piano { height: 96px; }
 }
 </style>
@@ -2696,12 +2707,15 @@ const statusClass = (l) => {
   return done === lessonTotal(l) ? 'status done' : done > 0 ? 'status partial' : 'status';
 };
 
-/** The current lesson's week: its lessons as rows, with the open one's details under its row. */
+/**
+ * The current lesson's week up to the open lesson, with its details under its
+ * row. Later lessons stay hidden behind the Next lesson button.
+ */
 function renderWeek() {
   const l = current();
   const body = $('#lessonBody');
   $('#lessonPane').appendChild(body); // park it before the list is rebuilt
-  $('#weekLessons').innerHTML = LESSONS.filter((x) => x.week === l.week).map((x) => {
+  $('#weekLessons').innerHTML = LESSONS.filter((x) => x.week === l.week && x.n <= l.n).map((x) => {
     const open = x.id === l.id;
     return `
       <li class="lesson${open ? ' open' : ''}">
@@ -2867,24 +2881,44 @@ function renderDrills() {
   const plan = l.practice || [];
   $('#drills').innerHTML = plan.map((d, i) => {
     const rec = state.drills[drillKey(l.id, i)];
-    const result = rec ? `${rec.passed ? '✓ ' : ''}Best ${rec.best}%` : `Not tried · aim for ${d.target}%`;
+    const tried = rec?.best !== undefined;
+    const aim = `aim for ${d.target}%`;
+    const result = tried ? (rec.passed ? `Best ${rec.best}%` : `Best ${rec.best}% · ${aim}`)
+      : rec?.passed ? 'Marked done' : `Not tried · ${aim}`;
     return `
       <li class="drill${rec?.passed ? ' passed' : ''}">
+        <label class="check"><input type="checkbox" data-drill-done="${i}" ${rec?.passed ? 'checked' : ''} aria-label="Done: ${esc(drillLabel(d))}"><span class="ring"></span></label>
         <div class="drill-text">
           <span class="drill-title">${esc(drillLabel(d))}</span>
           <span class="drill-why">${esc(d.why)}</span>
           <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
         </div>
-        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${rec ? 'Again' : 'Start'}</button>
+        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${tried ? 'Again' : 'Start'}</button>
       </li>`;
   }).join('');
   const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
-  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} passed` : '';
+  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} done` : '';
 }
 
 $('#drills').addEventListener('click', (e) => {
   const b = e.target.closest('[data-drill]');
   if (b) startSession(current().id, Number(b.dataset.drill));
+});
+// Tick a drill off by hand, e.g. after practising it away from the app.
+$('#drills').addEventListener('change', (e) => {
+  const i = e.target.dataset.drillDone;
+  if (i === undefined) return;
+  const l = current();
+  const key = drillKey(l.id, Number(i));
+  state.drills[key] = { ...state.drills[key], passed: e.target.checked, at: Date.now() };
+  if (e.target.checked) {
+    logEvent('drill', `${drillLabel(l.practice[i])}: marked done`);
+    checkLessonComplete(l);
+  }
+  save();
+  renderDrills();
+  renderTasks();
+  renderOpenRow();
 });
 
 // ---------------------------------------------------------------- tasks
@@ -2917,8 +2951,11 @@ function renderTasks() {
   $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
   $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
   const next = LESSONS[LESSONS.indexOf(l) + 1];
-  $('#nextUp').innerHTML = lessonComplete(l) && next
-    ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
+  $('#nextUp').innerHTML = next ? `
+    <button class="next-lesson${lessonComplete(l) ? ' ready' : ''}" data-lesson="${next.id}">
+      <span><span class="next-label">${next.week === l.week ? 'Next lesson' : `Next · week ${next.week}`}</span><span class="next-title">${esc(next.title)}</span></span>
+      <span class="next-arrow" aria-hidden="true">→</span>
+    </button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {

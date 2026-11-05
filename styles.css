@@ -179,7 +179,8 @@ main {
   padding: 0 var(--s6);
 }
 .pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; }
+.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; scrollbar-width: none; }
+.lesson-pane::-webkit-scrollbar { display: none; }
 .tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
 .tabs { grid-column: 2; grid-row: 1; display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
 .tab { position: relative; border: none; background: none; padding: 0 2px; font: 600 var(--fs-base)/1 var(--sans); color: var(--muted); cursor: pointer; }
@@ -208,6 +209,7 @@ main {
 .lesson-row-text { display: flex; flex-direction: column; min-width: 0; }
 .lesson-row-title { font-weight: 600; }
 .lesson-row-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.lesson.open { border-bottom: none; }
 .lesson.open .lesson-row { padding-top: var(--s4); cursor: default; }
 .lesson.open .lesson-row:hover .lesson-row-title { color: inherit; }
 .lesson.open .lesson-row-title { font: 600 24px/32px var(--serif); }
@@ -242,7 +244,8 @@ main {
 
 /* The lesson's ear-training plan. */
 .drills { list-style: none; border-top: 1px solid var(--line); }
-.drill { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; column-gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.drill .check { align-self: start; }
 .drill-text { display: flex; flex-direction: column; min-width: 0; }
 .drill-title { font-weight: 600; }
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
@@ -270,7 +273,14 @@ main {
 .task-links { list-style: none; display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 .task-links .note { color: var(--muted); }
 .task-body .btn { align-self: flex-start; margin-left: calc(-1 * var(--s2)); }
-#nextUp:not(:empty) { margin-top: var(--s5); }
+#nextUp:not(:empty) { margin-top: var(--s6); }
+.next-lesson { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); width: 100%; padding: var(--s3) var(--s4); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.next-lesson:hover { border-color: var(--accent); }
+.next-lesson:hover .next-arrow { transform: translateX(2px); }
+.next-lesson.ready { border-color: var(--accent); background: var(--accent-soft); }
+.next-label { display: block; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
+.next-title { display: block; font-weight: 600; }
+.next-arrow { color: var(--accent); font-size: var(--fs-lg); transition: transform 0.15s; }
 #journalSaved { margin-top: var(--s1); }
 
 /* ---------------------------------------------------------------- tool pane */
@@ -340,6 +350,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
   .app-name { font-weight: 400; }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
   .lesson-body { padding-left: 0; }
-  .drill { flex-wrap: wrap; }
+  .drill { grid-template-columns: 28px minmax(0, 1fr); }
+  .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
   .piano { height: 96px; }
 }

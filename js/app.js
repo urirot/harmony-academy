@@ -336,12 +336,15 @@ const statusClass = (l) => {
   return done === lessonTotal(l) ? 'status done' : done > 0 ? 'status partial' : 'status';
 };
 
-/** The current lesson's week: its lessons as rows, with the open one's details under its row. */
+/**
+ * The current lesson's week up to the open lesson, with its details under its
+ * row. Later lessons stay hidden behind the Next lesson button.
+ */
 function renderWeek() {
   const l = current();
   const body = $('#lessonBody');
   $('#lessonPane').appendChild(body); // park it before the list is rebuilt
-  $('#weekLessons').innerHTML = LESSONS.filter((x) => x.week === l.week).map((x) => {
+  $('#weekLessons').innerHTML = LESSONS.filter((x) => x.week === l.week && x.n <= l.n).map((x) => {
     const open = x.id === l.id;
     return `
       <li class="lesson${open ? ' open' : ''}">
@@ -507,24 +510,44 @@ function renderDrills() {
   const plan = l.practice || [];
   $('#drills').innerHTML = plan.map((d, i) => {
     const rec = state.drills[drillKey(l.id, i)];
-    const result = rec ? `${rec.passed ? '✓ ' : ''}Best ${rec.best}%` : `Not tried · aim for ${d.target}%`;
+    const tried = rec?.best !== undefined;
+    const aim = `aim for ${d.target}%`;
+    const result = tried ? (rec.passed ? `Best ${rec.best}%` : `Best ${rec.best}% · ${aim}`)
+      : rec?.passed ? 'Marked done' : `Not tried · ${aim}`;
     return `
       <li class="drill${rec?.passed ? ' passed' : ''}">
+        <label class="check"><input type="checkbox" data-drill-done="${i}" ${rec?.passed ? 'checked' : ''} aria-label="Done: ${esc(drillLabel(d))}"><span class="ring"></span></label>
         <div class="drill-text">
           <span class="drill-title">${esc(drillLabel(d))}</span>
           <span class="drill-why">${esc(d.why)}</span>
           <span class="drill-meta">${d.count} questions · ${esc(result)}</span>
         </div>
-        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${rec ? 'Again' : 'Start'}</button>
+        <button class="btn${rec?.passed ? '' : ' primary'}" data-drill="${i}">${tried ? 'Again' : 'Start'}</button>
       </li>`;
   }).join('');
   const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
-  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} passed` : '';
+  $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} done` : '';
 }
 
 $('#drills').addEventListener('click', (e) => {
   const b = e.target.closest('[data-drill]');
   if (b) startSession(current().id, Number(b.dataset.drill));
+});
+// Tick a drill off by hand, e.g. after practising it away from the app.
+$('#drills').addEventListener('change', (e) => {
+  const i = e.target.dataset.drillDone;
+  if (i === undefined) return;
+  const l = current();
+  const key = drillKey(l.id, Number(i));
+  state.drills[key] = { ...state.drills[key], passed: e.target.checked, at: Date.now() };
+  if (e.target.checked) {
+    logEvent('drill', `${drillLabel(l.practice[i])}: marked done`);
+    checkLessonComplete(l);
+  }
+  save();
+  renderDrills();
+  renderTasks();
+  renderOpenRow();
 });
 
 // ---------------------------------------------------------------- tasks
@@ -557,8 +580,11 @@ function renderTasks() {
   $('#checklistPct').textContent = `${done} of ${l.tasks.length} · ${minutes} min`;
   $('#progressFill').style.width = `${(100 * done) / l.tasks.length}%`;
   const next = LESSONS[LESSONS.indexOf(l) + 1];
-  $('#nextUp').innerHTML = lessonComplete(l) && next
-    ? `<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>` : '';
+  $('#nextUp').innerHTML = next ? `
+    <button class="next-lesson${lessonComplete(l) ? ' ready' : ''}" data-lesson="${next.id}">
+      <span><span class="next-label">${next.week === l.week ? 'Next lesson' : `Next · week ${next.week}`}</span><span class="next-title">${esc(next.title)}</span></span>
+      <span class="next-arrow" aria-hidden="true">→</span>
+    </button>` : '';
 }
 
 $('#tasks').addEventListener('change', (e) => {
