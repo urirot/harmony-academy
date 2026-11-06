@@ -133,8 +133,8 @@ export const LESSONS = [
     practice: [
       drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm',
         more: 'I and V are both major. The 3rd decides major or minor, which is why it is the note you never leave out of a chord.' }),
-      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads',
-        more: 'An inversion changes only the bass, and the bass shapes the progression: I → V → I sounds smoothest when the bass moves by step.' }),
+      drill('inversions', 'Which chord note is at the bottom: the root, the 3rd or the 5th?', { level: 'triads',
+        more: 'In this lesson’s I → V → I the bass leaps C–G–C. Put V in first inversion and B moves to the bass: C–B–C, one step each way. Same chords, smoother bass line.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh: building triads and inversions', detail: 'M4 “Listening to Triads” and “Building Triads”; M5 “Chord Inversions”.', links: [edinburgh(4, 'Listening to Triads, Building Triads'), edinburgh(5, 'Chord Inversions')] },

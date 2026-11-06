@@ -1033,8 +1033,8 @@ const LESSONS = [
     practice: [
       drill('triads', 'Bright or dark: major or minor, root position.', { level: 'mm',
         more: 'I and V are both major. The 3rd decides major or minor, which is why it is the note you never leave out of a chord.' }),
-      drill('inversions', 'Listen to the lowest note only. Is it the root, the 3rd or the 5th?', { level: 'triads',
-        more: 'An inversion changes only the bass, and the bass shapes the progression: I → V → I sounds smoothest when the bass moves by step.' }),
+      drill('inversions', 'Which chord note is at the bottom: the root, the 3rd or the 5th?', { level: 'triads',
+        more: 'In this lesson’s I → V → I the bass leaps C–G–C. Put V in first inversion and B moves to the bass: C–B–C, one step each way. Same chords, smoother bass line.' }),
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 20, title: 'Edinburgh: building triads and inversions', detail: 'M4 “Listening to Triads” and “Building Triads”; M5 “Chord Inversions”.', links: [edinburgh(4, 'Listening to Triads, Building Triads'), edinburgh(5, 'Chord Inversions')] },
@@ -2322,34 +2322,34 @@ const EXERCISES = {
   },
   inversions: {
     title: 'Inversions',
-    hint: 'Listen only to the lowest note. Sing it, then find whether it is the root, 3rd, 5th or 7th of the chord.',
+    hint: 'After the chord, its notes play one at a time from the bottom up. Find the gap that is not a 3rd: where it sits names the inversion.',
     levels: {
       triads: { label: 'Triads', items: ['5/3', '6', '6/4'] },
       sevenths: { label: 'V7 inversions', items: ['7', '6/5', '4/3', '4/2'] },
     },
     label: (id) => ({ '5/3': 'Root position', 6: '1st inv. (6)', '6/4': '2nd inv. (6/4)', 7: 'Root (7)', '6/5': '6/5', '4/3': '4/3', '4/2': '4/2' }[id]),
     hears: ({ items }) => (items.includes('7')
-      ? 'A dominant 7th chord with the root, 3rd, 5th or 7th in the bass, then the bass note alone.'
-      : 'A major or minor triad with the root, 3rd or 5th in the bass, then the bass note alone.'),
+      ? 'A dominant 7th chord, played together and then one note at a time from the bottom up. Name the chord note at the bottom. In G7 (G–B–D–F, V7 in C major), G is the root, B the 3rd, D the 5th and F the 7th.'
+      : 'A major or minor chord, played together and then one note at a time from the bottom up. Name the chord note at the bottom. In C major (C–E–G), C is the root, E the 3rd and G the 5th, in any order.'),
     how: ({ items }) => (items.includes('7') ? [
-      'Ignore the top of the chord. Sing the lowest note; it plays again on its own.',
-      'Hear the bass as a degree of the key the chord resolves to: sol is root position (7), ti is 6/5, re is 4/3 and fa is 4/2.',
-      'In 4/2 the bass and the note above it are only a step apart (fa and sol), so the bottom of the chord sounds thick.',
+      'You hear four notes and three gaps between them. In root position all three are 3rds. Otherwise one is a 2nd, a single step (do–re) that rubs.',
+      'Where the 2nd sits gives the answer. None: root position, 7 (G B D F). On top: 6/5 (B D F G). In the middle: 4/3 (D F G B). At the bottom: 4/2 (F G B D).',
+      'Or hear the bottom note in the key the chord resolves to: sol is 7, ti is 6/5, re is 4/3 and fa is 4/2.',
     ] : [
-      'Ignore the top of the chord. Sing the lowest note; it plays again on its own.',
-      'Hum up through the chord from the bass. A 3rd then a 3rd is root position, a 3rd then a 4th is 6, a 4th then a 3rd is 6/4.',
-      'Root position sounds grounded, 6 lighter, and 6/4 unsettled because of the 4th above the bass.',
+      'The bottom note comes back on top, so you hear four notes and three gaps: two 3rds (do–mi) and one wider 4th (do–fa, Here Comes the Bride).',
+      'Where the 4th sits gives the answer. On top: root position (C E G C). In the middle: 6 (E G C E). At the bottom: 6/4 (G C E G).',
+      'Check by sound: root position is settled, 6 lighter, and 6/4 hollow and unsettled, because of the 4th right above the bottom note.',
     ]),
     tips: {
-      '5/3': 'Root in the bass. Solid and complete.',
-      6: '3rd in the bass. Lighter; good for stepwise bass lines.',
-      '6/4': '5th in the bass. Unsettled; the 4th above the bass wants to move.',
-      7: 'Sol in the bass. The strongest pull to I.',
-      '6/5': 'Ti in the bass; it rises to do.',
-      '4/3': 'Re in the bass; it steps to do or mi.',
-      '4/2': 'Fa in the bass; it falls to mi, so I6 follows.',
+      '5/3': 'Root at the bottom: C E G C. The 4th is on top. Settled, like an ending.',
+      6: '3rd at the bottom: E G C E. The 4th is in the middle. Lighter. C is a 6th above E, hence 6.',
+      '6/4': '5th at the bottom: G C E G. The 4th is at the bottom. Hollow and unsettled. C and E are a 4th and a 6th above G, hence 6/4.',
+      7: 'Root (sol) at the bottom: G B D F. No 2nd. The strongest pull to I.',
+      '6/5': '3rd (ti) at the bottom: B D F G. The 2nd is on top. Ti rises to do.',
+      '4/3': '5th (re) at the bottom: D F G B. The 2nd is in the middle. Re steps to do or mi.',
+      '4/2': '7th (fa) at the bottom: F G B D. The 2nd is at the bottom, so it sounds thick. Fa falls to mi, so I6 follows.',
     },
-    why: 'Figured bass numbers are the intervals above the bass, so hearing the bass is hearing the figure.',
+    why: 'The figures under a chord (6, 6/4, 6/5…) count up from the bottom note, so naming the bottom note gives you the figure.',
   },
   sevenths: {
     title: 'Seventh chords',
@@ -2403,6 +2403,11 @@ const TRIAD_SHAPES = { major: [0, 4, 7], minor: [0, 3, 7], diminished: [0, 3, 6]
 const INVERSION_SHAPES = {
   '5/3': [0, 4, 7, 12], 6: [4, 7, 12, 16], '6/4': [7, 12, 16, 19],
   7: [0, 4, 7, 10], '6/5': [4, 7, 10, 12], '4/3': [7, 10, 12, 16], '4/2': [10, 12, 16, 19],
+};
+// The one gap in each shape that is not a 3rd.
+const INVERSION_GAP = {
+  '5/3': 'the 4th is on top', 6: 'the 4th is in the middle', '6/4': 'the 4th is at the bottom',
+  7: 'all 3rds, no 2nd', '6/5': 'the 2nd is on top', '4/3': 'the 2nd is in the middle', '4/2': 'the 2nd is at the bottom',
 };
 
 /** Every item an exercise can ask about, across all its levels. */
@@ -2466,8 +2471,8 @@ function makeQuestion(exercise, level, { direction = 'up', items = null, stats =
     const root = 43 + Math.floor(rand() * 8); // G2 … D3, the theoretical root
     const notes = adj.map((s) => root + s);
     events.push({ at: 0, notes, dur: 1.6 });
-    events.push({ at: 1.9, notes: [notes[0]], dur: 1.2 });
-    reveal = `${ex.label(answer)}${isSeventh ? ' of a dominant 7th' : triadMinor ? ' (minor triad)' : ' (major triad)'}. The second note was the bass.`;
+    notes.forEach((n, i) => events.push({ at: 1.9 + i * 0.4, notes: [n], dur: 0.6 }));
+    reveal = `${ex.label(answer)}${isSeventh ? ' of a dominant 7th' : `, ${triadMinor ? 'minor' : 'major'} triad`}: ${INVERSION_GAP[answer]}.`;
   }
 
   if (exercise === 'cadences') {
