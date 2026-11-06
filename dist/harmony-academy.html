@@ -8,7 +8,7 @@
   <title>Harmony Academy</title>
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxZTNhOGEiLz4KICA8ZyBmaWxsPSIjZmJmYWY3Ij4KICAgIDxyZWN0IHg9IjEwIiB5PSIxNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjM2IiByeD0iMiIvPgogICAgPHJlY3QgeD0iMjIiIHk9IjE0IiB3aWR0aD0iMTAiIGhlaWdodD0iMzYiIHJ4PSIyIi8+CiAgICA8cmVjdCB4PSIzNCIgeT0iMTQiIHdpZHRoPSIxMCIgaGVpZ2h0PSIzNiIgcng9IjIiLz4KICAgIDxyZWN0IHg9IjQ2IiB5PSIxNCIgd2lkdGg9IjgiIGhlaWdodD0iMzYiIHJ4PSIyIi8+CiAgPC9nPgogIDxnIGZpbGw9IiNmNTllMGIiPgogICAgPHJlY3QgeD0iMTciIHk9IjE0IiB3aWR0aD0iNyIgaGVpZ2h0PSIyMSIgcng9IjEuNSIvPgogICAgPHJlY3QgeD0iNDEiIHk9IjE0IiB3aWR0aD0iNyIgaGVpZ2h0PSIyMSIgcng9IjEuNSIvPgogIDwvZz4KPC9zdmc+Cg==">
   <style>
-/* Calm two-pane study desk: lesson on the left, one tool on the right.
+/* Calm study desk in one centered column: the lesson, or one tool.
    No cards; hairlines only under the header and tabs, between tasks, under the
    table head and above the dock. One accent. Six type sizes. */
 
@@ -50,6 +50,10 @@
   --shadow: 0 8px 24px rgb(0 0 0 / 0.12);
   --header-h: 56px;
   --tabs-h: 44px;
+  --col: 760px;
+  --gutter: var(--s6);
+  /* Side padding that holds content to a centered column of --col. */
+  --edge: max(var(--gutter), (100% - var(--col)) / 2);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -157,8 +161,8 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .degrees { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* ---------------------------------------------------------------- header */
-.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s6); border-bottom: 1px solid var(--line); background: var(--bg); }
-.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: default; }
+.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--edge); border-bottom: 1px solid var(--line); background: var(--bg); }
+.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: pointer; }
 .timer { gap: var(--s2); padding: 0 var(--s3); }
 .timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .menu-wrap { position: relative; }
@@ -180,26 +184,24 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .sw-sel { background: var(--lit-sel); }
 
 /* ---------------------------------------------------------------- panes */
-/* Lesson and tools share the width equally, edge to edge. */
+/* One pane at a time under the tabs. Panes scroll edge to edge, so the wheel
+   works anywhere, and their padding holds the content to the column. */
 main {
   min-height: 0;
-  display: grid; column-gap: var(--s8);
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: var(--tabs-h) minmax(0, 1fr);
-  padding: 0 var(--s6);
 }
-.pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; scrollbar-width: none; }
-.lesson-pane::-webkit-scrollbar { display: none; }
-.tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
-.tabs { grid-column: 2; grid-row: 1; display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
+.pane { grid-column: 1; grid-row: 2; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--s5) var(--edge) var(--s7); scrollbar-width: none; }
+.pane::-webkit-scrollbar { display: none; }
+main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
+.tabs { grid-column: 1; grid-row: 1; margin: 0 var(--edge); display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
 .tab { position: relative; border: none; background: none; padding: 0 2px; font: 600 var(--fs-base)/1 var(--sans); color: var(--muted); cursor: pointer; }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); }
 .tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
-.tab-lesson { display: none; }
 .panel { display: none; flex-direction: column; gap: var(--s4); }
-.panel.active { display: flex; }
+.panel.active, .panel.inline { display: flex; }
 
 /* ---------------------------------------------------------------- lesson pane */
 .stepper { display: inline-flex; align-items: center; gap: var(--s1); }
@@ -255,12 +257,16 @@ main {
 /* The lesson's ear-training plan. */
 .drills { list-style: none; border-top: 1px solid var(--line); }
 .drill { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; column-gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
-.drill .check { align-self: start; }
+.drill > .check { align-self: start; }
+.drill.running > .btn { display: none; }
 .drill-text { display: flex; flex-direction: column; min-width: 0; }
 .drill-title { font-weight: 600; }
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill.passed .drill-meta { color: var(--ok); }
+/* A running drill opens the ear-training panel under its row. */
+.drill > .panel { grid-column: 2 / -1; margin-top: var(--s3); }
+.panel.inline #earHow { display: none; }
 .text-link { align-self: flex-start; border: none; background: none; padding: 0; color: var(--accent); font: inherit; font-size: var(--fs-sm); line-height: var(--lh-sm); cursor: pointer; }
 .text-link:hover { text-decoration: underline; }
 #earHow { font-size: inherit; line-height: inherit; }
@@ -319,7 +325,7 @@ main {
 .session-bar span { display: block; height: 100%; background: var(--accent); transition: width 0.25s; }
 
 /* ---------------------------------------------------------------- dock */
-.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s6) env(safe-area-inset-bottom); }
+.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--edge) env(safe-area-inset-bottom); }
 .dock-bar { height: 36px; display: flex; align-items: center; gap: var(--s2); }
 .dock.closed .piano-wrap { display: none; }
 .piano-wrap { margin-bottom: var(--s2); overflow-x: auto; }
@@ -356,22 +362,15 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .tl-lesson .tl-icon, .tl-lesson .tl-text { color: var(--accent); font-weight: 600; }
 .sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 
-/* ---------------------------------------------------------------- one pane below 1024px */
-@media (max-width: 1023px) {
-  .top, .dock { padding-left: var(--s4); padding-right: var(--s4); }
-  .app-name { cursor: pointer; }
-  main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
-  .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
-  .tab-lesson { display: block; }
-  .lesson-pane, .tool-pane { grid-column: 1; grid-row: 2; padding: var(--s5) 0 var(--s7); }
-  main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
-}
+/* ---------------------------------------------------------------- phones */
 @media (max-width: 640px) {
+  :root { --gutter: var(--s4); }
   .app-name { font-weight: 400; }
+  .tabs { gap: var(--s4); }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
   .lesson-body { padding-left: 0; }
   .drill { grid-template-columns: 28px minmax(0, 1fr); }
-  .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
+  .drill > .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
   .learn-answers div { grid-template-columns: minmax(0, 1fr); }
   .piano { height: 96px; }
 }
@@ -397,7 +396,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 
   <main id="main" data-view="lesson">
     <nav class="tabs" id="tabs" role="tablist">
-      <button class="tab tab-lesson" data-tab="lesson" role="tab">Lesson</button>
+      <button class="tab" data-tab="lesson" role="tab">Lesson</button>
       <button class="tab" data-tab="ear" role="tab">Ear training</button>
       <button class="tab" data-tab="explore" role="tab">Explore</button>
     </nav>
@@ -2666,14 +2665,14 @@ function rnHtml(text) {
 
 // ================================================================ tabs and layout
 
-let phoneView = 'lesson'; // on narrow screens: the lesson, or the current tool
+let view = 'lesson'; // the lesson, or the current tool
 
 function showTab(tab) {
   if (tab === 'lesson') {
-    phoneView = 'lesson';
+    view = 'lesson';
   } else {
     state.tab = tab;
-    phoneView = 'tool';
+    view = 'tool';
     save();
   }
   renderTabs();
@@ -2682,7 +2681,7 @@ function showTab(tab) {
 
 function renderTabs() {
   if (!TOOLS.includes(state.tab)) state.tab = 'ear';
-  const lessonView = narrow.matches && phoneView === 'lesson';
+  const lessonView = view === 'lesson';
   $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
   document.querySelectorAll('#tabs .tab').forEach((b) => {
     const on = b.dataset.tab === 'lesson' ? lessonView : !lessonView && b.dataset.tab === state.tab;
@@ -2690,14 +2689,15 @@ function renderTabs() {
     b.setAttribute('aria-selected', String(on));
   });
   document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
+  placeEar();
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
 }
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
-// On phones the header shows where you are; tapping it goes back to the lesson.
-$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
+// On phones the header shows where you are. Tapping it goes back to the lesson.
+$('#crumb').addEventListener('click', () => showTab('lesson'));
 
 // ================================================================ popovers and dialogs
 
@@ -2800,7 +2800,7 @@ function userNote(midi, vel = 0.22) {
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
 let kbOctave = 4;
 const typing = (e) => /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
-const earVisible = () => state.tab === 'ear' && !(narrow.matches && phoneView === 'lesson');
+const earVisible = () => (view === 'lesson' ? !!session : state.tab === 'ear');
 
 document.addEventListener('keydown', (e) => {
   if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat || document.querySelector('dialog[open]')) return;
@@ -3012,7 +3012,7 @@ function openLesson(id) {
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
   const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
   openTasks = new Set(firstOpen ? [firstOpen.id] : []);
-  phoneView = 'lesson';
+  view = 'lesson';
   renderAll();
   $('#lessonPane').scrollTop = 0;
 }
@@ -3067,14 +3067,16 @@ function drillLabel(d) {
 function renderDrills() {
   const l = current();
   const plan = l.practice || [];
+  $('#toolPane').prepend($('#panel-ear')); // park it before the list is rebuilt
   $('#drills').innerHTML = plan.map((d, i) => {
     const rec = state.drills[drillKey(l.id, i)];
     const tried = rec?.best !== undefined;
     const aim = `aim for ${d.target}%`;
     const result = tried ? (rec.passed ? `Best ${rec.best}%` : `Best ${rec.best}% · ${aim}`)
       : rec?.passed ? 'Marked done' : `Not tried · ${aim}`;
+    const running = session?.lessonId === l.id && session.index === i;
     return `
-      <li class="drill${rec?.passed ? ' passed' : ''}">
+      <li class="drill${rec?.passed ? ' passed' : ''}${running ? ' running' : ''}">
         <label class="check"><input type="checkbox" data-drill-done="${i}" ${rec?.passed ? 'checked' : ''} aria-label="Done: ${esc(drillLabel(d))}"><span class="ring"></span></label>
         <div class="drill-text">
           <span class="drill-title">${esc(drillLabel(d))}</span>
@@ -3087,6 +3089,17 @@ function renderDrills() {
   }).join('');
   const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
   $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} done` : '';
+  placeEar();
+}
+
+/** A lesson drill runs under its row in the lesson; free practice, in the Ear training tab. */
+function placeEar() {
+  const panel = $('#panel-ear');
+  const row = session && view === 'lesson' ? $('#drills .drill.running') : null;
+  if (row) row.appendChild(panel);
+  else if (panel.parentElement !== $('#toolPane')) $('#toolPane').prepend(panel);
+  panel.classList.toggle('inline', !!row);
+  renderSession();
 }
 
 $('#drills').addEventListener('click', (e) => {
@@ -3277,32 +3290,41 @@ function renderSession() {
   const d = session.spec;
   const pct = session.asked ? Math.round((100 * session.correct) / session.asked) : 0;
   const finished = session.asked >= d.count;
-  box.innerHTML = `
+  const end = `<button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>`;
+  const bar = `<div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>`;
+  const score = finished
+    ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
+    : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`;
+  const again = '<button class="btn primary" data-again>Again</button>';
+  // Under its row the drill's name and purpose are already on screen.
+  box.innerHTML = $('#panel-ear').classList.contains('inline') ? `
+    <div class="session-head"><span class="sm">${score}</span>${end}</div>
+    ${bar}
+    ${finished ? `<div class="row">${again}</div>` : ''}` : `
     <div class="session-head">
       <span class="sm muted">Lesson drill · W${l.week} L${l.n}</span>
-      <button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>
+      ${end}
     </div>
     <div class="session-title">${esc(drillLabel(d))}</div>
     <p class="sm muted">${esc(d.why)}</p>
-    <div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>
-    <p class="sm">${finished
-      ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
-      : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`}</p>
-    ${finished ? '<div class="row"><button class="btn primary" data-again>Again</button><button class="btn" data-back>Back to the lesson</button></div>' : ''}`;
+    ${bar}
+    <p class="sm">${score}</p>
+    ${finished ? `<div class="row">${again}<button class="btn" data-back>Back to the lesson</button></div>` : ''}`;
 }
 
 $('#session').addEventListener('click', (e) => {
-  if (e.target.closest('[data-end]')) { endSession(); renderEar(); }
+  if (e.target.closest('[data-end]')) { endSession(); renderDrills(); renderEar(); }
   if (e.target.closest('[data-again]')) startSession(session.lessonId, session.index);
-  if (e.target.closest('[data-back]')) { endSession(); renderEar(); showTab('lesson'); }
+  if (e.target.closest('[data-back]')) { endSession(); renderDrills(); renderEar(); showTab('lesson'); }
 });
 
 function startSession(lessonId, index) {
   const spec = lessonById(lessonId).practice[index];
   session = { lessonId, index, spec, asked: 0, correct: 0 };
   earExercise = spec.exercise;
-  showTab('ear');
+  renderDrills();
   renderEar();
+  $('#panel-ear').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 function endSession() {

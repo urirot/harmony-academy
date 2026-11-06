@@ -1,4 +1,4 @@
-/* Calm two-pane study desk: lesson on the left, one tool on the right.
+/* Calm study desk in one centered column: the lesson, or one tool.
    No cards; hairlines only under the header and tabs, between tasks, under the
    table head and above the dock. One accent. Six type sizes. */
 
@@ -40,6 +40,10 @@
   --shadow: 0 8px 24px rgb(0 0 0 / 0.12);
   --header-h: 56px;
   --tabs-h: 44px;
+  --col: 760px;
+  --gutter: var(--s6);
+  /* Side padding that holds content to a centered column of --col. */
+  --edge: max(var(--gutter), (100% - var(--col)) / 2);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -147,8 +151,8 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .degrees { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* ---------------------------------------------------------------- header */
-.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s6); border-bottom: 1px solid var(--line); background: var(--bg); }
-.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: default; }
+.top { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--edge); border-bottom: 1px solid var(--line); background: var(--bg); }
+.app-name { border: none; background: none; color: var(--text); font: 600 var(--fs-base)/1 var(--sans); padding: var(--s2) 0; cursor: pointer; }
 .timer { gap: var(--s2); padding: 0 var(--s3); }
 .timer.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .menu-wrap { position: relative; }
@@ -170,26 +174,24 @@ textarea.mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .sw-sel { background: var(--lit-sel); }
 
 /* ---------------------------------------------------------------- panes */
-/* Lesson and tools share the width equally, edge to edge. */
+/* One pane at a time under the tabs. Panes scroll edge to edge, so the wheel
+   works anywhere, and their padding holds the content to the column. */
 main {
   min-height: 0;
-  display: grid; column-gap: var(--s8);
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: var(--tabs-h) minmax(0, 1fr);
-  padding: 0 var(--s6);
 }
-.pane { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-.lesson-pane { grid-column: 1; grid-row: 1 / span 2; padding: var(--s6) var(--s1) var(--s7) 0; scrollbar-width: none; }
-.lesson-pane::-webkit-scrollbar { display: none; }
-.tool-pane { grid-column: 2; grid-row: 2; padding: var(--s6) var(--s1) var(--s7); }
-.tabs { grid-column: 2; grid-row: 1; display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
+.pane { grid-column: 1; grid-row: 2; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--s5) var(--edge) var(--s7); scrollbar-width: none; }
+.pane::-webkit-scrollbar { display: none; }
+main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
+.tabs { grid-column: 1; grid-row: 1; margin: 0 var(--edge); display: flex; gap: var(--s5); border-bottom: 1px solid var(--line); align-self: end; height: var(--tabs-h); }
 .tab { position: relative; border: none; background: none; padding: 0 2px; font: 600 var(--fs-base)/1 var(--sans); color: var(--muted); cursor: pointer; }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); }
 .tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
-.tab-lesson { display: none; }
 .panel { display: none; flex-direction: column; gap: var(--s4); }
-.panel.active { display: flex; }
+.panel.active, .panel.inline { display: flex; }
 
 /* ---------------------------------------------------------------- lesson pane */
 .stepper { display: inline-flex; align-items: center; gap: var(--s1); }
@@ -245,12 +247,16 @@ main {
 /* The lesson's ear-training plan. */
 .drills { list-style: none; border-top: 1px solid var(--line); }
 .drill { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; column-gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
-.drill .check { align-self: start; }
+.drill > .check { align-self: start; }
+.drill.running > .btn { display: none; }
 .drill-text { display: flex; flex-direction: column; min-width: 0; }
 .drill-title { font-weight: 600; }
 .drill-why { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill-meta { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted); }
 .drill.passed .drill-meta { color: var(--ok); }
+/* A running drill opens the ear-training panel under its row. */
+.drill > .panel { grid-column: 2 / -1; margin-top: var(--s3); }
+.panel.inline #earHow { display: none; }
 .text-link { align-self: flex-start; border: none; background: none; padding: 0; color: var(--accent); font: inherit; font-size: var(--fs-sm); line-height: var(--lh-sm); cursor: pointer; }
 .text-link:hover { text-decoration: underline; }
 #earHow { font-size: inherit; line-height: inherit; }
@@ -309,7 +315,7 @@ main {
 .session-bar span { display: block; height: 100%; background: var(--accent); transition: width 0.25s; }
 
 /* ---------------------------------------------------------------- dock */
-.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--s6) env(safe-area-inset-bottom); }
+.dock { border-top: 1px solid var(--line); background: var(--bg); padding: 0 var(--edge) env(safe-area-inset-bottom); }
 .dock-bar { height: 36px; display: flex; align-items: center; gap: var(--s2); }
 .dock.closed .piano-wrap { display: none; }
 .piano-wrap { margin-bottom: var(--s2); overflow-x: auto; }
@@ -346,22 +352,15 @@ dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .tl-lesson .tl-icon, .tl-lesson .tl-text { color: var(--accent); font-weight: 600; }
 .sources { list-style: none; display: flex; flex-direction: column; gap: var(--s3); font-size: var(--fs-sm); line-height: var(--lh-sm); }
 
-/* ---------------------------------------------------------------- one pane below 1024px */
-@media (max-width: 1023px) {
-  .top, .dock { padding-left: var(--s4); padding-right: var(--s4); }
-  .app-name { cursor: pointer; }
-  main { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--tabs-h) minmax(0, 1fr); padding: 0 var(--s4); }
-  .tabs { grid-column: 1; gap: var(--s4); overflow-x: auto; scrollbar-width: none; }
-  .tab-lesson { display: block; }
-  .lesson-pane, .tool-pane { grid-column: 1; grid-row: 2; padding: var(--s5) 0 var(--s7); }
-  main[data-view="lesson"] .tool-pane, main:not([data-view="lesson"]) .lesson-pane { display: none; }
-}
+/* ---------------------------------------------------------------- phones */
 @media (max-width: 640px) {
+  :root { --gutter: var(--s4); }
   .app-name { font-weight: 400; }
+  .tabs { gap: var(--s4); }
   .lesson.open .lesson-row-title { font-size: 21px; line-height: 28px; }
   .lesson-body { padding-left: 0; }
   .drill { grid-template-columns: 28px minmax(0, 1fr); }
-  .drill .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
+  .drill > .btn { grid-column: 2; justify-self: start; margin-top: var(--s2); }
   .learn-answers div { grid-template-columns: minmax(0, 1fr); }
   .piano { height: 96px; }
 }

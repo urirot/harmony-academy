@@ -21,23 +21,23 @@ Safari plays sound but has no Web MIDI.
 
 ## What is in it
 
-The screen is split in half. On the left, the course: one week at a time
-(dropdown, or ‹ › to step through lessons), the start date and whether you are
-on pace, ahead or behind, and the open lesson:
+One centered column with three tabs. **Lesson** is the course: one week at a
+time (dropdown, or ‹ › to step through lessons), the start date and whether you
+are on pace, ahead or behind, and the open lesson:
 
 - **Explanation** in short sections, with **Hear it** buttons that play each
   example (mistakes in red next to their fixes).
 - **Ear training**: one to three drills chosen for the lesson, each 20
-  questions with an 80% target. Passing counts toward finishing the lesson.
+  questions with an 80% target. A drill runs right under its row, and passing
+  counts toward finishing the lesson.
 - **Session**: the outside work, each linked to the matching Open Music Theory
   chapter (with the page in the PDF), worksheet, and Edinburgh or Berklee
   Coursera videos.
 - **Notes** behind the ✎ icon.
 
-On the right: **Ear training** (lesson drills, or free practice in six drills:
-intervals, scale degrees, triads, inversions, seventh chords, cadences; missed
-items come up more often) and **Explore** (chords in any key, a drone with
-scale degrees). The ⋯ menu has the account, practice totals, a **Timeline** of
+The other tabs are **Ear training** (free practice in six drills: intervals,
+scale degrees, triads, inversions, seventh chords, cadences; missed items come
+up more often) and **Explore** (chords in any key, a drone with scale degrees). The ⋯ menu has the account, practice totals, a **Timeline** of
 what you did each day, and the sources.
 
 ## Changing it

@@ -107,14 +107,14 @@ function rnHtml(text) {
 
 // ================================================================ tabs and layout
 
-let phoneView = 'lesson'; // on narrow screens: the lesson, or the current tool
+let view = 'lesson'; // the lesson, or the current tool
 
 function showTab(tab) {
   if (tab === 'lesson') {
-    phoneView = 'lesson';
+    view = 'lesson';
   } else {
     state.tab = tab;
-    phoneView = 'tool';
+    view = 'tool';
     save();
   }
   renderTabs();
@@ -123,7 +123,7 @@ function showTab(tab) {
 
 function renderTabs() {
   if (!TOOLS.includes(state.tab)) state.tab = 'ear';
-  const lessonView = narrow.matches && phoneView === 'lesson';
+  const lessonView = view === 'lesson';
   $('#main').dataset.view = lessonView ? 'lesson' : state.tab;
   document.querySelectorAll('#tabs .tab').forEach((b) => {
     const on = b.dataset.tab === 'lesson' ? lessonView : !lessonView && b.dataset.tab === state.tab;
@@ -131,14 +131,15 @@ function renderTabs() {
     b.setAttribute('aria-selected', String(on));
   });
   document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === state.tab));
+  placeEar();
   const l = current();
   $('#crumb').textContent = narrow.matches ? `Week ${l.week} · Lesson ${l.n}` : 'Harmony Academy';
 }
 
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 narrow.addEventListener('change', renderTabs);
-// On phones the header shows where you are; tapping it goes back to the lesson.
-$('#crumb').addEventListener('click', () => { if (narrow.matches) showTab('lesson'); });
+// On phones the header shows where you are. Tapping it goes back to the lesson.
+$('#crumb').addEventListener('click', () => showTab('lesson'));
 
 // ================================================================ popovers and dialogs
 
@@ -241,7 +242,7 @@ function userNote(midi, vel = 0.22) {
 const KEYMAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12, o: 13, l: 14, p: 15, ';': 16 };
 let kbOctave = 4;
 const typing = (e) => /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
-const earVisible = () => state.tab === 'ear' && !(narrow.matches && phoneView === 'lesson');
+const earVisible = () => (view === 'lesson' ? !!session : state.tab === 'ear');
 
 document.addEventListener('keydown', (e) => {
   if (typing(e) || e.metaKey || e.ctrlKey || e.altKey || e.repeat || document.querySelector('dialog[open]')) return;
@@ -453,7 +454,7 @@ function openLesson(id) {
   exKey = l.explorerKey ? keyValue(l.explorerKey) : 'C-major';
   const firstOpen = l.tasks.find((t) => !lessonRec(l.id).tasks[t.id]);
   openTasks = new Set(firstOpen ? [firstOpen.id] : []);
-  phoneView = 'lesson';
+  view = 'lesson';
   renderAll();
   $('#lessonPane').scrollTop = 0;
 }
@@ -508,14 +509,16 @@ function drillLabel(d) {
 function renderDrills() {
   const l = current();
   const plan = l.practice || [];
+  $('#toolPane').prepend($('#panel-ear')); // park it before the list is rebuilt
   $('#drills').innerHTML = plan.map((d, i) => {
     const rec = state.drills[drillKey(l.id, i)];
     const tried = rec?.best !== undefined;
     const aim = `aim for ${d.target}%`;
     const result = tried ? (rec.passed ? `Best ${rec.best}%` : `Best ${rec.best}% · ${aim}`)
       : rec?.passed ? 'Marked done' : `Not tried · ${aim}`;
+    const running = session?.lessonId === l.id && session.index === i;
     return `
-      <li class="drill${rec?.passed ? ' passed' : ''}">
+      <li class="drill${rec?.passed ? ' passed' : ''}${running ? ' running' : ''}">
         <label class="check"><input type="checkbox" data-drill-done="${i}" ${rec?.passed ? 'checked' : ''} aria-label="Done: ${esc(drillLabel(d))}"><span class="ring"></span></label>
         <div class="drill-text">
           <span class="drill-title">${esc(drillLabel(d))}</span>
@@ -528,6 +531,17 @@ function renderDrills() {
   }).join('');
   const passed = plan.filter((_, i) => drillPassed(l.id, i)).length;
   $('#practicePct').textContent = plan.length ? `${passed} of ${plan.length} done` : '';
+  placeEar();
+}
+
+/** A lesson drill runs under its row in the lesson; free practice, in the Ear training tab. */
+function placeEar() {
+  const panel = $('#panel-ear');
+  const row = session && view === 'lesson' ? $('#drills .drill.running') : null;
+  if (row) row.appendChild(panel);
+  else if (panel.parentElement !== $('#toolPane')) $('#toolPane').prepend(panel);
+  panel.classList.toggle('inline', !!row);
+  renderSession();
 }
 
 $('#drills').addEventListener('click', (e) => {
@@ -718,32 +732,41 @@ function renderSession() {
   const d = session.spec;
   const pct = session.asked ? Math.round((100 * session.correct) / session.asked) : 0;
   const finished = session.asked >= d.count;
-  box.innerHTML = `
+  const end = `<button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>`;
+  const bar = `<div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>`;
+  const score = finished
+    ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
+    : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`;
+  const again = '<button class="btn primary" data-again>Again</button>';
+  // Under its row the drill's name and purpose are already on screen.
+  box.innerHTML = $('#panel-ear').classList.contains('inline') ? `
+    <div class="session-head"><span class="sm">${score}</span>${end}</div>
+    ${bar}
+    ${finished ? `<div class="row">${again}</div>` : ''}` : `
     <div class="session-head">
       <span class="sm muted">Lesson drill · W${l.week} L${l.n}</span>
-      <button class="btn quiet sm" data-end>${finished ? 'Close' : 'End drill'}</button>
+      ${end}
     </div>
     <div class="session-title">${esc(drillLabel(d))}</div>
     <p class="sm muted">${esc(d.why)}</p>
-    <div class="session-bar"><span style="width:${(100 * session.asked) / d.count}%"></span></div>
-    <p class="sm">${finished
-      ? `<strong class="${pct >= d.target ? 'ok' : 'bad'}">${session.correct} of ${d.count} · ${pct}% ${pct >= d.target ? '✓ target met' : `· target ${d.target}%`}</strong>`
-      : `Question ${Math.min(session.asked + 1, d.count)} of ${d.count} · ${session.correct} right`}</p>
-    ${finished ? '<div class="row"><button class="btn primary" data-again>Again</button><button class="btn" data-back>Back to the lesson</button></div>' : ''}`;
+    ${bar}
+    <p class="sm">${score}</p>
+    ${finished ? `<div class="row">${again}<button class="btn" data-back>Back to the lesson</button></div>` : ''}`;
 }
 
 $('#session').addEventListener('click', (e) => {
-  if (e.target.closest('[data-end]')) { endSession(); renderEar(); }
+  if (e.target.closest('[data-end]')) { endSession(); renderDrills(); renderEar(); }
   if (e.target.closest('[data-again]')) startSession(session.lessonId, session.index);
-  if (e.target.closest('[data-back]')) { endSession(); renderEar(); showTab('lesson'); }
+  if (e.target.closest('[data-back]')) { endSession(); renderDrills(); renderEar(); showTab('lesson'); }
 });
 
 function startSession(lessonId, index) {
   const spec = lessonById(lessonId).practice[index];
   session = { lessonId, index, spec, asked: 0, correct: 0 };
   earExercise = spec.exercise;
-  showTab('ear');
+  renderDrills();
   renderEar();
+  $('#panel-ear').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 function endSession() {
