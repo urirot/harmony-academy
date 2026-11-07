@@ -914,6 +914,11 @@ __m.curriculum = (() => {
 //   Musicianship" on Coursera. Video titles come from each course's public
 //   syllabus. Links open the module page; lecture deep links need a login.
 //   Coursera now gives a free preview of module 1 only.
+// - J. Anthony Allen's "Music Theory Comprehensive" Parts 7–9 (one paid Udemy
+//   course) for videos from week 3 on. Session and video titles come from the
+//   same course's public lists on Kadenze ("Music Theory Level 2", Parts Seven
+//   and Eight); Udemy's section names may differ a little. Where a video covers
+//   a topic, the OMT chapter stays as an optional link.
 //
 // Every progression below is checked by test/theory.test.js: clean ones must
 // produce no voice-leading issues, and "find the error" ones must contain the
@@ -938,6 +943,10 @@ const berklee = (module, videos) => ({
   url: `https://www.coursera.org/learn/develop-your-musicianship/home/module/${module}`,
   note: 'Coursera',
 });
+const ALLEN_URL = 'https://www.udemy.com/course/music-theory-comprehensive-combined-part-7-8-9/';
+const allen = (part, session) => ({ label: `Allen Part ${part}: ${session}`, url: ALLEN_URL, note: 'Udemy' });
+// A reading kept beside a video, for when you want it in writing.
+const optional = (link) => ({ ...link, note: `optional · ${link.note}` });
 
 // "Hear it" examples. A string is a progression id from this file; the
 // helpers make short note or chord sequences.
@@ -952,6 +961,7 @@ const SOURCES = [
   { name: 'Open Music Theory, v2', url: `${OMT_BASE}/`, note: 'Free. The PDF in your Downloads matches the page numbers cited here.' },
   { name: 'Edinburgh: Fundamentals of Music Theory', url: 'https://www.coursera.org/learn/edinburgh-music-theory', note: 'Coursera. Free preview covers module 1 only; modules 4–6 are the harmony part.' },
   { name: 'Berklee: Developing Your Musicianship', url: 'https://www.coursera.org/learn/develop-your-musicianship', note: 'Coursera. Interval ear training in the order M2/M3 → P4/P5 → M6/M7.' },
+  { name: 'J. Anthony Allen: Music Theory Comprehensive, Parts 7–9', url: ALLEN_URL, note: 'Udemy, paid, about 9.5 hours of video. Part 7 is V7, figured bass, predominants and harmonizing; Part 8 the 6/4 chords and tonic expansions. Part 9 is not used yet. The same videos are on Kadenze as Music Theory Level 2, Parts Seven and Eight.' },
 ];
 
 // SATB voicings are written soprano, alto, tenor, bass.
@@ -1417,7 +1427,7 @@ const LESSONS = [
         more: 'In an authentic cadence with V7, ti rises to do and fa falls to mi at the same moment. A half cadence stops on V and resolves nothing.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Strengthening Endings with V7', detail: 'The default resolution, then the alternatives.', links: [omt('Strengthening Endings with V7', 410, 'strengthening-endings-with-v7')] },
+      { id: 'allen', kind: 'watch', minutes: 20, title: 'Allen: resolving V7', detail: 'Part 7, “Inversions of V7 and Resolutions”: Chordal 7th, Root Position V7 Resolutions, Exception and Doubling Problems.', links: [allen(7, 'Inversions of V7 and Resolutions'), optional(omt('Strengthening Endings with V7', 410, 'strengthening-endings-with-v7'))] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'V7 worksheet', detail: 'Write and resolve V7 chords. Play every answer and listen for the 7th falling.', links: [worksheet('Strengthening Endings with V7', '2021/07/WK-Strengthening-Endings-with-V7.pdf')] },
       { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: both V7 resolutions', detail: 'Play the complete and the incomplete version in C, then in G and F.' },
     ],
@@ -1481,7 +1491,7 @@ const LESSONS = [
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 10, title: 'Edinburgh: Chord Inversions, Chord Names', detail: 'M5. Rewatch Chord Inversions now that you know seventh chords.', links: [edinburgh(5, 'Chord Inversions, Chord Names')] },
-      { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Inversion and Figured Bass (seventh chords)', detail: 'Seventh Chord Inversion and Figures; Other Figured Bass Symbols.', links: [omt('Inversion and Figured Bass', 201, 'figured-bass')] },
+      { id: 'allen', kind: 'watch', minutes: 35, title: 'Allen: inverted V7 and figured bass', detail: 'Part 7: all of “Inversion Names”, Resolving Inversion of V7 from “Inversions of V7 and Resolutions”, and “Figured Bass” through Realizing Figured Bass. The Bach videos after it are optional.', links: [allen(7, 'Inversion Names; Figured Bass'), optional(omt('Inversion and Figured Bass', 201, 'figured-bass'))] },
       { id: 'sheet', kind: 'write', minutes: 15, title: 'Seventh chord inversions worksheet', links: [worksheet('Inversion and Figured Bass 2', '2021/10/WK-Inversion-and-Figured-Bass-2.pdf')] },
     ],
     progressions: [
@@ -1533,7 +1543,7 @@ const LESSONS = [
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh and Berklee: primary chords and I–IV–V', detail: 'Edinburgh M1 “Primary Chords”, M5 “Common Chord Progressions”; Berklee M2 “I IV V Chord Progression”.', links: [edinburgh(5, 'Common Chord Progressions'), berklee(2, 'I IV V Chord Progression')] },
-      { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Strong Predominants', links: [omt('Strengthening Endings with Strong Predominants', 415, 'strong-predominants')] },
+      { id: 'allen', kind: 'watch', minutes: 25, title: 'Allen: ii and IV as predominants', detail: 'Part 7, “T-D-T Becomes T-PD-D-T”: PreDominant, Using ii and IV as Predominant, Moving From Root Position IV to V, Doubling in Diminished Chords and Predominant 7th Chords.', links: [allen(7, 'T-D-T Becomes T-PD-D-T'), optional(omt('Strengthening Endings with Strong Predominants', 415, 'strong-predominants'))] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Strong predominants worksheet', detail: 'Part writing from Roman numerals and figures. Play every answer.', links: [worksheet('Strengthening Endings with Strong Predominants', '2021/07/WK-Strengthening-Endings-with-Strong-Predominants.pdf')] },
     ],
     progressions: [
@@ -1591,7 +1601,7 @@ const LESSONS = [
         more: 'Melody notes suggest functions: do, mi and sol the tonic, fa and la the predominant, ti and re the dominant.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Performing Harmonic Analysis Using the Phrase Model', links: [omt('Performing Harmonic Analysis Using the Phrase Model', 436, 'performing-harmonic-analysis-using-the-phrase-model')] },
+      { id: 'allen', kind: 'watch', minutes: 15, title: 'Allen: the phrase model', detail: 'Part 7, “T-D-T Becomes T-PD-D-T”: Back To Phrasing, then the major and minor key examples.', links: [allen(7, 'T-D-T Becomes T-PD-D-T'), optional(omt('Performing Harmonic Analysis Using the Phrase Model', 436, 'performing-harmonic-analysis-using-the-phrase-model'))] },
       { id: 'analyze', kind: 'write', minutes: 30, title: 'Analyze the Bach Prelude in C (BWV 846)', detail: 'Edinburgh M6 reading. Roman numerals for mm. 1–11, then mark T/PD/D. Play each bar as a block chord.', links: [edinburgh(6, 'Harmonic Analysis: Bach Prelude in C Major')] },
     ],
     progressions: [
@@ -1643,7 +1653,7 @@ const LESSONS = [
         more: 'The cadential 6/4 delays V: over the same bass, do and mi lean down to ti and re. It does not change the answer; where V goes does.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 20, title: 'OMT: Strengthening Endings with Cadential 6/4', links: [omt('Strengthening Endings with Cadential 6/4', 426, 'cadential-64')] },
+      { id: 'allen', kind: 'watch', minutes: 25, title: 'Allen: the cadential 6/4', detail: 'Part 8, “The Cadential 6/4 Chord”, all five videos.', links: [allen(8, 'The Cadential 6/4 Chord'), optional(omt('Strengthening Endings with Cadential 6/4', 426, 'cadential-64'))] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Cadential 6/4 worksheet', detail: 'Includes unfigured bass exercises.', links: [worksheet('Strengthening Endings with Cadential 6/4', '2021/07/WK-Strengthening-Endings-with-Cadential-64.pdf')] },
       { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: I – IV – V6/4–5/3 – I', detail: 'In C, G and D. The upper voices step down 6–5 and 4–3 over a held bass.' },
     ],
@@ -1752,7 +1762,7 @@ const LESSONS = [
         more: 'Prolonging the tonic is mostly a bass-line idea. Hear the degrees in the bass and you can name the chords.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 25, title: 'OMT: Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', links: [omt('Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', 431, 'inverted-v7s')] },
+      { id: 'allen', kind: 'watch', minutes: 15, title: 'Allen: V7 as a tonic expansion', detail: 'Part 8, “Other Expansions of the Tonic Area”: The V7 As Tonic Expansion, Other V7 Expansions and The Double Neighbor V7 Expansion.', links: [allen(8, 'Other Expansions of the Tonic Area'), optional(omt('Prolonging Tonic at Phrase Beginnings with V6 and Inverted V7s', 431, 'inverted-v7s'))] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'Tonic prolongation worksheet', links: [worksheet('Prolonging Tonic at Phrase Beginnings Using V6 and Inverted V7', '2021/07/WK-Prolonging-Tonic-at-Phrase-Beginnings-Using-V6-and-Inverted-V7.pdf')] },
       { id: 'play', kind: 'play', minutes: 10, title: 'Keyboard: the three bass patterns', detail: 'do–ti–do, do–re–mi, sol–fa–mi. Say the bass solfège aloud as you play.' },
     ],
@@ -1814,7 +1824,8 @@ const LESSONS = [
         more: 'Cadential, passing, pedal and arpeggiated 6/4s all have the 5th in the bass. Hearing that a chord is a 6/4 always comes first.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 25, title: 'OMT: the leading-tone chord; 6/4 chords as prolongation', links: [omt('Prolongation at Phrase Beginnings using the Leading-Tone Chord', 439), omt('6/4 Chords as Forms of Prolongation', 443)] },
+      { id: 'read', kind: 'read', minutes: 15, title: 'OMT: the leading-tone chord', links: [omt('Prolongation at Phrase Beginnings using the Leading-Tone Chord', 439)] },
+      { id: 'allen', kind: 'watch', minutes: 40, title: 'Allen: neighbor, arpeggiating and passing 6/4s', detail: 'Part 8: “Neighboring or Pedal 6/4 Chords”, “Arpeggiating 6/4 Chords” and “The Passing 6/4 Chord”.', links: [allen(8, 'Neighboring, Arpeggiating and Passing 6/4 Chords'), optional(omt('6/4 Chords as Forms of Prolongation', 443))] },
       { id: 'sheet', kind: 'write', minutes: 20, title: 'Leading-tone chord worksheet', links: [worksheet('Prolongation Using the Leading-Tone Chord', '2021/07/WK-Prolongation-at-Phrase-Endings-Using-the-Leading-Tone-Chord.pdf')] },
     ],
     progressions: [
@@ -1880,7 +1891,7 @@ const LESSONS = [
         more: 'I and vi share do and mi, so they sound close. Quality is the difference, and the difference between an authentic and a deceptive ending.' }),
     ],
     tasks: [
-      { id: 'read', kind: 'read', minutes: 20, title: 'OMT: La (Scale Degree 6) in the Bass', links: [omt('La (Scale Degree 6) in the Bass at Beginnings, Middles, and Endings', 451)] },
+      { id: 'allen', kind: 'watch', minutes: 10, title: 'Allen: submediant expansions', detail: 'Part 8, “Other Expansions of the Tonic Area”: Sub Mediant Expansions. The OMT chapter adds deceptive motion at endings.', links: [allen(8, 'Other Expansions of the Tonic Area'), optional(omt('La (Scale Degree 6) in the Bass at Beginnings, Middles, and Endings', 451))] },
       { id: 'sheet', kind: 'write', minutes: 25, title: 'La in the bass worksheet', links: [worksheet('La in the bass', '2021/07/WK-La-in-the-bass.pdf')] },
     ],
     progressions: [
@@ -1932,6 +1943,7 @@ const LESSONS = [
     ],
     tasks: [
       { id: 'watch', kind: 'watch', minutes: 15, title: 'Edinburgh: Harmonising a Melody', detail: 'M4, the longest video in the course (12:53).', links: [edinburgh(4, 'Harmonising a Melody')] },
+      { id: 'allen', kind: 'watch', minutes: 30, title: 'Allen: harmonizing a chorale melody', detail: 'Part 7, “Harmonizing Chorale Melodies”: the method and the first example, through Complete Inner Voices. The Mary Had a Little Lamb run-through is optional.', links: [allen(7, 'Harmonizing Chorale Melodies')] },
       { id: 'write', kind: 'write', minutes: 35, title: 'Harmonize do–re–mi–fa–mi–re–do', detail: 'Soprano C5 D5 E5 F5 E5 D5 C5 in C major, one chord per note, ending with a PAC. Write it on paper and play it, then compare with “one possible answer” above. Then try A minor (A–B–C–D–C–B–A).' },
     ],
     progressions: [

@@ -31,8 +31,9 @@ are on pace, ahead or behind, and the open lesson:
   questions with an 80% target. A drill runs right under its row, and passing
   counts toward finishing the lesson.
 - **Session**: the outside work, each linked to the matching Open Music Theory
-  chapter (with the page in the PDF), worksheet, and Edinburgh or Berklee
-  Coursera videos.
+  chapter (with the page in the PDF), worksheet and videos: Edinburgh and
+  Berklee on Coursera, then from week 3 J. Anthony Allen's harmony course on
+  Udemy (paid), which replaces most of the reading.
 - **Notes** behind the ✎ icon.
 
 The other tabs are **Ear training** (free practice in six drills: intervals,
